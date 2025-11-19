@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Pengaturan - PonPay{% endblock %}
+{% block page_title %}Pengaturan{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Profil User -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title"><i class="fas fa-user"></i> Profil User</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if user.profile_picture %}
+                            <img src="{{ url_for('static', filename=user.profile_picture) }}?t={{ session.get('profile_picture_timestamp', 0) }}" alt="Profile" class="profile-picture-preview" id="profile-preview">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user['full_name'] }}&background=6366F1&color=fff&size=120" alt="Profile" class="profile-picture-preview" id="profile-preview">
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" action="{{ url_for('settings.update_profile') }}" enctype="multipart/form-data">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" name="full_name" value="{{ user['full_name'] or '' }}" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ user['email'] or '' }}">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Foto Profil (opsional)</label>
+                            <input type="file" class="form-control" name="profile_picture" accept="image/*" onchange="previewImage(this)">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ user['username'] }}" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Lama (opsional)</label>
+                            <input type="password" class="form-control" name="current_password" placeholder="Masukkan password lama untuk mengubah password">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Baru (opsional)</label>
+                            <input type="password" class="form-control" name="new_password" placeholder="Masukkan password baru">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Konfirmasi Password Baru</label>
+                            <input type="password" class="form-control" name="confirm_password" placeholder="Konfirmasi password baru">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control" value="{{ user['role']|upper }}" disabled>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengaturan Sistem -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title"><i class="fas fa-cog"></i> Pengaturan Sistem</h6>
+                </div>
+                <div class="card-body">
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted">Nama Pondok</label>
+                        <p class="form-control-plaintext">{{ settings.get('pondok_name', 'Pondok Pesantren Al Huda') }}</p>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted">Mata Uang</label>
+                        <p class="form-control-plaintext">{{ settings.get('system_currency', 'IDR') }} (Rupiah Indonesia)</p>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted">Versi Sistem</label>
+                        <p class="form-control-plaintext">PonPay v1.0</p>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i> Untuk mengubah pengaturan sistem, hubungi administrator
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Bantuan & Dokumentasi -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title"><i class="fas fa-question-circle"></i> Bantuan</h6>
+                </div>
+                <div class="card-body">
+                    <div class="help-item mb-3">
+                        <h6>Bagaimana cara menambah transaksi?</h6>
+                        <p class="text-muted small">Pergi ke menu Transaksi > Tambah Transaksi, lalu isi form dengan data transaksi yang sesuai.</p>
+                    </div>
+                    <div class="help-item mb-3">
+                        <h6>Bagaimana cara melihat statistik?</h6>
+                        <p class="text-muted small">Pergi ke menu Statistik untuk melihat grafik pemasukan dan pengeluaran dengan filter waktu.</p>
+                    </div>
+                    <div class="help-item mb-3">
+                        <h6>Bagaimana cara export data?</h6>
+                        <p class="text-muted small">Gunakan menu <strong>Data Santri &raquo; Export Data</strong> untuk mengunduh data santri dalam format Excel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tentang Aplikasi -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title"><i class="fas fa-info"></i> Tentang PonPay</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        <strong>PonPay</strong> adalah sistem pembayaran dan manajemen keuangan khusus untuk Pondok Pesantren Al Huda.
+                    </p>
+                    <p class="text-muted small">
+                        Aplikasi ini dirancang untuk memudahkan pengelolaan kas pondok, pencatatan transaksi, dan analisis keuangan secara real-time.
+                    </p>
+                    <hr>
+                    <p class="text-muted small mb-0">
+                        <strong>Versi:</strong> 1.0<br>
+                        <strong>Tahun:</strong> 2025<br>
+                        <strong>Dikembangkan untuk:</strong> Pondok Pesantren Al Huda
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium promotion removed -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profile-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

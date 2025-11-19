@@ -1,0 +1,13 @@
+# Lingkungan Virtual (Penting!)
+.venv/
+venv/
+env/
+
+# Python Cache & File Sementara
+__pycache__/
+*.pyc
+*.pyo
+
+# Output dan Log
+artifacts_*
+artifact_*

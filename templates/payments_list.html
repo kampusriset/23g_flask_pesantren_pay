@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Pembayaran Santri{% endblock %}
+{% block page_title %}Pembayaran Santri{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title">Tagihan & Pembayaran</h5>
+            <div>
+                <a href="{{ url_for('payments.create_bill_view') }}" class="btn btn-primary">Buat Tagihan</a>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Santri</th>
+                    <th>Judul</th>
+                    <th>Jumlah</th>
+                    <th>Jatuh Tempo</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bills %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ b.student_name }} ({{ b.student_nisn }})</td>
+                    <td>{{ b.title }}</td>
+                    <td>{{ b.amount|rupiah }}</td>
+                    <td>{{ b.due_date or '-' }}</td>
+                    <td>
+                        {% if b.status == 'paid' %}
+                            <span class="badge bg-success">Lunas</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Belum Bayar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form action="{{ url_for('payments.delete_bill_view', bill_id=b.id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Hapus tagihan ini?');">
+                            <button class="btn btn-sm btn-danger">Hapus</button>
+                        </form>
+                        {% if b.status != 'paid' %}
+                                                <button type="button" class="btn btn-sm btn-success btn-mark-paid" data-bill-id="{{ b.id }}" data-bill-title="{{ b.title }}" data-bill-amount="{{ b.amount }}" style="margin-left:6px;">Tandai Lunas</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">Belum ada tagihan.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Mark Paid -->
+<div class="modal fade" id="markPaidModal" tabindex="-1" aria-labelledby="markPaidModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="markPaidModalLabel">Konfirmasi Tandai Lunas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="markPaidModalText">Apakah Anda yakin ingin menandai tagihan ini sebagai lunas?</p>
+                <form id="markPaidForm" method="post" action="">
+                    <!-- form action will be set dynamically -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" id="markPaidConfirmBtn" class="btn btn-success">Ya, Tandai Lunas</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+        let currentAction = null;
+
+        document.querySelectorAll('.btn-mark-paid').forEach(btn => {
+                btn.addEventListener('click', function() {
+                        const billId = this.dataset.billId;
+                        const title = this.dataset.billTitle;
+                        const amount = this.dataset.billAmount;
+                        const form = document.getElementById('markPaidForm');
+                        form.innerHTML = '';
+                        form.action = `{{ url_for('payments.index_payments') }}`.replace('/payments', `/payments`) + `/mark-paid/${billId}`;
+                        // Add CSRF token here if you use CSRF
+                        document.getElementById('markPaidModalText').textContent = `Tandai tagihan "${title}" ({{ '{' }}{ amount }{{ '}' }}) sebagai lunas?`;
+                        currentAction = form.action;
+                        modal.show();
+                });
+        });
+
+        document.getElementById('markPaidConfirmBtn').addEventListener('click', function() {
+                if (!currentAction) return;
+                // Submit POST via fetch to avoid needing hidden form fields
+                fetch(currentAction, { method: 'POST' })
+                        .then(resp => {
+                                if (resp.redirected) {
+                                        window.location = resp.url;
+                                } else {
+                                        window.location.reload();
+                                }
+                        }).catch(err => {
+                                console.error(err);
+                                showToast('Gagal menandai lunas', 'danger');
+                        });
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Daftar Santri - PonPay{% endblock %}
+
+{% block page_title %}
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title"><i class="fas fa-users"></i> Daftar Santri</h1>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Total Santri</h6>
+                <h3 class="text-primary">{{ students|length }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Santri Aktif</h6>
+                {% set aktif = students|selectattr('status', 'equalto', 'aktif')|list %}
+                <h3 class="text-success">{{ aktif|length }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Belum Bayar Bulan Ini</h6>
+                {% set belum_bayar_count = 0 %}
+                {% for s in students %}
+                    {% if s.month_payment == 0 %}
+                        {% set belum_bayar_count = belum_bayar_count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                <h3 class="text-warning">{{ belum_bayar_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Total Bayar</h6>
+                <h3 class="text-info">{{ (students|map(attribute='total_payment')|sum)|int|rupiah }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons moved here (under statistics) -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card p-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('students.add') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Santri</a>
+                    <a href="{{ url_for('students.import_excel') }}" class="btn btn-info"><i class="fas fa-upload"></i> Import Excel</a>
+                    <a href="{{ url_for('students.export_excel') }}" class="btn btn-success"><i class="fas fa-download"></i> Export Data</a>
+                    <a href="{{ url_for('students.download_report') }}" class="btn btn-warning"><i class="fas fa-file-excel"></i> Laporan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:5%">No.</th>
+                            <th>Nama</th>
+                            <th>NISN</th>
+                            <th>Kelas</th>
+                            <th class="d-none d-md-table-cell">Jenis Kelamin</th>
+                            <th class="d-none d-lg-table-cell">Status</th>
+                            <th class="d-none d-lg-table-cell">Total Pembayaran</th>
+                            <th style="width:18%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if students %}
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <strong>{{ student.name }}</strong><br>
+                                    <small class="text-muted d-md-none">{{ student.kelas }}</small>
+                                </td>
+                                <td><code>{{ student.nisn }}</code></td>
+                                <td><span class="badge bg-light text-primary">{{ student.kelas }}</span></td>
+                                <td class="d-none d-md-table-cell">
+                                    {% if student.jenis_kelamin == 'Perempuan' %}
+                                        <i class="fas fa-venus text-pink"></i> Perempuan
+                                    {% else %}
+                                        <i class="fas fa-mars text-primary"></i> Laki-laki
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-lg-table-cell">
+                                    {% if student.status == 'aktif' %}
+                                        <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Non-Aktif</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-lg-table-cell"><strong>{{ student.total_payment|rupiah }}</strong></td>
+                                <td>
+                                    <a href="{{ url_for('students.detail', student_id=student.id) }}" class="btn btn-sm btn-outline-primary">Lihat</a>
+                                    <a href="{{ url_for('students.edit', student_id=student.id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    <form action="{{ url_for('students.delete', student_id=student.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus santri ini?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Tidak ada santri</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

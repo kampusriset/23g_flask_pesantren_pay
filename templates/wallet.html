@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Dompet Pondok - PonPay{% endblock %}
+{% block page_title %}Dompet Pondok{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Main Wallet Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="balance-card">
+                <div class="balance-header">
+                    <div>
+                        <p class="balance-label">Saldo Kas Pondok Pesantren</p>
+                        <h1 class="balance-amount" style="font-size: 3rem;">{{ balance|rupiah }}</h1>
+                        <small class="text-muted">Pembaruan terakhir: {{ now|format_date }}</small>
+                    </div>
+                    <div class="balance-icon" style="font-size: 80px;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ url_for('transaction.add') }}" class="btn btn-success me-2">
+                        <i class="fas fa-plus"></i> Tambah Transaksi
+                    </a>
+                    <a href="{{ url_for('transaction.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> Lihat Semua Transaksi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet History -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title">Riwayat Transaksi Dompet</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kategori</th>
+                                    <th>Keterangan</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Kredit</th>
+                                    <th class="text-end">Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set running_balance = balance %}
+                                {% for trans in transactions %}
+                                <tr>
+                                    <td>
+                                        <small class="text-muted">{{ trans['date']|format_date }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: {% if trans['type'] == 'income' %}#2E7D32{% else %}#D32F2F{% endif %}; color: white;">
+                                            {{ trans['category'] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ trans['description'] }}</td>
+                                    <td class="text-end">
+                                        {% if trans['type'] == 'expense' %}
+                                            <span style="color: #D32F2F;">{{ trans['amount']|rupiah }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if trans['type'] == 'income' %}
+                                            <span style="color: #2E7D32;">{{ trans['amount']|rupiah }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end font-weight-bold">{{ balance|rupiah }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> Belum ada transaksi
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set current date and time for 'pembaruan terakhir'
+    const now = new Date();
+    // Already handled by template
+</script>
+{% endblock %}

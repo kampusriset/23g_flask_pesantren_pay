@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Santri - {{ student.name }} - PonPay{% endblock %}
+
+{% block page_title %}
+<div>
+    <h1 class="page-title"><i class="fas fa-user-edit"></i> Edit Data Santri</h1>
+    <p class="text-muted">{{ student.name }}</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-form"></i> Form Edit Santri</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('students.edit', student_id=student.id) }}" method="POST" enctype="multipart/form-data">
+                        <!-- Data Pribadi -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-user"></i> Data Pribadi</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-center">
+                                {% if student.photo %}
+                                    <img src="{{ url_for('static', filename=student.photo) }}" alt="Foto Santri" class="img-fluid rounded mb-2" style="max-height:120px;">
+                                {% else %}
+                                    {% if student.jenis_kelamin == 'Perempuan' %}
+                                        <i class="fas fa-user-circle" style="font-size:80px; color:#FF1493;"></i>
+                                    {% else %}
+                                        <i class="fas fa-user-circle" style="font-size:80px; color:#4169E1;"></i>
+                                    {% endif %}
+                                {% endif %}
+                                <div class="mt-2">
+                                    <label class="form-label small">Ganti Foto</label>
+                                    <input type="file" name="photo" accept="image/*" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Lengkap *</label>
+                                <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">NISN *</label>
+                                <input type="text" name="nisn" class="form-control" value="{{ student.nisn }}" required>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kelas *</label>
+                                <select name="kelas" class="form-select" required>
+                                    <option value="Kelas 1" {% if student.kelas == 'Kelas 1' %}selected{% endif %}>Kelas 1</option>
+                                    <option value="Kelas 2" {% if student.kelas == 'Kelas 2' %}selected{% endif %}>Kelas 2</option>
+                                    <option value="Kelas 3" {% if student.kelas == 'Kelas 3' %}selected{% endif %}>Kelas 3</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Jenis Kelamin *</label>
+                                <select name="jenis_kelamin" class="form-select" required>
+                                    <option value="Laki-laki" {% if student.jenis_kelamin == 'Laki-laki' %}selected{% endif %}>Laki-laki</option>
+                                    <option value="Perempuan" {% if student.jenis_kelamin == 'Perempuan' %}selected{% endif %}>Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">No. Telepon</label>
+                                <input type="tel" name="phone" class="form-control" value="{{ student.phone }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea name="alamat" class="form-control" rows="3">{{ student.alamat }}</textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Data Orang Tua -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-family"></i> Data Orang Tua</h6>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Orang Tua *</label>
+                                <input type="text" name="parent_name" class="form-control" value="{{ student.parent_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">No. Telepon Orang Tua *</label>
+                                <input type="tel" name="parent_phone" class="form-control" value="{{ student.parent_phone }}" required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Status -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-cog"></i> Status</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status Santri *</label>
+                            <select name="status" class="form-select" required>
+                                <option value="aktif" {% if student.status == 'aktif' %}selected{% endif %}>Aktif</option>
+                                <option value="non-aktif" {% if student.status == 'non-aktif' %}selected{% endif %}>Non-Aktif</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('students.detail', student_id=student.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update Santri
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="mb-2"><i class="fas fa-calendar"></i> Informasi Sistem</h6>
+                    <ul class="small mb-0">
+                        <li>Dibuat: {{ student.created_at|format_date }}</li>
+                        <li>ID Santri: <code>{{ student.id }}</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

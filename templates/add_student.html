@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Santri - PonPay{% endblock %}
+
+{% block page_title %}
+<div>
+    <h1 class="page-title"><i class="fas fa-user-plus"></i> Tambah Santri Baru</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-form"></i> Form Pendaftaran Santri</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('students.add') }}" method="POST">
+                        <!-- Data Pribadi -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-user"></i> Data Pribadi</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Lengkap *</label>
+                                <input type="text" name="name" class="form-control" placeholder="Nama lengkap santri" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">NISN *</label>
+                                <input type="text" name="nisn" class="form-control" placeholder="Nomor Induk Siswa Nasional" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kelas *</label>
+                                <select name="kelas" class="form-select" required>
+                                    <option value="">-- Pilih Kelas --</option>
+                                    <option value="Kelas 1">Kelas 1</option>
+                                    <option value="Kelas 2">Kelas 2</option>
+                                    <option value="Kelas 3">Kelas 3</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Jenis Kelamin *</label>
+                                <select name="jenis_kelamin" class="form-select" required>
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">No. Telepon</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="08XXXXXXXXX">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea name="alamat" class="form-control" rows="3" placeholder="Alamat lengkap santri"></textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Data Orang Tua -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-family"></i> Data Orang Tua</h6>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Orang Tua *</label>
+                                <input type="text" name="parent_name" class="form-control" placeholder="Nama orang tua" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">No. Telepon Orang Tua *</label>
+                                <input type="tel" name="parent_phone" class="form-control" placeholder="08XXXXXXXXX" required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('students.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Santri
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 bg-light">
+                <div class="card-body">
+                    <h6 class="mb-2"><i class="fas fa-info-circle"></i> Informasi Penting</h6>
+                    <ul class="small mb-0">
+                        <li>Isi semua field yang bertanda (*)</li>
+                        <li>NISN harus unik dan tidak boleh sama dengan santri lain</li>
+                        <li>Format telepon: 08XXXXXXXXX (tanpa spasi atau simbol)</li>
+                        <li>Data santri akan langsung tersimpan di sistem</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

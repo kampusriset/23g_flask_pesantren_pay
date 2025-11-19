@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Tambah Transaksi - PonPay{% endblock %}
+{% block page_title %}Tambah Transaksi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title">Form Tambah Transaksi</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Jenis Transaksi</label>
+                            <select class="form-select" name="type" id="transType" required>
+                                <option value="">Pilih Jenis Transaksi</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Kategori</label>
+                            <select class="form-select" name="category" id="category" required>
+                                <option value="">Pilih Kategori</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Santri <small class="text-muted">(Opsional, jika pembayaran santri)</small></label>
+                            <select class="form-select" name="student_id" id="student_id">
+                                <option value="">-- Tidak ada santri --</option>
+                                {% if students %}
+                                    {% for student in students %}
+                                    <option value="{{ student['id'] }}">{{ student['name'] }} ({{ student['nisn'] }})</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nominal (Rupiah)</label>
+                            <input type="number" class="form-control" name="amount" placeholder="0" min="0" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Keterangan</label>
+                            <textarea class="form-control" name="description" rows="3" placeholder="Masukkan keterangan transaksi"></textarea>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Tanggal</label>
+                            <input type="date" class="form-control" name="date" value="{{ today }}" required>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Simpan Transaksi
+                            </button>
+                            <a href="{{ url_for('transaction.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title">Panduan Kategori</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-success mb-3"><i class="fas fa-arrow-down"></i> Kategori Pemasukan</h6>
+                    <ul class="list-unstyled ms-3">
+                        <li><i class="fas fa-check"></i> Pembayaran Santri</li>
+                        <li><i class="fas fa-check"></i> Donasi</li>
+                        <li><i class="fas fa-check"></i> Subsidi Pemerintah</li>
+                        <li><i class="fas fa-check"></i> Lainnya</li>
+                    </ul>
+
+                    <h6 class="text-danger mb-3 mt-4"><i class="fas fa-arrow-up"></i> Kategori Pengeluaran</h6>
+                    <ul class="list-unstyled ms-3">
+                        <li><i class="fas fa-check"></i> Pembelian Kebutuhan</li>
+                        <li><i class="fas fa-check"></i> Gaji Pengajar</li>
+                        <li><i class="fas fa-check"></i> Perbaikan Bangunan</li>
+                        <li><i class="fas fa-check"></i> Listrik & Air</li>
+                        <li><i class="fas fa-check"></i> Operasional</li>
+                    </ul>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i> Pastikan data yang diisi sudah benar sebelum menyimpan
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const incomeCategories = ['Pembayaran Santri', 'Donasi', 'Subsidi Pemerintah', 'Lainnya'];
+    const expenseCategories = ['Pembelian Kebutuhan', 'Gaji Pengajar', 'Perbaikan Bangunan', 'Listrik & Air', 'Operasional'];
+
+    document.getElementById('transType').addEventListener('change', function() {
+        const categorySelect = document.getElementById('category');
+        categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
+        
+        const categories = this.value === 'income' ? incomeCategories : expenseCategories;
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
+    });
+
+    // Set today's date
+    document.querySelector('input[name="date"]').valueAsDate = new Date();
+</script>
+{% endblock %}

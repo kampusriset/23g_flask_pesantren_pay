@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaksi - PonPay{% endblock %}
+{% block page_title %}Daftar Transaksi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Filter & Add Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label">Jenis Transaksi</label>
+                            <select class="form-select" id="filterType">
+                                <option value="all">Semua</option>
+                                <option value="income" {% if filter_type == 'income' %}selected{% endif %}>Pemasukan</option>
+                                <option value="expense" {% if filter_type == 'expense' %}selected{% endif %}>Pengeluaran</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label">Kategori</label>
+                            <select class="form-select" id="filterCategory">
+                                <option value="all">Semua Kategori</option>
+                                {% for cat in categories_income %}
+                                    <option value="{{ cat }}" {% if filter_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                                {% for cat in categories_expense %}
+                                    <option value="{{ cat }}" {% if filter_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label">Bulan</label>
+                            <input type="month" class="form-control" id="filterMonth" value="{{ filter_month }}">
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <button class="btn btn-primary w-100" id="filterBtn">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Transaction Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ url_for('transaction.add') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> Tambah Transaksi
+            </a>
+        </div>
+    </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">Daftar Transaksi</h6>
+                                    <div>
+                                        <button id="downloadReportBtn" class="btn btn-outline-primary btn-sm me-2">
+                                            <i class="fas fa-file-excel"></i> Unduh Laporan
+                                        </button>
+                                        <a href="{{ url_for('transaction.add') }}" class="btn btn-success btn-sm">
+                                            <i class="fas fa-plus"></i> Tambah
+                                        </a>
+                                    </div>
+                                </div>
+                                    <th>No</th>
+                                    <th>Tanggal</th>
+                                    <th>Kategori</th>
+                                    <th>Keterangan</th>
+                                    <th>Santri</th>
+                                    <th class="text-end">Nominal</th>
+                                    <th>Jenis</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set counter = namespace(value=1) %}
+                                {% for trans in transactions %}
+                                <tr>
+                                    <td>{{ counter.value }}</td>
+                                    <td>
+                                        <small class="text-muted">{{ trans['date']|format_date }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: {% if trans['type'] == 'income' %}#3B82F6{% else %}#EF4444{% endif %}; color: white;">
+                                            {{ trans['category'] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ trans['description'] }}</td>
+                                    <td>
+                                        {% if trans['student_name'] %}
+                                            <small><strong>{{ trans['student_name'] }}</strong></small>
+                                            <br>
+                                            <small class="text-muted">NISN: {{ trans['student_nisn'] }}</small>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end font-weight-bold">
+                                        <span style="color: {% if trans['type'] == 'income' %}#3B82F6{% else %}#EF4444{% endif %};">
+                                            {% if trans['type'] == 'income' %}+{% else %}-{% endif %}{{ trans['amount']|rupiah }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if trans['type'] == 'income' %}
+                                            <i class="fas fa-arrow-down" style="color: #3B82F6;"></i> Masuk
+                                        {% else %}
+                                            <i class="fas fa-arrow-up" style="color: #EF4444;"></i> Keluar
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('transaction.edit', id=trans['id']) }}" class="btn btn-sm btn-info" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('transaction.delete', id=trans['id']) }}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% set counter.value = counter.value + 1 %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> Belum ada transaksi
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('filterBtn').addEventListener('click', function() {
+        const type = document.getElementById('filterType').value;
+        const category = document.getElementById('filterCategory').value;
+        const month = document.getElementById('filterMonth').value;
+        
+        let url = '{{ url_for("transaction.index") }}?';
+        if (type !== 'all') url += 'type=' + type + '&';
+        if (category !== 'all') url += 'category=' + category + '&';
+        if (month) url += 'month=' + month + '&';
+        
+        window.location.href = url;
+    });
+
+    // Build export URL with the same filters
+    const downloadBtn = document.getElementById('downloadReportBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            const type = document.getElementById('filterType').value;
+            const category = document.getElementById('filterCategory').value;
+            const month = document.getElementById('filterMonth').value;
+            let url = '{{ url_for("transaction.export_excel") }}?';
+            if (type !== 'all') url += 'type=' + type + '&';
+            if (category !== 'all') url += 'category=' + category + '&';
+            if (month) url += 'month=' + month + '&';
+            window.location.href = url;
+        });
+    }
+</script>
+{% endblock %}
