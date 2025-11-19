@@ -32,6 +32,6 @@ Pastikan Anda telah menginstal di komputer Anda:
 Buka Terminal (atau Command Prompt/PowerShell) dan *clone* kode dari GitHub:
 
 ```bash
-# Ganti [https://theengravedgifts.com/products/repo-dane-12inch-black](https://theengravedgifts.com/products/repo-dane-12inch-black) dengan alamat GitHub proyek ini
-git clone [https://theengravedgifts.com/products/repo-dane-12inch-black](https://theengravedgifts.com/products/repo-dane-12inch-black)
+
+git clone https://github.com/kampusriset/23g_flask_pesantren_pay.git
 cd PONPAY FLASK
