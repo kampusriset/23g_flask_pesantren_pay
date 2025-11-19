@@ -35,3 +35,81 @@ Buka Terminal (atau Command Prompt/PowerShell) dan *clone* kode dari GitHub:
 
 git clone https://github.com/kampusriset/23g_flask_pesantren_pay.git
 cd PONPAY FLASK
+```
+
+### Langkah 2: Buat Lingkungan Virtual (Virtual Environment)
+
+Membuat lingkungan virtual mencegah konflik library dengan proyek Python lain di komputer Anda.
+
+### Windows:
+
+```bash
+
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+### macOS/Linux::
+
+```bash
+
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Catatan: Setelah diaktifkan, Anda akan melihat (venv) muncul di awal baris Terminal Anda.
+
+
+### Langkah 3: Instalasi Dependensi Proyek
+
+Instal semua library Python yang dibutuhkan yang tercantum dalam file requirements.txt:
+
+
+```bash
+
+pip install -r requirements.txt
+```
+
+### Langkah 4: Inisialisasi Database
+
+Anda perlu menyiapkan file database awal (jika proyek menggunakan SQLite).
+
+
+```bash
+
+# Perintah ini akan menjalankan skrip db.py untuk menyiapkan skema database
+python db.py
+```
+
+
+### Langkah 5: Jalankan Aplikasi Flask
+
+Setelah semua setup selesai, jalankan file utama aplikasi:
+
+
+```bash
+
+python app.py
+```
+
+### Langkah 6: Akses Aplikasi
+
+- Buka browser web Anda (Chrome, Firefox, dll.).
+
+- Akses alamat: http://127.0.0.1:5000/ atau http://localhost:5000/
+
+- Aplikasi PONPAY FLASK Anda sekarang berjalan dan siap digunakan!
+
+  ### 🗺 Struktur Proyek
+
+
+```md
+  PONPAY FLASK/
+├── app.py             # File utama aplikasi Flask
+├── routes.py          # Definisi semua rute dan logika terkait
+├── db.py              # Skrip/konfigurasi database
+├── requirements.txt   # Daftar dependensi Python
+├── .gitignore         # File yang dikecualikan dari Git (Wajib ada!)
+├── templates/         # Semua file HTML (interface)
+└── static/            # File CSS, JavaScript, dan Gambar
+```
