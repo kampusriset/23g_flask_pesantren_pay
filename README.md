@@ -34,7 +34,7 @@ Buka Terminal (atau Command Prompt/PowerShell) dan *clone* kode dari GitHub:
 ```bash
 
 git clone https://github.com/kampusriset/23g_flask_pesantren_pay.git
-cd PONPAY FLASK
+cd 23g_flask_pesantren_pay
 ```
 
 ### Langkah 2: Buat Lingkungan Virtual (Virtual Environment)
