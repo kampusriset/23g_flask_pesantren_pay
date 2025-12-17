@@ -152,20 +152,20 @@ def index():
                COALESCE(s.nisn, '') as student_nisn
         FROM transactions t
         LEFT JOIN students s ON t.student_id = s.id
-        WHERE t.user_id = ?
+        WHERE t.user_id = %s
     '''
     params = [user_id]
     
     if filter_type != 'all':
-        query += 'AND t.type = ? '
+        query += 'AND t.type = %s '
         params.append(filter_type)
     
     if filter_category != 'all':
-        query += 'AND t.category = ? '
+        query += 'AND t.category = %s '
         params.append(filter_category)
     
     if filter_month:
-        query += 'AND t.date LIKE ? '
+        query += 'AND t.date LIKE %s '
         params.append(f'{filter_month}%')
     
     query += 'ORDER BY t.date DESC, t.created_at DESC'
@@ -174,11 +174,11 @@ def index():
     
     # Ambil kategori unik untuk dropdown
     categories_income = query_db(
-        'SELECT DISTINCT category FROM transactions WHERE user_id = ? AND type = "income" ORDER BY category',
+        'SELECT DISTINCT category FROM transactions WHERE user_id = %s AND type = "income" ORDER BY category',
         (user_id,)
     )
     categories_expense = query_db(
-        'SELECT DISTINCT category FROM transactions WHERE user_id = ? AND type = "expense" ORDER BY category',
+        'SELECT DISTINCT category FROM transactions WHERE user_id = %s AND type = "expense" ORDER BY category',
         (user_id,)
     )
     
@@ -213,12 +213,12 @@ def add():
         # Insert transaksi dengan student_id
         trans_id = execute_db(
             '''INSERT INTO transactions (user_id, student_id, type, category, amount, description, date)
-               VALUES (?, ?, ?, ?, ?, ?, ?)''',
+               VALUES (%s, %s, %s, %s, %s, %s, %s)''',
             (user_id, student_id, trans_type, category, amount, description, date)
         )
         
         # Update saldo wallet
-        wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+        wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
         current_balance = wallet['balance'] if wallet else 0
         
         if trans_type == 'income':
@@ -226,7 +226,7 @@ def add():
         else:
             new_balance = current_balance - amount
         
-        execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (new_balance, user_id))
+        execute_db('UPDATE wallet SET balance = %s WHERE user_id = %s', (new_balance, user_id))
         try:
             record_history(user_id, 'create', 'transaction', trans_id, f"{category}:{amount}")
         except Exception:
@@ -255,17 +255,17 @@ def export_excel():
         SELECT t.*, COALESCE(s.name, '') as student_name, COALESCE(s.nisn, '') as student_nisn
         FROM transactions t
         LEFT JOIN students s ON t.student_id = s.id
-        WHERE t.user_id = ?
+        WHERE t.user_id = %s
     '''
     params = [user_id]
     if filter_type != 'all':
-        query += ' AND t.type = ? '
+        query += ' AND t.type = %s '
         params.append(filter_type)
     if filter_category != 'all':
-        query += ' AND t.category = ? '
+        query += ' AND t.category = %s '
         params.append(filter_category)
     if filter_month:
-        query += ' AND t.date LIKE ? '
+        query += ' AND t.date LIKE %s '
         params.append(f'{filter_month}%')
 
     query += ' ORDER BY t.date DESC, t.created_at DESC'
@@ -326,7 +326,7 @@ def export_excel():
 def edit(id):
     """Edit transaksi"""
     user_id = session.get('user_id', 1)
-    trans = query_db('SELECT * FROM transactions WHERE id = ? AND user_id = ?', (id, user_id), one=True)
+    trans = query_db('SELECT * FROM transactions WHERE id = %s AND user_id = %s', (id, user_id), one=True)
     
     if not trans:
         return redirect(url_for('transaction.index'))
@@ -347,7 +347,7 @@ def edit(id):
                 student_id = None
         
         # Hitung perubahan saldo
-        wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+        wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
         current_balance = wallet['balance'] if wallet else 0
         
         # Kembalikan nilai lama terlebih dahulu
@@ -362,12 +362,12 @@ def edit(id):
         else:
             current_balance -= amount
         
-        execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (current_balance, user_id))
+        execute_db('UPDATE wallet SET balance = %s WHERE user_id = %s', (current_balance, user_id))
         
         # Update transaksi dengan student_id
         execute_db(
-            '''UPDATE transactions SET student_id = ?, type = ?, category = ?, amount = ?, description = ?, date = ?
-               WHERE id = ?''',
+            '''UPDATE transactions SET student_id = %s, type = %s, category = %s, amount = %s, description = %s, date = %s
+               WHERE id = %s''',
             (student_id, trans_type, category, amount, description, date, id)
         )
         try:
@@ -394,11 +394,11 @@ def edit(id):
 def delete(id):
     """Hapus transaksi"""
     user_id = session.get('user_id', 1)
-    trans = query_db('SELECT * FROM transactions WHERE id = ? AND user_id = ?', (id, user_id), one=True)
+    trans = query_db('SELECT * FROM transactions WHERE id = %s AND user_id = %s', (id, user_id), one=True)
     
     if trans:
         # Update saldo
-        wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+        wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
         current_balance = wallet['balance'] if wallet else 0
         
         if trans['type'] == 'income':
@@ -406,10 +406,10 @@ def delete(id):
         else:
             current_balance += trans['amount']
         
-        execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (current_balance, user_id))
+        execute_db('UPDATE wallet SET balance = %s WHERE user_id = %s', (current_balance, user_id))
         
         # Hapus transaksi
-        execute_db('DELETE FROM transactions WHERE id = ?', (id,))
+        execute_db('DELETE FROM transactions WHERE id = %s', (id,))
         try:
             record_history(user_id, 'delete', 'transaction', id, None)
         except Exception:
@@ -458,13 +458,13 @@ def index():
     """Halaman dompet pondok"""
     user_id = session.get('user_id', 1)
     
-    wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+    wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
     balance = wallet['balance'] if wallet else 0
     
     # Ambil transaksi terakhir
     transactions = query_db('''
         SELECT * FROM transactions 
-        WHERE user_id = ? 
+        WHERE user_id = %s 
         ORDER BY date DESC, created_at DESC 
         LIMIT 20
     ''', (user_id,))
@@ -482,7 +482,7 @@ def index():
     """Halaman pengaturan"""
     user_id = session.get('user_id', 1)
     
-    user = query_db('SELECT * FROM users WHERE id = ?', (user_id,), one=True)
+    user = query_db('SELECT * FROM users WHERE id = %s', (user_id,), one=True)
     settings = query_db('SELECT key, value FROM settings')
     
     settings_dict = {row['key']: row['value'] for row in settings}
@@ -528,7 +528,7 @@ def update_profile():
 
     # Update basic fields
     execute_db(
-        'UPDATE users SET username = ?, full_name = ?, email = ? WHERE id = ?',
+        'UPDATE users SET username = %s, full_name = %s, email = %s WHERE id = %s',
         (username, full_name, email, user_id)
     )
     
@@ -702,13 +702,13 @@ def add_payment(student_id):
     # Insert transaksi
     execute_db('''
         INSERT INTO transactions (user_id, student_id, type, category, amount, description, date)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     ''', (user_id, student_id, 'income', 'Pembayaran Santri', amount, description, date_str))
     
     # Update balance
-    wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+    wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
     new_balance = wallet['balance'] + amount
-    execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (new_balance, user_id))
+    execute_db('UPDATE wallet SET balance = %s WHERE user_id = %s', (new_balance, user_id))
     
     return redirect(url_for('students.detail', student_id=student_id))
 
@@ -1008,7 +1008,7 @@ def index():
 @history_bp.route('/delete/<int:entry_id>', methods=['POST'])
 def delete(entry_id):
     """Hapus satu entri history"""
-    execute_db('DELETE FROM history WHERE id = ?', (entry_id,))
+    execute_db('DELETE FROM history WHERE id = %s', (entry_id,))
     return redirect(url_for('history.index'))
 
 
@@ -1232,15 +1232,15 @@ def mark_paid_view(bill_id):
         # Insert transaction (income)
         trans_id = execute_db(
             '''INSERT INTO transactions (user_id, student_id, type, category, amount, description, date)
-               VALUES (?, ?, ?, ?, ?, ?, ?)''',
+               VALUES (%s, %s, %s, %s, %s, %s, %s)''',
             (user_id, student_id, 'income', 'Pembayaran Santri', amount, title, today)
         )
 
         # Update wallet balance for the user who receives the payment
-        wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+        wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
         current_balance = wallet['balance'] if wallet else 0
         new_balance = current_balance + amount
-        execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (new_balance, user_id))
+        execute_db('UPDATE wallet SET balance = %s WHERE user_id = %s', (new_balance, user_id))
 
         record_history(user_id, 'pay', 'bill', bill_id, f"{title}:{amount}")
         flash(f"Tagihan '{title}' berhasil ditandai lunas", 'success')
