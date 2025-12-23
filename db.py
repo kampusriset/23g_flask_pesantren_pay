@@ -469,3 +469,15 @@ def get_student_unpaid_amount(student_id):
     """Hitung total kekurangan pembayaran per santri"""
     row = query_db('SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE student_id = %s AND status = "unpaid"', (student_id,), one=True)
     return row['total'] if row else 0
+
+
+def get_bill_stats_by_class():
+    """Mengambil total tunggakan per kelas"""
+    return query_db('''
+        SELECT s.kelas, SUM(b.amount) as total_unpaid
+        FROM bills b
+        JOIN students s ON b.student_id = s.id
+        WHERE b.status = 'unpaid'
+        GROUP BY s.kelas
+        ORDER BY total_unpaid DESC
+    ''')

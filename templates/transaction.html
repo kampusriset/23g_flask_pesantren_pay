@@ -117,12 +117,17 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
+                                        <a href="{{ url_for('transaction.receipt', id=trans['id']) }}" class="btn btn-sm btn-outline-primary" title="Cetak Kwitansi" target="_blank">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
                                         <a href="{{ url_for('transaction.edit', id=trans['id']) }}" class="btn btn-sm btn-info" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        {% if session.get('role') == 'admin' %}
                                         <a href="{{ url_for('transaction.delete', id=trans['id']) }}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% set counter.value = counter.value + 1 %}

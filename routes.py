@@ -6,7 +6,7 @@ from db import (query_db, execute_db, get_dashboard_stats, get_monthly_stats, ge
                 get_all_students, get_student, get_student_payments, get_student_payment_stats,
                 add_student, update_student, delete_student, record_history, get_history,
                 get_all_users, get_user, create_user, update_user, delete_user, set_user_password, get_user_by_username,
-                get_all_bills, create_bill, get_bill, update_bill, delete_bill, mark_bill_paid, get_student_unpaid_amount)
+                get_all_bills, create_bill, get_bill, update_bill, delete_bill, mark_bill_paid, get_student_unpaid_amount, get_bill_stats_by_class)
 from werkzeug.security import check_password_hash
 from datetime import datetime, timedelta
 import json
@@ -14,7 +14,22 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from io import BytesIO
 import os
+from fpdf import FPDF
 from werkzeug.utils import secure_filename
+from functools import wraps
+
+def _is_admin():
+    return session.get('role') == 'admin'
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not _is_admin():
+            flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+            return redirect(url_for('dashboard.index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # ============ BLUEPRINTS ============
 
@@ -417,6 +432,118 @@ def delete(id):
     
     return redirect(url_for('transaction.index'))
 
+@transaction_bp.route('/receipt/<int:id>')
+def receipt(id):
+    """Generate kwitansi PDF untuk transaksi tunggal"""
+    user_id = session.get('user_id', 1)
+    
+    # Ambil data transaksi dengan info santri
+    query = '''
+        SELECT t.*, s.name as student_name, s.nisn as student_nisn, s.kelas as student_kelas
+        FROM transactions t
+        LEFT JOIN students s ON t.student_id = s.id
+        WHERE t.id = %s AND t.user_id = %s
+    '''
+    trans = query_db(query, (id, user_id), one=True)
+    
+    if not trans:
+        flash('Transaksi tidak ditemukan', 'danger')
+        return redirect(url_for('transaction.index'))
+
+    # Ambil setting nama pondok
+    settings = query_db('SELECT `key`, value FROM settings')
+    settings_dict = {row['key']: row['value'] for row in settings}
+    pondok_name = settings_dict.get('pondok_name', 'Pondok Pesantren Al Huda')
+
+    # Buat PDF
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Header
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, pondok_name.upper(), 0, 1, "C")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 5, "Sistem Pembayaran Terpadu (PonPay)", 0, 1, "C")
+    pdf.ln(5)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y())
+    pdf.ln(10)
+
+    # Title
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.cell(0, 10, "BUKTI PEMBAYARAN", 0, 1, "C")
+    pdf.ln(5)
+
+    # Info Transaksi
+    pdf.set_font("Helvetica", "", 11)
+    
+    col_width = 45
+    
+    def add_row(label, value):
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(col_width, 8, label, 0, 0)
+        pdf.set_font("Helvetica", "", 11)
+        pdf.cell(0, 8, f": {value}", 0, 1)
+
+    add_row("No. Transaksi", f"TRX-{trans['id']}")
+    add_row("Tanggal", trans['date'])
+    add_row("Penerima", session.get('full_name', 'Bendahara'))
+    pdf.ln(5)
+
+    # Info Santri
+    if trans['student_name']:
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(0, 8, "Data Santri:", 0, 1)
+        pdf.set_font("Helvetica", "", 11)
+        add_row("Nama", trans['student_name'])
+        add_row("NISN", trans['student_nisn'] or "-")
+        add_row("Kelas", trans['student_kelas'] or "-")
+        pdf.ln(5)
+
+    # Rincian
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(0, 8, "Rincian Pembayaran:", 0, 1)
+    pdf.set_font("Helvetica", "", 11)
+    
+    # Table Header
+    pdf.set_fill_color(240, 240, 240)
+    pdf.cell(130, 10, "Keterangan / Kategori", 1, 0, "C", True)
+    pdf.cell(60, 10, "Jumlah", 1, 1, "C", True)
+    
+    # Table Content
+    description = f"{trans['category']} - {trans['description']}"
+    pdf.cell(130, 20, description, 1, 0, "L")
+    
+    # Format Rupiah manual for PDF
+    amount_str = f"Rp {int(trans['amount']):,.0f}".replace(',', '.')
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(60, 20, amount_str, 1, 1, "R")
+    
+    pdf.ln(20)
+
+    # Tanda Tangan
+    current_date = datetime.now().strftime("%d %m %Y")
+    pdf.set_font("Helvetica", "", 11)
+    pdf.cell(120, 8, "", 0, 0)
+    pdf.cell(0, 8, f"Dicetak pada: {current_date}", 0, 1, "C")
+    pdf.ln(20)
+    pdf.cell(120, 8, "", 0, 0)
+    pdf.cell(0, 8, "( ____________________ )", 0, 1, "C")
+    pdf.cell(120, 8, "", 0, 0)
+    pdf.cell(0, 8, "Bendahara Pondok", 0, 1, "C")
+
+    # Output to BytesIO
+    output = BytesIO()
+    pdf_content = pdf.output(dest='S')
+    output.write(pdf_content)
+    output.seek(0)
+
+    return send_file(
+        output,
+        mimetype='application/pdf',
+        as_attachment=False,
+        download_name=f"kwitansi_{trans['id']}.pdf"
+    )
+
 # Statistics Blueprint
 statistics_bp = Blueprint('statistics', __name__, url_prefix='/statistics')
 
@@ -442,11 +569,18 @@ def index():
     # Warna untuk chart
     colors = ['#2E7D32', '#43A047', '#66BB6A', '#81C784', '#A5D6A7', '#C8E6C9']
     
+    # Ambil statistik tunggakan per kelas
+    class_stats = get_bill_stats_by_class()
+    class_labels = [r['kelas'] for r in class_stats]
+    class_values = [r['total_unpaid'] for r in class_stats]
+    
     return render_template('statistics.html',
                          expense_labels=json.dumps(expense_labels),
                          expense_values=json.dumps(expense_values),
                          income_labels=json.dumps(income_labels),
                          income_values=json.dumps(income_values),
+                         class_labels=json.dumps(class_labels),
+                         class_values=json.dumps(class_values),
                          colors=json.dumps(colors),
                          filter_period=filter_period)
 
@@ -478,6 +612,7 @@ settings_bp = Blueprint('settings', __name__, url_prefix='/settings')
 students_bp = Blueprint('students', __name__, url_prefix='/students')
 
 @settings_bp.route('/')
+@admin_required
 def index():
     """Halaman pengaturan"""
     user_id = session.get('user_id', 1)
@@ -490,6 +625,7 @@ def index():
     return render_template('settings.html', user=user, settings=settings_dict)
 
 @settings_bp.route('/update-profile', methods=['POST'])
+@admin_required
 def update_profile():
     """Update profil user"""
     user_id = session.get('user_id', 1)
@@ -666,11 +802,22 @@ def edit(student_id):
                         # ignore failure to update photo in DB
                         pass
 
+        # Prepare changes for history
+        old_data = dict(student)
+        new_data = {
+            'name': name, 'nisn': nisn, 'kelas': kelas, 'jenis_kelamin': jenis_kelamin,
+            'phone': phone, 'parent_name': parent_name, 'parent_phone': parent_phone,
+            'alamat': alamat, 'status': status
+        }
+        changes = {k: v for k, v in new_data.items() if str(v) != str(old_data.get(k))}
+        meta_info = json.dumps(changes) if changes else name
+
         try:
-            record_history(session.get('user_id'), 'update', 'student', student_id, name)
+            record_history(session.get('user_id'), 'update', 'student', student_id, meta_info)
         except Exception:
             pass
 
+        flash('Data santri berhasil diperbarui', 'success')
         return redirect(url_for('students.detail', student_id=student_id))
     # Convert to dict for template convenience
     try:
@@ -1015,23 +1162,20 @@ def delete(entry_id):
 # --- User management (admin only) ---
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
-def _is_admin():
-    return session.get('role') == 'admin'
+
 
 
 @users_bp.route('/')
+@admin_required
 def index():
-    if not _is_admin():
-        return redirect(url_for('dashboard.index'))
     users = get_all_users()
     users = [dict(u) for u in users] if users else []
     return render_template('users.html', users=users)
 
 
 @users_bp.route('/create', methods=['GET', 'POST'])
+@admin_required
 def create():
-    if not _is_admin():
-        return redirect(url_for('dashboard.index'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -1048,9 +1192,8 @@ def create():
 
 
 @users_bp.route('/edit/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
 def edit(user_id):
-    if not _is_admin():
-        return redirect(url_for('dashboard.index'))
     user = get_user(user_id)
     if not user:
         return redirect(url_for('users.index'))
@@ -1077,9 +1220,8 @@ def edit(user_id):
 
 
 @users_bp.route('/delete/<int:user_id>', methods=['POST'])
+@admin_required
 def delete(user_id):
-    if not _is_admin():
-        return redirect(url_for('dashboard.index'))
     delete_user(user_id)
     try:
         record_history(session.get('user_id'), 'delete', 'user', user_id, None)

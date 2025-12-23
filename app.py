@@ -2,13 +2,17 @@
 PonPay - Sistem Pembayaran Pondok Pesantren Al Huda
 Main Flask Application
 """
-from flask import Flask, render_template
+from flask import Flask, render_template, session, redirect, url_for, g
+from flask_wtf.csrf import CSRFProtect
 from db import init_db, get_db, close_db, ensure_history_table
 import locale
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ponpay-secret-key-2025'
+
+# Initialize CSRF Protection
+csrf = CSRFProtect(app)
 # Database Configuration
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'

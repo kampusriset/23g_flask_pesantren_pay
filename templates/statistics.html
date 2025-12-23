@@ -53,7 +53,7 @@
     </div>
 
     <!-- Expense vs Income Comparison -->
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-12">
             <div class="card card-chart">
                 <div class="card-header">
@@ -67,16 +67,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Unpaid Bills per Class -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-chart">
+                <div class="card-header">
+                    <h6 class="card-title">Tunggakan Pembayaran per Kelas</h6>
+                </div>
+                <div class="card-body">
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="classUnpaidChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    const colors = {{ colors|safe }};
+    let colors = {{ colors|safe }};
     const expenseLabels = {{ expense_labels|safe }};
     const expenseValues = {{ expense_values|safe }};
     const incomeLabels = {{ income_labels|safe }};
     const incomeValues = {{ income_values|safe }};
+    const classLabels = {{ class_labels|safe }};
+    const classValues = {{ class_values|safe }};
 
     // Expense Pie Chart
     if (expenseLabels.length > 0) {
@@ -149,7 +167,7 @@
             datasets: [
                 {
                     label: 'Pemasukan',
-                    data: [expenseValues.reduce((a, b) => a + b, 0) + incomeValues.reduce((a, b) => a + b, 0)],
+                    data: [incomeValues.reduce((a, b) => a + b, 0)],
                     backgroundColor: '#2E7D32'
                 },
                 {
@@ -178,6 +196,55 @@
                     ticks: {
                         callback: function(value) {
                             return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Class Unpaid Bar Chart
+    const classUnpaidCtx = document.getElementById('classUnpaidChart').getContext('2d');
+    new Chart(classUnpaidCtx, {
+        type: 'bar',
+        data: {
+            labels: classLabels,
+            datasets: [{
+                label: 'Total Tunggakan',
+                data: classValues,
+                backgroundColor: 'rgba(211, 47, 47, 0.7)',
+                borderColor: '#D32F2F',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000).toFixed(0) + 'rb';
                         }
                     }
                 }

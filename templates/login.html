@@ -314,6 +314,7 @@
             </div>
 
             <form action="/login" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 {% if error %}
                 <div class="alert-error">
                     <i class="fas fa-exclamation-circle"></i>

@@ -105,9 +105,11 @@
                                 <td>
                                     <a href="{{ url_for('students.detail', student_id=student.id) }}" class="btn btn-sm btn-outline-primary">Lihat</a>
                                     <a href="{{ url_for('students.edit', student_id=student.id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    {% if session.get('role') == 'admin' %}
                                     <form action="{{ url_for('students.delete', student_id=student.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus santri ini?');">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                                     </form>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}

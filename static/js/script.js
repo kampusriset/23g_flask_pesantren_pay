@@ -427,11 +427,13 @@ async function fetchData(url) {
  * Post Data
  */
 async function postData(url, data) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify(data)
         });
