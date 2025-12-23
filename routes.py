@@ -483,7 +483,7 @@ def index():
     user_id = session.get('user_id', 1)
     
     user = query_db('SELECT * FROM users WHERE id = %s', (user_id,), one=True)
-    settings = query_db('SELECT key, value FROM settings')
+    settings = query_db('SELECT `key`, `value` FROM settings')
     
     settings_dict = {row['key']: row['value'] for row in settings}
     
