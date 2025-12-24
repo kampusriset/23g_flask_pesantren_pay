@@ -1,115 +1,157 @@
-# 💸 PONPAY FLASK (Sistem Manajemen Pembayaran & Transaksi)
+# 💸 PonPay - Sistem Pembayaran Pondok Pesantren Al Huda
 
 [![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.x-lightgrey.svg)](https://flask.palletsprojects.com/)
+[![MySQL](https://img.shields.io/badge/Database-MySQL-orange.svg)](https://www.mysql.com/)
 
-## 📝 Penjelasan Proyek
-
-Proyek **PONPAY FLASK** adalah aplikasi web berbasis Python menggunakan *framework* Flask yang dirancang untuk mengelola berbagai aspek transaksi dan pembayaran. Aplikasi ini bertujuan menyediakan antarmuka terpusat (Dashboard) untuk memantau aktivitas pembayaran, mengelola data pengguna/siswa, dan menyediakan fitur pelaporan data.
-
-### Fitur Utama yang Didukung:
-
-* **Autentikasi Pengguna**: Manajemen login dan sesi.
-* **Manajemen Entitas**: Pengelolaan data *Students* (Siswa) dan *Users* (Pengguna/Staf).
-* **Transaksi & Pembayaran**: Pencatatan dan pelacakan semua aktivitas pembayaran (*Payments* dan *Transactions*).
-* **Pelaporan Data**: Fitur ekspor/impor data menggunakan **Excel (`openpyxl`)** untuk mempermudah audit atau analisis data.
-* **Wallet, History, Settings**: Fitur tambahan untuk manajemen saldo, riwayat, dan konfigurasi aplikasi.
+**PonPay** adalah aplikasi web manajemen keuangan dan pembayaran yang dirancang khusus untuk Pondok Pesantren Al Huda. Aplikasi ini memudahkan pengelolaan data santri, pencatatan transaksi (pemasukan & pengeluaran), pemantauan tunggakan SPP/tagihan, serta pelaporan keuangan yang transparan dan akuntabel.
 
 ---
 
-## ⚙️ Panduan Instalasi dan Menjalankan Proyek (Untuk Pengguna Baru)
+## ✨ Fitur Utama
 
-Ikuti langkah-langkah ini secara berurutan untuk mengunduh, menyiapkan, dan menjalankan aplikasi Flask di komputer lokal Anda.
+### 📊 Dashboard & Statistik
+
+- **Ringkasan Real-time**: Menampilkan total pemasukan, pengeluaran, saldo saat ini, dan jumlah transaksi bulanan.
+- **Visualisasi Data**: Grafik interaktif (Chart.js) untuk tren keuangan, klasifikasi pengeluaran vs pemasukan, dan statistik tunggakan per kelas.
+
+### 👥 Manajemen Santri (Siswa)
+
+- **Data Lengkap**: Pengelolaan biodata santri (CRUD), termasuk foto profil, data wali, dan status aktif/non-aktif.
+- **Riwayat Pembayaran**: Memantau history pembayaran spesifik untuk setiap santri.
+
+### 💰 Transaksi & Keuangan
+
+- **Pencatatan Transaksi**: Input pemasukan (SPP, donasi, dll) dan pengeluaran (operasional, gaji, dll).
+- **Kwitansi Digital**: Cetak bukti pembayaran (Kwitansi) dalam format **PDF** secara otomatis.
+- **Dompet Pondok**: Pemantauan saldo kas pondok secara real-time.
+
+### 🧾 Tagihan & Tunggakan
+
+- **Manajemen Tagihan**: Buat tagihan bulanan atau insidentil untuk santri.
+- **Monitoring Tunggakan**: Laporan otomatis jumlah santri yang belum lunas dan total nominal tunggakan per kelas.
+
+### 🔐 Keamanan & Akses
+
+- **Role-Based Access Control (RBAC)**:
+  - **Admin**: Akses penuh (termasuk manajemen user dan hapus data).
+  - **Staff/Bendahara**: Akses terbatas (input transaksi, lihat data, cetak kwitansi).
+- **CSRF Protection**: Perlindungan formulir dari serangan Cross-Site Request Forgery.
+- **Secure Login**: Sistem autentikasi aman dengan hashing password.
+
+### 📝 Laporan & Audit
+
+- **Audit Log (Riwayat)**: Mencatat setiap aktivitas user (siapa mengubah apa) untuk transparansi.
+- **Ekspor Data**: Unduh laporan transaksi dalam format Excel.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+- **Backend**: Python (Flask Framework)
+- **Database**: MySQL (via `mysql-connector-python`)
+- **Frontend**: HTML5, CSS3, Bootstrap 5
+- **Visualisasi**: Chart.js
+- **PDF Generator**: FPDF2
+- **Form Security**: Flask-WTF
+
+---
+
+## ⚙️ Panduan Instalasi & Menjalankan Aplikasi
+
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di komputer lokal (Windows/Linux/Mac).
 
 ### Prasyarat
 
-Pastikan Anda telah menginstal di komputer Anda:
-1.  **Python 3.x**
-2.  **Git** (untuk mengunduh repositori)
+1.  **Python 3.8+** terinstal.
+2.  **XAMPP** (atau server MySQL lainnya) terinstal dan berjalan.
+3.  **Git** terinstal.
 
-### Langkah 1: Unduh (Clone) Repositori
-
-Buka Terminal (atau Command Prompt/PowerShell) dan *clone* kode dari GitHub:
+### 1. Clone Repositori
 
 ```bash
-
 git clone https://github.com/kampusriset/23g_flask_pesantren_pay.git
 cd 23g_flask_pesantren_pay
 ```
 
-### Langkah 2: Buat Lingkungan Virtual (Virtual Environment)
+### 2. Buat Virtual Environment (Disarankan)
 
-Membuat lingkungan virtual mencegah konflik library dengan proyek Python lain di komputer Anda.
+Mengisolasi dependensi proyek agar tidak bentrok dengan sistem.
 
-### Windows:
+**Windows:**
 
-```bash
-
+```powershell
 python -m venv venv
 .\venv\Scripts\activate
 ```
 
-### macOS/Linux::
+**Mac/Linux:**
 
 ```bash
-
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-Catatan: Setelah diaktifkan, Anda akan melihat (venv) muncul di awal baris Terminal Anda.
-
-
-### Langkah 3: Instalasi Dependensi Proyek
-
-Instal semua library Python yang dibutuhkan yang tercantum dalam file requirements.txt:
-
+### 3. Instal Dependensi
 
 ```bash
-
 pip install -r requirements.txt
 ```
 
-### Langkah 4: Inisialisasi Database
+### 4. Konfigurasi Database
 
-Anda perlu menyiapkan file database awal (jika proyek menggunakan SQLite).
+1.  Pastikan **MySQL** di XAMPP sudah berjalan (Klik **Start** pada modul MySQL).
+2.  Buat database baru bernama `ponpay` (opsional, aplikasi akan mencoba membuatnya otomatis, tapi lebih baik dibuat manual di phpMyAdmin jika gagal).
+3.  Cek koneksi di file `app.py` (Default XAMPP):
+    ```python
+    app.config['MYSQL_HOST'] = 'localhost'
+    app.config['MYSQL_USER'] = 'root'
+    app.config['MYSQL_PASSWORD'] = ''  # Password default XAMPP biasanya kosong
+    app.config['MYSQL_DB'] = 'ponpay'
+    ```
 
+### 5. Jalankan Aplikasi
+
+Aplikasi akan otomatis membuat tabel-tabel yang dibutuhkan saat pertama kali dijalankan.
 
 ```bash
-
-# Perintah ini akan menjalankan skrip db.py untuk menyiapkan skema database
-python db.py
-```
-
-
-### Langkah 5: Jalankan Aplikasi Flask
-
-Setelah semua setup selesai, jalankan file utama aplikasi:
-
-
-```bash
-
 python app.py
 ```
 
-### Langkah 6: Akses Aplikasi
+_Tunggu hingga muncul pesan `Running on http://127.0.0.1:5000`_
 
-- Buka browser web Anda (Chrome, Firefox, dll.).
+### 6. Login
 
-- Akses alamat: http://127.0.0.1:5000/ atau http://localhost:5000/
+Buka browser dan akses **http://127.0.0.1:5000**.
+Gunakan akun default administrator:
 
-- Aplikasi PONPAY FLASK Anda sekarang berjalan dan siap digunakan!
+- **Username**: `admin`
+- **Password**: `admin123`
 
-  ### 🗺 Struktur Proyek
+_(Jangan lupa ganti password setelah login pertama kali!)_
 
+---
 
-```md
-  PONPAY FLASK/
-├── app.py             # File utama aplikasi Flask
-├── routes.py          # Definisi semua rute dan logika terkait
-├── db.py              # Skrip/konfigurasi database
-├── requirements.txt   # Daftar dependensi Python
-├── .gitignore         # File yang dikecualikan dari Git (Wajib ada!)
-├── templates/         # Semua file HTML (interface)
-└── static/            # File CSS, JavaScript, dan Gambar
+## � Struktur Proyek
+
 ```
+PONPAY/
+├── app.py              # Entry point aplikasi & konfigurasi global
+├── routes.py           # Logic routing & controller
+├── db.py               # Koneksi database & schema creation
+├── requirements.txt    # Daftar library Python
+├── templates/          # File HTML (Jinja2)
+│   ├── base.html       # Layout utama
+│   ├── dashboard.html  # Halaman utama
+│   ├── transaction.html
+│   └── ...
+├── static/             # Aset statis (CSS, JS, Images)
+└── ...
+```
+
+---
+
+## 👨‍💻 Kontribusi & Lisensi
+
+Dikembangkan oleh Tim IT Pondok Pesantren Al Huda.
+Hak Cipta © 2025.
