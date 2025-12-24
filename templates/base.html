@@ -135,7 +135,7 @@
                             {% if session.get('profile_picture') %}
                             <img src="{{ url_for('static', filename=session['profile_picture']) }}?t={{ session.get('profile_picture_timestamp', 0) }}"
                                 alt="Profile"
-                                onerror="this.src='https://ui-avatars.com/api/?name={{ session.get('full_name', 'User') }}&amp;background=6366F1&amp;color=fff'">
+                                onerror="this.src='https://ui-avatars.com/api/?name={{ session.get('full_name', 'User')|urlencode }}&background=6366F1&color=fff'">
 
                             {% else %}
                             <img src="https://ui-avatars.com/api/?name={{ session.get('full_name', 'User') }}&amp;background=6366F1&amp;color=fff"
@@ -182,10 +182,13 @@
     {% if messages %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            {% for category, msg in messages %}
-            {% set type = 'success' if category == 'success' else 'danger' %}
-            showToast({{ msg| tojson }}, "{{ type }}");
-        {% endfor %}
+            const flashMessages = {{ messages | tojson }};
+            flashMessages.forEach(item => {
+                const category = item[0];
+                const msg = item[1];
+                const type = (category === 'success') ? 'success' : 'danger';
+                showToast(msg, type);
+            });
         });
     </script>
     {% endif %}

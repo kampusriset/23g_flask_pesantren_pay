@@ -88,13 +88,13 @@
 
 {% block extra_js %}
 <script>
-    let colors = {{ colors|safe }};
-    const expenseLabels = {{ expense_labels|safe }};
-    const expenseValues = {{ expense_values|safe }};
-    const incomeLabels = {{ income_labels|safe }};
-    const incomeValues = {{ income_values|safe }};
-    const classLabels = {{ class_labels|safe }};
-    const classValues = {{ class_values|safe }};
+    let colors = JSON.parse('{{ colors|safe }}');
+    let expenseLabels = JSON.parse('{{ expense_labels|safe }}');
+    let expenseValues = JSON.parse('{{ expense_values|safe }}');
+    let incomeLabels = JSON.parse('{{ income_labels|safe }}');
+    let incomeValues = JSON.parse('{{ income_values|safe }}');
+    let classLabels = JSON.parse('{{ class_labels|safe }}');
+    let classValues = JSON.parse('{{ class_values|safe }}');
 
     // Expense Pie Chart
     if (expenseLabels.length > 0) {
