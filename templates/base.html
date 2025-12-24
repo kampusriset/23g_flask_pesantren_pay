@@ -132,13 +132,15 @@
                 <div class="navbar-right">
                     <div class="user-profile">
                         <div class="profile-avatar">
+                            {% set avatar_name = session.get('full_name') or 'User' %}
+                            {% set avatar_fallback = ('https://ui-avatars.com/api/?name=' ~ avatar_name ~ '&background=6366F1&color=fff') %}
                             {% if session.get('profile_picture') %}
                             <img src="{{ url_for('static', filename=session['profile_picture']) }}?t={{ session.get('profile_picture_timestamp', 0) }}"
                                 alt="Profile"
-                                onerror="this.src='https://ui-avatars.com/api/?name={{ session.get('full_name', 'User') }}&amp;background=6366F1&amp;color=fff'">
+                                onerror="this.src='{{ avatar_fallback }}'">
 
                             {% else %}
-                            <img src="https://ui-avatars.com/api/?name={{ session.get('full_name', 'User') }}&amp;background=6366F1&amp;color=fff"
+                            <img src="{{ avatar_fallback }}"
                                 alt="Profile">
                             {% endif %}
                         </div>
@@ -180,12 +182,25 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
+    <script id="flashedMessages" type="application/json">
+{{ messages | tojson | safe }}
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            {% for category, msg in messages %}
-            {% set type = 'success' if category == 'success' else 'danger' %}
-            showToast({{ msg| tojson }}, "{{ type }}");
-        {% endfor %}
+            const el = document.getElementById('flashedMessages');
+            if (el) {
+                try {
+                    const flashedMessages = JSON.parse(el.textContent || '[]');
+                    flashedMessages.forEach(function(item) {
+                        const category = item[0];
+                        const msg = item[1];
+                        const type = category === 'success' ? 'success' : 'danger';
+                        showToast(msg, type);
+                    });
+                } catch (e) {
+                    console.error('Failed to parse flashed messages', e);
+                }
+            }
         });
     </script>
     {% endif %}

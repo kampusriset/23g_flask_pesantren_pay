@@ -448,36 +448,69 @@ async function postData(url, data) {
 
 /**
  * Initialize Sidebar Collapse
+ * - On desktop: toggles a full hide ("hidden-desktop") so the main content expands to full width.
+ * - State is saved to localStorage under 'sidebarHiddenDesktop' and persists across reloads.
+ * - On small screens the button falls back to the mobile open behavior (toggle .active).
  */
 function initializeSidebarCollapse() {
     const collapseBtn = document.getElementById('sidebarCollapseBtn');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
+    const DESKTOP_MIN = 992; // Bootstrap lg breakpoint in px
+
+    function applyStateFromStorage() {
+        const hidden = localStorage.getItem('sidebarHiddenDesktop') === 'true';
+        if (hidden && window.innerWidth >= DESKTOP_MIN) {
+            sidebar.classList.add('hidden-desktop');
+            mainContent.classList.add('expanded');
+            if (collapseBtn) collapseBtn.setAttribute('aria-pressed', 'true');
+        } else {
+            sidebar.classList.remove('hidden-desktop');
+            mainContent.classList.remove('expanded');
+            if (collapseBtn) collapseBtn.setAttribute('aria-pressed', 'false');
+        }
+    }
 
     if (collapseBtn && sidebar) {
         collapseBtn.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-
-            // Adjust main content margin
-            if (sidebar.classList.contains('collapsed')) {
-                mainContent.style.marginLeft = '5.00rem';
+            if (window.innerWidth >= DESKTOP_MIN) {
+                const hidden = sidebar.classList.toggle('hidden-desktop');
+                if (hidden) {
+                    mainContent.classList.add('expanded');
+                } else {
+                    mainContent.classList.remove('expanded');
+                }
+                // Persist state
+                localStorage.setItem('sidebarHiddenDesktop', hidden);
+                collapseBtn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
             } else {
-                mainContent.style.marginLeft = '20.00rem';
+                // Mobile fallback (existing behavior)
+                sidebar.classList.toggle('active');
+                document.body.classList.toggle('sidebar-open');
             }
-
-            // Save state to localStorage
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         });
     }
 
-    // Load saved state
+    // Legacy collapsed support (kept for backward compatibility)
     const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     if (isCollapsed && sidebar) {
         sidebar.classList.add('collapsed');
-        if (mainContent) {
-            mainContent.style.marginLeft = '5.00rem';
-        }
+        if (mainContent) mainContent.style.marginLeft = '5.00rem';
     }
+
+    // Apply stored hidden state on load (desktop only)
+    applyStateFromStorage();
+
+    // Handle window resize to re-apply stored state or show sidebar on small screens
+    window.addEventListener('resize', function() {
+        if (window.innerWidth < DESKTOP_MIN) {
+            // On mobile always ensure sidebar isn't hidden by desktop-only rule so toggle still works
+            sidebar.classList.remove('hidden-desktop');
+            mainContent.classList.remove('expanded');
+        } else {
+            applyStateFromStorage();
+        }
+    });
 }
 
 /**
