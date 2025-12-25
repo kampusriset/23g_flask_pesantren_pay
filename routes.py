@@ -551,29 +551,29 @@ statistics_bp = Blueprint('statistics', __name__, url_prefix='/statistics')
 def index():
     """Halaman statistik"""
     user_id = session.get('user_id', 1)
-    
+
     filter_period = request.args.get('period', '1')  # 1, 3, 6, 12 bulan
     period_months = int(filter_period)
-    
+
     # Ambil data kategori
     expense_categories = get_category_stats(user_id, 'expense', period_months)
     income_categories = get_category_stats(user_id, 'income', period_months)
-    
-    # Format data untuk chart
-    expense_labels = [r['category'] for r in expense_categories]
-    expense_values = [r['total'] for r in expense_categories]
-    
-    income_labels = [r['category'] for r in income_categories]
-    income_values = [r['total'] for r in income_categories]
-    
+
+    # Format data untuk chart - konversi Decimal ke float dan handle None
+    expense_labels = [r['category'] for r in expense_categories] if expense_categories else []
+    expense_values = [float(r['total']) if r['total'] is not None else 0.0 for r in expense_categories] if expense_categories else []
+
+    income_labels = [r['category'] for r in income_categories] if income_categories else []
+    income_values = [float(r['total']) if r['total'] is not None else 0.0 for r in income_categories] if income_categories else []
+
     # Warna untuk chart
     colors = ['#2E7D32', '#43A047', '#66BB6A', '#81C784', '#A5D6A7', '#C8E6C9']
-    
-    # Ambil statistik tunggakan per kelas
+
+    # Ambil statistik tunggakan per kelas - konversi Decimal ke float dan handle None
     class_stats = get_bill_stats_by_class()
-    class_labels = [r['kelas'] for r in class_stats]
-    class_values = [r['total_unpaid'] for r in class_stats]
-    
+    class_labels = [r['kelas'] for r in class_stats] if class_stats else []
+    class_values = [float(r['total_unpaid']) if r['total_unpaid'] is not None else 0.0 for r in class_stats] if class_stats else []
+
     return render_template('statistics.html',
                          expense_labels=json.dumps(expense_labels),
                          expense_values=json.dumps(expense_values),
