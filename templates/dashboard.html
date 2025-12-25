@@ -1,243 +1,449 @@
-{% extends 'base.html' %}
-
-{% block title %}Dashboard - PonPay{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Dashboard - PonPay{% endblock %} {%
+block page_title %}Dashboard{% endblock %} {% block content %}
 <div class="container-fluid">
-    <!-- Main Balance Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="balance-card">
-                <div class="balance-header">
-                    <div>
-                        <p class="balance-label">Saldo Kas Pondok</p>
-                        <h2 class="balance-amount">{{ stats.balance|rupiah }}</h2>
-                    </div>
-                    <div class="balance-icon">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                </div>
-                <a href="{{ url_for('wallet.index') }}" class="btn btn-light btn-sm mt-3">Lihat Detail Dompet</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-icon income">
-                    <i class="fas fa-arrow-down"></i>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Total Pemasukan</p>
-                    <h5 class="stat-value">{{ stats.total_income|rupiah }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-icon expense">
-                    <i class="fas fa-arrow-up"></i>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Total Pengeluaran</p>
-                    <h5 class="stat-value">{{ stats.total_expense|rupiah }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-icon transaction">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Total Transaksi</p>
-                    <h5 class="stat-value">{{ stats.total_transactions }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stat-card">
-                <div class="stat-icon profit">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Net Profit</p>
-                    <h5 class="stat-value">{{ (stats.total_income - stats.total_expense)|rupiah }}</h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart Row -->
-    <div class="row mb-4">
-        <div class="col-lg-8">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h6 class="card-title">Grafik Pemasukan & Pengeluaran (12 Bulan Terakhir)</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="col-lg-4">
-            <div class="card card-actions">
-                <div class="card-header">
-                    <h6 class="card-title">Aksi Cepat</h6>
-                </div>
-                <div class="card-body">
-                    <a href="{{ url_for('transaction.add') }}" class="btn btn-action">
-                        <i class="fas fa-plus"></i>
-                        <span>Tambah Transaksi</span>
-                    </a>
-                    <a href="{{ url_for('wallet.index') }}" class="btn btn-action">
-                        <i class="fas fa-wallet"></i>
-                        <span>Lihat Dompet</span>
-                    </a>
-                    <a href="{{ url_for('statistics.index') }}" class="btn btn-action">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Lihat Statistik</span>
-                    </a>
-                    <a href="{{ url_for('transaction.index') }}" class="btn btn-action">
-                        <i class="fas fa-list"></i>
-                        <span>Semua Transaksi</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Transactions -->
+  <!-- Hero Section with Main Balance Card -->
+  <div class="hero-section mb-5">
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="card-title">Riwayat Transaksi Terakhir</h6>
-                    <a href="{{ url_for('transaction.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+      <div class="col-12">
+        <div class="balance-card-main">
+          <div class="balance-card-glow"></div>
+          <div class="balance-card-content">
+            <div class="balance-header">
+              <div class="balance-info">
+                <div class="balance-meta">
+                  <span class="balance-badge">Live Balance</span>
+                  <p class="balance-label">Saldo Kas Pondok</p>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Kategori</th>
-                                    <th>Keterangan</th>
-                                    <th class="text-end">Nominal</th>
-                                    <th>Jenis</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for trans in stats.recent_transactions %}
-                                <tr>
-                                    <td>
-                                        <small class="text-muted">{{ trans['date']|format_date }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge" style="background-color: {% if trans['type'] == 'income' %}var(--primary-color){% else %}var(--danger-color){% endif %}; color: white;">
-                                            {{ trans['category'] }}
-                                        </span>
-                                    </td>
-                                    <td>{{ trans['description'] }}</td>
-                                    <td class="text-end font-weight-bold">
-                                        <span style="color: {% if trans['type'] == 'income' %}var(--primary-color){% else %}var(--danger-color){% endif %}">
-                                            {% if trans['type'] == 'income' %}+{% else %}-{% endif %}{{ trans['amount']|rupiah }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if trans['type'] == 'income' %}
-                                            <i class="fas fa-arrow-down" style="color: var(--primary-color);"></i> Masuk
-                                        {% else %}
-                                            <i class="fas fa-arrow-up" style="color: var(--danger-color);"></i> Keluar
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-3">Belum ada transaksi</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <h1 class="balance-amount" data-count="{{ stats.balance }}">
+                  <span class="currency-symbol">Rp</span>
+                  <span class="amount-value"
+                    >{{ stats.balance|rupiah|replace('Rp ', '') }}</span
+                  >
+                </h1>
+                <p class="balance-subtitle">
+                  <i class="fas fa-clock me-1"></i>
+                  Update terakhir: {{ stats.last_update if stats.last_update
+                  else 'Hari ini' }}
+                </p>
+              </div>
+              <div class="balance-visual">
+                <div class="balance-icon-wrapper">
+                  <i class="fas fa-wallet balance-icon"></i>
+                  <div class="icon-particles">
+                    <div class="particle particle-1"></div>
+                    <div class="particle particle-2"></div>
+                    <div class="particle particle-3"></div>
+                  </div>
                 </div>
+              </div>
             </div>
+            <div class="balance-actions">
+              <a
+                href="{{ url_for('wallet.index') }}"
+                class="btn btn-primary-ghost">
+                <i class="fas fa-eye"></i>
+                <span>Lihat Detail</span>
+              </a>
+              <a
+                href="{{ url_for('transaction.add') }}"
+                class="btn btn-primary-solid">
+                <i class="fas fa-plus"></i>
+                <span>Tambah Transaksi</span>
+              </a>
+              <a
+                href="{{ url_for('statistics.index') }}"
+                class="btn btn-secondary-ghost">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+              </a>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon income">
+          <i class="fas fa-arrow-down"></i>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Total Pemasukan</p>
+          <h5 class="stat-value">{{ stats.total_income|rupiah }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon expense">
+          <i class="fas fa-arrow-up"></i>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Total Pengeluaran</p>
+          <h5 class="stat-value">{{ stats.total_expense|rupiah }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon transaction">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Total Transaksi</p>
+          <h5 class="stat-value">{{ stats.total_transactions }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-icon profit">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Net Profit</p>
+          <h5 class="stat-value">
+            {{ (stats.total_income - stats.total_expense)|rupiah }}
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Row -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h6 class="card-title">
+            Grafik Pemasukan & Pengeluaran (12 Bulan Terakhir)
+          </h6>
+        </div>
+        <div class="card-body">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+      <div class="card card-actions">
+        <div class="card-header">
+          <h6 class="card-title">Aksi Cepat</h6>
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('transaction.add') }}" class="btn btn-action">
+            <i class="fas fa-plus"></i>
+            <span>Tambah Transaksi</span>
+          </a>
+          <a href="{{ url_for('wallet.index') }}" class="btn btn-action">
+            <i class="fas fa-wallet"></i>
+            <span>Lihat Dompet</span>
+          </a>
+          <a href="{{ url_for('statistics.index') }}" class="btn btn-action">
+            <i class="fas fa-chart-bar"></i>
+            <span>Lihat Statistik</span>
+          </a>
+          <a href="{{ url_for('transaction.index') }}" class="btn btn-action">
+            <i class="fas fa-list"></i>
+            <span>Semua Transaksi</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="card-title">Riwayat Transaksi Terakhir</h6>
+          <a
+            href="{{ url_for('transaction.index') }}"
+            class="btn btn-sm btn-outline-primary"
+            >Lihat Semua</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover transaction-table">
+              <thead>
+                <tr>
+                  <th class="table-header-date">Tanggal</th>
+                  <th class="table-header-category">Kategori</th>
+                  <th class="table-header-description">Keterangan</th>
+                  <th class="table-header-amount text-end">Nominal</th>
+                  <th class="table-header-type">Jenis</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for trans in stats.recent_transactions %}
+                <tr
+                  class="transaction-row {% if trans['type'] == 'income' %}income-row{% else %}expense-row{% endif %}">
+                  <td class="transaction-date">
+                    <div class="date-display">
+                      <span class="date-day"
+                        >{{ (trans['date']|format_date).split()[0] }}</span
+                      >
+                      <span class="date-month"
+                        >{{ (trans['date']|format_date).split()[1] }}</span
+                      >
+                    </div>
+                    <small class="date-year text-muted"
+                      >{{ (trans['date']|format_date).split()[2] }}</small
+                    >
+                  </td>
+                  <td>
+                    <span
+                      class="badge-modern {% if trans['type'] == 'income' %}badge-income{% else %}badge-expense{% endif %}">
+                      <i
+                        class="fas {% if trans['type'] == 'income' %}fa-plus-circle{% else %}fa-minus-circle{% endif %} me-1"></i>
+                      {{ trans['category'] }}
+                    </span>
+                  </td>
+                  <td class="transaction-description">
+                    <div class="description-text">
+                      {{ trans['description'] }}
+                    </div>
+                  </td>
+                  <td class="text-end transaction-amount">
+                    <div class="amount-wrapper">
+                      <span
+                        class="amount-value {% if trans['type'] == 'income' %}text-success{% else %}text-danger{% endif %}">
+                        {% if trans['type'] == 'income' %}
+                        <i class="fas fa-arrow-up me-1"></i>
+                        {% else %}
+                        <i class="fas fa-arrow-down me-1"></i>
+                        {% endif %} {{ trans['amount']|rupiah }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}">
+                      {% if trans['type'] == 'income' %}
+                      <i class="fas fa-arrow-trend-up me-1"></i>Pemasukan {%
+                      else %}
+                      <i class="fas fa-arrow-trend-down me-1"></i>Pengeluaran {%
+                      endif %}
+                    </span>
+                  </td>
+                </tr>
+                {% else %}
+                <tr class="empty-state">
+                  <td colspan="5" class="text-center py-5">
+                    <div class="empty-state-content">
+                      <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                      <h6 class="text-muted">Belum ada transaksi</h6>
+                      <p class="text-muted small">
+                        Transaksi pertama Anda akan muncul di sini
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-    const months = {{ months|safe }};
-    const incomeData = {{ income_data|safe }};
-    const expenseData = {{ expense_data|safe }};
+  // Count-up animation for balance
+  function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          obj.innerHTML = 'Rp ' + Math.floor(progress * (end - start) + start).toLocaleString('id-ID');
+          if (progress < 1) {
+              window.requestAnimationFrame(step);
+          }
+      };
+      window.requestAnimationFrame(step);
+  }
 
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const revenueChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: 'Pemasukan',
-                    data: incomeData,
-                    borderColor: '#6366F1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.12)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#6366F1',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                },
-                {
-                    label: 'Pengeluaran',
-                    data: expenseData,
-                    borderColor: '#D32F2F',
-                    backgroundColor: 'rgba(211, 47, 47, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#D32F2F',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15,
-                        font: { size: 12, weight: 'bold' }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
-                        }
-                    }
-                }
-            }
-        }
-    });
+  // Initialize count-up animation when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+      const balanceElement = document.querySelector('.balance-amount');
+      if (balanceElement && balanceElement.dataset.count) {
+          const targetValue = parseInt(balanceElement.dataset.count);
+          animateValue(balanceElement, 0, targetValue, 2000);
+      }
+  });
+
+  const months = {{ months|safe }};
+  const incomeData = {{ income_data|safe }};
+  const expenseData = {{ expense_data|safe }};
+
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  const revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: months,
+          datasets: [
+              {
+                  label: 'Pemasukan',
+                  data: incomeData,
+                  borderColor: '#2D5016',
+                  backgroundColor: 'rgba(45, 80, 22, 0.15)',
+                  borderWidth: 3,
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#2D5016',
+                  pointBorderColor: '#fff',
+                  pointBorderWidth: 3,
+                  pointRadius: 6,
+                  pointHoverRadius: 8,
+                  pointHoverBackgroundColor: '#1a2e0f',
+                  pointHoverBorderColor: '#fff',
+                  pointHoverBorderWidth: 3,
+                  hoverBorderWidth: 4
+              },
+              {
+                  label: 'Pengeluaran',
+                  data: expenseData,
+                  borderColor: '#B91C1C',
+                  backgroundColor: 'rgba(185, 28, 28, 0.15)',
+                  borderWidth: 3,
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#B91C1C',
+                  pointBorderColor: '#fff',
+                  pointBorderWidth: 3,
+                  pointRadius: 6,
+                  pointHoverRadius: 8,
+                  pointHoverBackgroundColor: '#7f1d1d',
+                  pointHoverBorderColor: '#fff',
+                  pointHoverBorderWidth: 3,
+                  hoverBorderWidth: 4
+              }
+          ]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+              legend: {
+                  display: true,
+                  position: 'top',
+                  labels: {
+                      usePointStyle: true,
+                      padding: 20,
+                      font: {
+                          size: 13,
+                          weight: '600',
+                          family: 'Inter, sans-serif'
+                      },
+                      color: '#1a1a1a'
+                  }
+              },
+              tooltip: {
+                  enabled: true,
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  titleColor: '#1a1a1a',
+                  bodyColor: '#1a1a1a',
+                  borderColor: 'rgba(45, 80, 22, 0.2)',
+                  borderWidth: 1,
+                  cornerRadius: 8,
+                  displayColors: true,
+                  padding: 12,
+                  titleFont: {
+                      size: 14,
+                      weight: 'bold',
+                      family: 'Inter, sans-serif'
+                  },
+                  bodyFont: {
+                      size: 13,
+                      family: 'Inter, sans-serif'
+                  },
+                  callbacks: {
+                      title: function(context) {
+                          return 'Bulan: ' + context[0].label;
+                      },
+                      label: function(context) {
+                          let label = context.dataset.label || '';
+                          if (label) {
+                              label += ': ';
+                          }
+                          label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                          return label;
+                      },
+                      afterLabel: function(context) {
+                          if (context.datasetIndex === 0) {
+                              return 'Pemasukan bulan ini';
+                          } else {
+                              return 'Pengeluaran bulan ini';
+                          }
+                      }
+                  }
+              }
+          },
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      callback: function(value) {
+                          return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                      },
+                      font: {
+                          size: 12,
+                          weight: '500',
+                          family: 'Inter, sans-serif'
+                      },
+                      color: '#6b7280'
+                  },
+                  grid: {
+                      color: 'rgba(45, 80, 22, 0.08)',
+                      lineWidth: 1,
+                      drawBorder: false
+                  },
+                  border: {
+                      color: 'rgba(45, 80, 22, 0.2)',
+                      width: 1
+                  }
+              },
+              x: {
+                  ticks: {
+                      font: {
+                          size: 12,
+                          weight: '500',
+                          family: 'Inter, sans-serif'
+                      },
+                      color: '#6b7280'
+                  },
+                  grid: {
+                      color: 'rgba(45, 80, 22, 0.08)',
+                      lineWidth: 1,
+                      drawBorder: false
+                  },
+                  border: {
+                      color: 'rgba(45, 80, 22, 0.2)',
+                      width: 1
+                  }
+              }
+          },
+          interaction: {
+              intersect: false,
+              mode: 'index'
+          },
+          hover: {
+              mode: 'index',
+              intersect: false
+          },
+          animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart'
+          }
+      }
+  });
 </script>
 {% endblock %}
