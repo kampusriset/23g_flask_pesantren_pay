@@ -1,370 +1,412 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - PonPay</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            background: linear-gradient(135deg, #2D5016 0%, #00695C 50%, #1A2E0F 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
+      body {
+        background: linear-gradient(
+          135deg,
+          #2d5016 0%,
+          #00695c 50%,
+          #1a2e0f 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+      }
 
-        body::before {
-            content: '';
-            position: fixed;
-            width: 400px;
-            height: 400px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            top: -100px;
-            right: -100px;
-            animation: float 20s infinite ease-in-out;
-            z-index: 1;
-        }
+      body::before {
+        content: "";
+        position: fixed;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+        animation: float 20s infinite ease-in-out;
+        z-index: 1;
+      }
 
-        body::after {
-            content: '';
-            position: fixed;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 50%;
-            bottom: -50px;
-            left: -50px;
-            animation: float 25s infinite ease-in-out reverse;
-            z-index: 1;
-        }
+      body::after {
+        content: "";
+        position: fixed;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 50%;
+        bottom: -50px;
+        left: -50px;
+        animation: float 25s infinite ease-in-out reverse;
+        z-index: 1;
+      }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(20px, -20px); }
-            50% { transform: translate(-10px, 20px); }
-            75% { transform: translate(10px, -30px); }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0);
         }
-
-        .login-wrapper {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
+        25% {
+          transform: translate(20px, -20px);
         }
+        50% {
+          transform: translate(-10px, 20px);
+        }
+        75% {
+          transform: translate(10px, -30px);
+        }
+      }
 
+      .login-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+      }
+
+      .login-container {
+        background: white;
+        border-radius: 20px;
+        padding: 50px 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.5s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 20px rgba(45, 80, 22, 0.18);
+        overflow: hidden;
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 15px;
+      }
+
+      .login-header h1 {
+        color: #2d5016;
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 5px;
+      }
+
+      .login-header p {
+        color: #999;
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        color: #333;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #fafafa;
+      }
+
+      .form-control:focus {
+        border-color: #2d5016;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.12);
+        outline: none;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        pointer-events: none;
+        font-size: 16px;
+      }
+
+      .input-group .form-control {
+        padding-left: 45px;
+      }
+
+      .alert-error {
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .alert-error i {
+        font-size: 18px;
+      }
+
+      .btn-login {
+        background: linear-gradient(135deg, #2d5016 0%, #00695c 100%);
+        border: none;
+        color: white;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(45, 80, 22, 0.25);
+        color: white;
+      }
+
+      .btn-login:active {
+        transform: translateY(0);
+      }
+
+      .btn-login i {
+        margin-right: 8px;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        margin: 30px 0;
+        gap: 10px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e0e0e0;
+      }
+
+      .divider span {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+      }
+
+      .login-footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .login-footer p {
+        font-size: 13px;
+        color: #666;
+        margin: 0;
+      }
+
+      .login-footer a {
+        color: #2d5016;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .login-footer a:hover {
+        color: #00695c;
+        text-decoration: underline;
+      }
+
+      .demo-info {
+        background: #f0f9f0;
+        border-left: 4px solid #2d5016;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #1a2e0f;
+        margin-bottom: 20px;
+      }
+
+      .demo-info i {
+        margin-right: 8px;
+      }
+
+      .demo-info strong {
+        color: #00695c;
+      }
+
+      @media (max-width: 576px) {
         .login-container {
-            background: white;
-            border-radius: 20px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 8px 20px rgba(45, 80, 22, 0.18);
-            overflow: hidden;
-        }
-
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 15px;
+          padding: 40px 20px;
         }
 
         .login-header h1 {
-            color: #2D5016;
-            font-weight: 700;
-            font-size: 32px;
-            margin-bottom: 5px;
+          font-size: 24px;
         }
 
-        .login-header p {
-            color: #999;
-            font-size: 14px;
-            margin: 0;
+        .logo {
+          width: 60px;
+          height: 60px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .logo img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 15px;
         }
-
-        .form-label {
-            color: #333;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .form-control {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background: #fafafa;
-        }
-
-        .form-control:focus {
-            border-color: #2D5016;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.12);
-            outline: none;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            pointer-events: none;
-            font-size: 16px;
-        }
-
-        .input-group .form-control {
-            padding-left: 45px;
-        }
-
-        .alert-error {
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
-            color: #c62828;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-error i {
-            font-size: 18px;
-        }
-
-        .btn-login {
-            background: linear-gradient(135deg, #2D5016 0%, #00695C 100%);
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(45, 80, 22, 0.25);
-            color: white;
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .btn-login i {
-            margin-right: 8px;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 30px 0;
-            gap: 10px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e0e0e0;
-        }
-
-        .divider span {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .login-footer {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .login-footer p {
-            font-size: 13px;
-            color: #666;
-            margin: 0;
-        }
-
-        .login-footer a {
-            color: #2D5016;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .login-footer a:hover {
-            color: #00695C;
-            text-decoration: underline;
-        }
-
-        .demo-info {
-            background: #f0f9f0;
-            border-left: 4px solid #2D5016;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #1a2e0f;
-            margin-bottom: 20px;
-        }
-
-        .demo-info i {
-            margin-right: 8px;
-        }
-
-        .demo-info strong {
-            color: #00695C;
-        }
-
-        @media (max-width: 576px) {
-            .login-container {
-                padding: 40px 20px;
-            }
-
-            .login-header h1 {
-                font-size: 24px;
-            }
-
-            .logo {
-                width: 60px;
-                height: 60px;
-            }
-
-            .logo img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                border-radius: 15px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="login-wrapper">
-        <div class="login-container">
-            <div class="login-header">
-                <div class="logo">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Al Huda">
-                </div>
-                <h1>PonPay</h1>
-                <p>Sistem Pembayaran Pondok Pesantren Al Huda</p>
-            </div>
-
-            <form action="/login" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                {% if error %}
-                <div class="alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>{{ error }}</span>
-                </div>
-                {% endif %}
-
-                <div class="demo-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Demo:</strong> Username: admin | Password: admin123
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <div class="input-group">
-                        <i class="fas fa-user input-icon"></i>
-                        <input type="text" name="username" class="form-control" 
-                               placeholder="Masukkan username" value="admin" required autofocus>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <div class="input-group">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="password" name="password" class="form-control" 
-                               placeholder="Masukkan password" value="admin123" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">
-                            Ingat saya
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> Masuk
-                </button>
-
-                <div class="login-footer">
-                    <p><a href="#"><i class="fas fa-question-circle"></i> Lupa Password? Hubungi Admin</a></p>
-                </div>
-            </form>
+      <div class="login-container">
+        <div class="login-header">
+          <div class="logo">
+            <img
+              src="{{ url_for('static', filename='images/logo.png') }}"
+              alt="Logo Al Huda" />
+          </div>
+          <h1>PonPay</h1>
+          <p>Sistem Pembayaran Pondok Pesantren Al Huda</p>
         </div>
+
+        <form action="/login" method="POST">
+          <!-- CSRF Token untuk keamanan -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% if error %}
+          <div class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+          </div>
+          {% endif %}
+
+          <div class="demo-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Demo:</strong> Username: admin | Password: admin123
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-group">
+              <i class="fas fa-user input-icon"></i>
+              <input
+                type="text"
+                name="username"
+                class="form-control"
+                placeholder="Masukkan username"
+                value="admin"
+                required
+                autofocus />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <i class="fas fa-lock input-icon"></i>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Masukkan password"
+                value="admin123"
+                required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="remember"
+                name="remember" />
+              <label class="form-check-label" for="remember">
+                Ingat saya
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Masuk
+          </button>
+
+          <div class="login-footer">
+            <p>
+              <a href="#"
+                ><i class="fas fa-question-circle"></i> Lupa Password? Hubungi
+                Admin</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>

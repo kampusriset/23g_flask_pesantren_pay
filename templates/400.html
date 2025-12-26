@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block title %}Bad Request - PonPay{% endblock %} {%
+block page_title %}Bad Request{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-exclamation-triangle"></i> Bad Request (400)
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <div class="mb-4">
+            <i
+              class="fas fa-exclamation-triangle text-warning"
+              style="font-size: 4rem"></i>
+          </div>
+
+          <h4 class="text-warning mb-3">Permintaan Tidak Valid</h4>
+
+          <p class="text-muted mb-4">
+            Server tidak dapat memproses permintaan Anda karena format yang
+            tidak valid.
+          </p>
+
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Informasi:</strong> Jika Anda terus mengalami error ini,
+            silakan hubungi administrator sistem.
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <a
+              href="javascript:window.history.back()"
+              class="btn btn-secondary">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+              <i class="fas fa-home"></i> Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

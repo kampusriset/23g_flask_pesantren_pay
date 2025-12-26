@@ -1,389 +1,837 @@
-{% extends "base.html" %}
-
-{% block title %}Data Santri - PonPay{% endblock %}
-
-{% block page_title %}
-<div class="d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="page-title"><i class="fas fa-users"></i> Daftar Santri</h1>
-        <p class="text-muted">Total: {{ students|length }} Santri</p>
-    </div>
-    <div class="btn-group" role="group">
-        <a href="{{ url_for('students.add') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Santri
-        </a>
-        <a href="{{ url_for('students.import_excel') }}" class="btn btn-info">
-            <i class="fas fa-upload"></i> Import Excel
-        </a>
-        <a href="{{ url_for('students.export_excel') }}" class="btn btn-success">
-            <i class="fas fa-download"></i> Export Data
-        </a>
-        <a href="{{ url_for('students.download_report') }}" class="btn btn-warning">
-            <i class="fas fa-file-excel"></i> Laporan
-        </a>
-    </div>
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card" style="border-left: 5px solid #6366F1;">
-                <div class="card-body">
-                    <h6 class="card-title text-muted">Total Santri</h6>
-                    <h3 style="color: #6366F1; font-weight: bold;">{{ students|length }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card" style="border-left: 5px solid #10B981;">
-                <div class="card-body">
-                    <h6 class="card-title text-muted">Santri Aktif</h6>
-                    <h3 style="color: #10B981; font-weight: bold;">
-                        {% set aktif = students|selectattr('status', 'equalto', 'aktif')|list %}
-                        {{ aktif|length }}
-                    </h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card" style="border-left: 5px solid #F59E0B;">
-                <div class="card-body">
-                    <h6 class="card-title text-muted">Belum Bayar Bulan Ini</h6>
-                    <h3 style="color: #F59E0B; font-weight: bold;">
-                        {% set belum_bayar_count = 0 %}
-                        {% for s in students %}
-                            {% if s.month_payment == 0 %}
-                                {% set belum_bayar_count = belum_bayar_count + 1 %}
-                            {% endif %}
-                        {% endfor %}
-                        {{ belum_bayar_count }}
-                    </h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card" style="border-left: 5px solid #8B5CF6;">
-                <div class="card-body">
-                    <h6 class="card-title text-muted">Total Bayar</h6>
-                    <h3 style="color: #8B5CF6; font-weight: bold;">
-                        {{ (students|map(attribute='total_payment')|sum)|int|rupiah }}
-                    </h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter & Tabs -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <ul class="nav nav-tabs mb-3" id="studentTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-pane" type="button" role="tab">
-                        <i class="fas fa-list"></i> Semua Santri
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="belum-bayar-tab" data-bs-toggle="tab" data-bs-target="#belum-bayar-pane" type="button" role="tab">
-                        <i class="fas fa-exclamation-circle"></i> Belum Bayar Bulan Ini
-                    </button>
-                </li>
-            </ul>
-
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Cari Nama</label>
-                    <input type="text" class="form-control" id="search" placeholder="Nama santri...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Kelas</label>
-                    <select class="form-select" id="filterKelas">
-                        <option value="">Semua Kelas</option>
-                        <option value="Kelas 1">Kelas 1</option>
-                        <option value="Kelas 2">Kelas 2</option>
-                        <option value="Kelas 3">Kelas 3</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="filterStatus">
-                        <option value="">Semua Status</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="non-aktif">Non-Aktif</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="reset" class="btn btn-outline-secondary w-100" onclick="document.getElementById('search').value=''; document.getElementById('filterKelas').value=''; document.getElementById('filterStatus').value='';">
-                        Reset
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab Content -->
-    <div class="tab-content" id="studentTabsContent">
-        <!-- All Students Tab -->
-        <div class="tab-pane fade show active" id="all-pane" role="tabpanel" tabindex="0">
-            <div class="card">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 5%">No.</th>
-                                <th>Nama Santri</th>
-                                <th>NISN</th>
-                                <th>Kelas</th>
-                                <th>Jenis Kelamin</th>
-                                <th>Status</th>
-                                <th>Total Pembayaran</th>
-                                <th style="width: 18%">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            {% if students %}
-                                {% for student in students %}
-                                <tr class="student-row" data-name="{{ student.name }}" data-kelas="{{ student.kelas }}" data-status="{{ student.status }}" data-paid="{{ student.month_payment }}">
-                                    <td>{{ loop.index }}</td>
-                                    <td>
-                                        <strong>{{ student.name }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ student.parent_name }}</small>
-                                    </td>
-                                    <td><code>{{ student.nisn }}</code></td>
-                                    <td>
-                                        <span class="badge" style="background-color: #E0E7FF; color: #4F46E5;">{{ student.kelas }}</span>
-                                    </td>
-                                    <td>
-                                        {% if student.jenis_kelamin == 'Perempuan' %}
-                                            <i class="fas fa-venus" style="color: #EC4899;"></i> Perempuan
-                                        {% else %}
-                                            <i class="fas fa-mars" style="color: #3B82F6;"></i> Laki-laki
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if student.status == 'aktif' %}
-                                            <span class="badge" style="background-color: #D1FAE5; color: #065F46;"><i class="fas fa-check-circle"></i> Aktif</span>
-                                        {% else %}
-                                            <span class="badge" style="background-color: #FEE2E2; color: #7F1D1D;"><i class="fas fa-times-circle"></i> Non-Aktif</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <strong style="color: #6366F1;">{{ student.total_payment|rupiah }}</strong>
-                                        <br>
-                                        <small class="text-muted">Bulan ini: {{ student.month_payment|rupiah }}</small>
-                                    </td>
-                                    <td>
-                                        <a href="{{ url_for('students.detail', student_id=student.id) }}" class="btn btn-sm btn-outline-primary" title="Lihat">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('students.edit', student_id=student.id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('students.delete', student_id=student.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin?')" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Tidak ada santri</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Belum Bayar Tab -->
-        <div class="tab-pane fade" id="belum-bayar-pane" role="tabpanel" tabindex="0">
-            <div class="card">
-                {% set belum_bayar_list = [] %}
-                {% for student in students %}
-                    {% if student.month_payment == 0 %}
-                        {% set _ = belum_bayar_list.append(student) %}
-                    {% endif %}
-                {% endfor %}
-
-                {% if belum_bayar_list|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 5%">No.</th>
-                                <th>Nama Santri</th>
-                                <th>NISN</th>
-                                <th>Kelas</th>
-                                <th>Orang Tua</th>
-                                <th>No. Telepon</th>
-                                <th style="width: 18%">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in belum_bayar_list %}
-                            <tr style="background-color: #FFFBEB;">
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    <strong>{{ student.name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ student.nisn }}</small>
-                                </td>
-                                <td><code>{{ student.nisn }}</code></td>
-                                <td>
-                                    <span class="badge" style="background-color: #FEF08A; color: #713F12;">{{ student.kelas }}</span>
-                                </td>
-                                <td>
-                                    <strong>{{ student.parent_name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ student.alamat }}</small>
-                                </td>
-                                <td>
-                                    <a href="tel:{{ student.parent_phone }}" style="color: #6366F1; text-decoration: none;">
-                                        <i class="fas fa-phone"></i> {{ student.parent_phone }}
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('students.detail', student_id=student.id) }}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-plus-circle"></i> Catat Bayar
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <div style="font-size: 3rem; color: #D1D5DB; margin-bottom: 10px;">
-                        <i class="fas fa-check-double"></i>
-                    </div>
-                    <h5 style="color: #6B7280;">Semua Santri Sudah Bayar</h5>
-                    <p style="color: #9CA3AF;">Semua santri telah melakukan pembayaran bulan ini. Bagus!</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
+{% extends "base.html" %} {% block title %}Data Santri - PonPay{% endblock %} {%
+block page_title %}Data Santri{% endblock %} {% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: "#f0fdf4",
+            100: "#dcfce7",
+            200: "#bbf7d0",
+            300: "#86efac",
+            400: "#4ade80",
+            500: "#22c55e",
+            600: "#16a34a",
+            700: "#15803d",
+            800: "#166534",
+            900: "#14532d",
+            950: "#052e16",
+          },
+        },
+      },
+    },
+  };
+</script>
 <style>
-    .badge {
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.375rem;
-        font-weight: 500;
-        font-size: 0.85rem;
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  .table > :not(caption) > * > * {
+    padding: 1rem 0.75rem;
+  }
+
+  .nav-tabs .nav-link {
+    color: #6b7280;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .nav-tabs .nav-link:hover {
+    color: #6366f1;
+  }
+
+  .nav-tabs .nav-link.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+    background-color: transparent;
+  }
+
+  .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f9fafb;
+  }
+
+  .btn-group-sm {
+    gap: 4px;
+  }
+
+  /* New Student Table Styles */
+  .student-table-row {
+    transition: all 0.2s ease;
+  }
+
+  .student-table-row:hover {
+    background-color: rgba(99, 102, 241, 0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .student-primary-info {
+    margin-bottom: 0.5rem;
+  }
+
+  .student-name {
+    font-size: 1.1rem;
+    color: #1f2937;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .student-secondary-info small {
+    display: block;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+  }
+
+  .payment-status-section {
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .payment-info {
+    margin-top: 0.5rem;
+  }
+
+  .total-payment {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .btn-group .btn {
+    margin-right: 0.25rem;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease;
+  }
+
+  .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-group .btn:last-child {
+    margin-right: 0;
+  }
+
+  /* Responsive improvements */
+  @media (max-width: 768px) {
+    .table {
+      font-size: 0.85rem;
     }
 
-    .table > :not(caption) > * > * {
-        padding: 1rem 0.75rem;
+    .student-name {
+      font-size: 1rem;
     }
 
-    .nav-tabs .nav-link {
-        color: #6B7280;
-        border: none;
-        border-bottom: 3px solid transparent;
-        transition: all 0.3s ease;
-    }
-
-    .nav-tabs .nav-link:hover {
-        color: #6366F1;
-    }
-
-    .nav-tabs .nav-link.active {
-        color: #6366F1;
-        border-bottom-color: #6366F1;
-        background-color: transparent;
-    }
-
-    .card {
-        border: 1px solid #E5E7EB;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: #F9FAFB;
+    .total-payment {
+      font-size: 1rem;
     }
 
     .btn-group-sm {
-        gap: 4px;
+      display: flex;
+      flex-wrap: wrap;
     }
 
-    /* Responsive improvements */
-    @media (max-width: 768px) {
-        .table {
-            font-size: 0.85rem;
-        }
-
-        .btn-group-sm {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .btn-group-sm .btn {
-            padding: 0.4rem 0.5rem;
-            font-size: 0.75rem;
-        }
-
-        .row.g-3 {
-            gap: 0.75rem;
-        }
-
-        .col-md-3 {
-            margin-bottom: 0.5rem;
-        }
+    .btn-group-sm .btn {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.75rem;
     }
 
-    @media (max-width: 576px) {
-        .btn-group {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .btn {
-            width: 100%;
-        }
-
-        .table {
-            font-size: 0.75rem;
-        }
-
-        th, td {
-            padding: 0.5rem !important;
-        }
+    .row.g-3 {
+      gap: 0.75rem;
     }
+
+    .col-md-3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .student-secondary-info small {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .btn-group {
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .btn-group .btn {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+      margin-bottom: 0;
+    }
+
+    .table {
+      font-size: 0.75rem;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 0.5rem !important;
+    }
+
+    .student-primary-info {
+      margin-bottom: 0.25rem;
+    }
+
+    .student-name {
+      font-size: 0.95rem;
+    }
+
+    .total-payment {
+      font-size: 0.95rem;
+    }
+
+    .payment-status-section {
+      min-height: auto;
+    }
+  }
 </style>
-{% endblock %}
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0">
+        <i class="fas fa-users text-primary me-2"></i>Daftar Santri
+      </h1>
+      <p class="text-muted mb-0">Total: {{ students|length }} Santri</p>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Total Santri</p>
+            <p class="text-3xl font-bold text-primary-600">
+              {{ students|length }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users text-primary-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
 
-{% block extra_js %}
-<script>
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+        style="animation-delay: 0.1s">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Santri Aktif</p>
+            <p class="text-3xl font-bold text-green-600">
+              {% set aktif = students|selectattr('status', 'equalto',
+              'aktif')|list %}{{ aktif|length }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+        style="animation-delay: 0.2s">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">
+              Belum Bayar Bulan Ini
+            </p>
+            <p class="text-3xl font-bold text-orange-600">
+              {% set belum_bayar_count = 0 %}{% for s in students %}{% if
+              s.month_payment == 0 %}{% set belum_bayar_count =
+              belum_bayar_count + 1 %}{% endif %}{% endfor %}{{
+              belum_bayar_count }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-orange-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+        style="animation-delay: 0.3s">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Total Bayar</p>
+            <p class="text-3xl font-bold text-purple-600">
+              {{ (students|map(attribute='total_payment')|sum)|int|rupiah }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-wallet text-purple-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Tabs -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <!-- Tabs -->
+      <div class="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+        <button
+          class="flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 active-tab bg-white text-primary-600 shadow-sm"
+          id="all-tab"
+          onclick="switchTab('all')">
+          <i class="fas fa-list mr-2"></i>
+          Semua Santri
+        </button>
+        <button
+          class="flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 text-gray-600 hover:text-gray-900"
+          id="belum-bayar-tab"
+          onclick="switchTab('belum-bayar')">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          Belum Bayar
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Cari Nama</label
+          >
+          <input
+            type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            id="search"
+            placeholder="Nama santri..." />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Kelas</label
+          >
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            id="filterKelas">
+            <option value="">Semua Kelas</option>
+            <option value="Kelas 1">Kelas 1</option>
+            <option value="Kelas 2">Kelas 2</option>
+            <option value="Kelas 3">Kelas 3</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Status</label
+          >
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            id="filterStatus">
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="non-aktif">Non-Aktif</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button
+            type="reset"
+            class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+            onclick="resetFilters()">
+            Reset Filter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <h6 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h6>
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="{{ url_for('students.add') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+          <i class="fas fa-plus mr-2"></i>Tambah Santri
+        </a>
+        <a
+          href="{{ url_for('students.import_excel') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+          <i class="fas fa-upload mr-2"></i>Import Excel
+        </a>
+        <a
+          href="{{ url_for('students.export_excel') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+          <i class="fas fa-download mr-2"></i>Export Data
+        </a>
+        <a
+          href="{{ url_for('students.download_report') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
+          <i class="fas fa-file-excel mr-2"></i>Laporan
+        </a>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="space-y-6">
+      <!-- All Students Tab -->
+      <div id="all-pane" class="active-tab-content">
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    No.
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Santri
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Kelas
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Pembayaran
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200" id="studentTableBody">
+                {% if students %} {% for student in students %}
+                <tr
+                  class="student-row hover:bg-gray-50 transition-colors duration-200"
+                  data-name="{{ student.name }}"
+                  data-kelas="{{ student.kelas }}"
+                  data-status="{{ student.status }}"
+                  data-paid="{{ student.month_payment }}">
+                  <!-- No. -->
+                  <td
+                    class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ loop.index }}
+                  </td>
+
+                  <!-- Santri -->
+                  <td class="px-4 py-3">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 w-8 h-8">
+                        <div
+                          class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+                          <span class="text-xs font-medium text-primary-700">
+                            {{ student.name[0].upper() }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="ml-3">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ student.name }}
+                        </div>
+                        <div class="text-xs text-gray-500 font-mono">
+                          {{ student.nisn }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Kelas -->
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 text-primary-800">
+                      {{ student.kelas }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    {% if student.status == 'aktif' %}
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                      <i class="fas fa-check-circle mr-1"></i>Aktif
+                    </span>
+                    {% else %}
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                      <i class="fas fa-times-circle mr-1"></i>Non-Aktif
+                    </span>
+                    {% endif %}
+                  </td>
+
+                  <!-- Pembayaran -->
+                  <td class="px-4 py-3">
+                    <div class="text-sm">
+                      <div class="font-medium text-gray-900">
+                        {{ student.total_payment|rupiah }}
+                      </div>
+                      <div class="text-gray-500 text-xs">
+                        {% if student.month_payment == 0 %}
+                        <span
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                          <i class="fas fa-exclamation-triangle mr-1"></i>Belum
+                          Bayar
+                        </span>
+                        {% else %}
+                        <span class="text-green-600 font-medium"
+                          >{{ student.month_payment|rupiah }}</span
+                        >
+                        <span class="text-gray-400">bulan ini</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Aksi -->
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                    <div class="relative">
+                      <button
+                        onclick="toggleDropdown({{ student.id }})"
+                        class="inline-flex items-center p-1.5 border border-gray-300 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        title="Menu Aksi">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </button>
+                      <div
+                        id="dropdown-{{ student.id }}"
+                        class="hidden absolute right-0 z-10 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200">
+                        <div class="py-1">
+                          <button
+                            onclick="toggleDetails({{ student.id }})"
+                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-eye mr-2"></i>Lihat Detail
+                          </button>
+                          <a
+                            href="{{ url_for('students.edit', student_id=student.id) }}"
+                            class="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+                            <i class="fas fa-edit mr-2"></i>Edit
+                          </a>
+                          <a
+                            href="{{ url_for('students.delete', student_id=student.id) }}"
+                            class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            onclick="return confirm('Yakin ingin menghapus santri ini?')">
+                            <i class="fas fa-trash mr-2"></i>Hapus
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Expandable Details Row -->
+                <tr id="details-{{ student.id }}" class="hidden bg-gray-50">
+                  <td colspan="6" class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span class="font-medium text-gray-600"
+                          >Jenis Kelamin:</span
+                        >
+                        <span class="ml-2">
+                          {% if student.jenis_kelamin == 'Perempuan' %}
+                          <i class="fas fa-venus text-pink-500 mr-1"></i
+                          >Perempuan {% else %}
+                          <i class="fas fa-mars text-blue-500 mr-1"></i
+                          >Laki-laki {% endif %}
+                        </span>
+                      </div>
+                      <div>
+                        <span class="font-medium text-gray-600"
+                          >Orang Tua:</span
+                        >
+                        <span class="ml-2">{{ student.parent_name }}</span>
+                      </div>
+                      <div>
+                        <span class="font-medium text-gray-600">Telepon:</span>
+                        <a
+                          href="tel:{{ student.parent_phone }}"
+                          class="ml-2 text-blue-600 hover:text-blue-800">
+                          <i class="fas fa-phone mr-1"></i>{{
+                          student.parent_phone }}
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="6" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center">
+                      <i class="fas fa-users text-gray-400 text-4xl mb-4"></i>
+                      <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Tidak ada data santri
+                      </h3>
+                      <p class="text-gray-500">
+                        Belum ada santri yang terdaftar dalam sistem.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Belum Bayar Tab -->
+      <div
+        class="tab-pane fade"
+        id="belum-bayar-pane"
+        role="tabpanel"
+        tabindex="0">
+        <div class="card">
+          {% set belum_bayar_list = [] %} {% for student in students %} {% if
+          student.month_payment == 0 %} {% set _ =
+          belum_bayar_list.append(student) %} {% endif %} {% endfor %} {% if
+          belum_bayar_list|length > 0 %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 5%">No.</th>
+                  <th>Nama Santri</th>
+                  <th>NISN</th>
+                  <th>Kelas</th>
+                  <th>Orang Tua</th>
+                  <th>No. Telepon</th>
+                  <th style="width: 18%">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in belum_bayar_list %}
+                <tr style="background-color: #fffbeb">
+                  <td>{{ loop.index }}</td>
+                  <td>
+                    <strong>{{ student.name }}</strong>
+                    <br />
+                    <small class="text-muted">{{ student.nisn }}</small>
+                  </td>
+                  <td><code>{{ student.nisn }}</code></td>
+                  <td>
+                    <span
+                      class="badge"
+                      style="background-color: #fef08a; color: #713f12"
+                      >{{ student.kelas }}</span
+                    >
+                  </td>
+                  <td>
+                    <strong>{{ student.parent_name }}</strong>
+                    <br />
+                    <small class="text-muted">{{ student.alamat }}</small>
+                  </td>
+                  <td>
+                    <a
+                      href="tel:{{ student.parent_phone }}"
+                      style="color: #6366f1; text-decoration: none">
+                      <i class="fas fa-phone"></i> {{ student.parent_phone }}
+                    </a>
+                  </td>
+                  <td>
+                    <a
+                      href="{{ url_for('students.detail', student_id=student.id) }}"
+                      class="btn btn-sm btn-primary">
+                      <i class="fas fa-plus-circle"></i> Catat Bayar
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div style="font-size: 3rem; color: #d1d5db; margin-bottom: 10px">
+              <i class="fas fa-check-double"></i>
+            </div>
+            <h5 style="color: #6b7280">Semua Santri Sudah Bayar</h5>
+            <p style="color: #9ca3af">
+              Semua santri telah melakukan pembayaran bulan ini. Bagus!
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %} {% block extra_js %}
+  <script>
+    // Tab switching functionality
+    function switchTab(tabName) {
+      // Update tab buttons
+      const allTab = document.getElementById("all-tab");
+      const belumBayarTab = document.getElementById("belum-bayar-tab");
+      const allPane = document.getElementById("all-pane");
+      const belumBayarPane = document.getElementById("belum-bayar-pane");
+
+      if (tabName === "all") {
+        allTab.classList.add(
+          "active-tab",
+          "bg-white",
+          "text-primary-600",
+          "shadow-sm"
+        );
+        allTab.classList.remove("text-gray-600", "hover:text-gray-900");
+        belumBayarTab.classList.remove(
+          "active-tab",
+          "bg-white",
+          "text-primary-600",
+          "shadow-sm"
+        );
+        belumBayarTab.classList.add("text-gray-600", "hover:text-gray-900");
+
+        allPane.classList.add("active-tab-content");
+        belumBayarPane.classList.remove("active-tab-content");
+      } else if (tabName === "belum-bayar") {
+        belumBayarTab.classList.add(
+          "active-tab",
+          "bg-white",
+          "text-primary-600",
+          "shadow-sm"
+        );
+        belumBayarTab.classList.remove("text-gray-600", "hover:text-gray-900");
+        allTab.classList.remove(
+          "active-tab",
+          "bg-white",
+          "text-primary-600",
+          "shadow-sm"
+        );
+        allTab.classList.add("text-gray-600", "hover:text-gray-900");
+
+        belumBayarPane.classList.add("active-tab-content");
+        allPane.classList.remove("active-tab-content");
+      }
+    }
+
+    // Details toggle functionality
+    function toggleDetails(studentId) {
+      const detailsRow = document.getElementById(`details-${studentId}`);
+      const eyeIcon = event.target.closest("button").querySelector("i");
+
+      if (detailsRow.classList.contains("hidden")) {
+        detailsRow.classList.remove("hidden");
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+      } else {
+        detailsRow.classList.add("hidden");
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+      }
+    }
+
+    // Dropdown toggle functionality
+    function toggleDropdown(studentId) {
+      const dropdown = document.getElementById(`dropdown-${studentId}`);
+      const isHidden = dropdown.classList.contains("hidden");
+
+      // Close all other dropdowns
+      document.querySelectorAll('[id^="dropdown-"]').forEach((d) => {
+        if (d !== dropdown) d.classList.add("hidden");
+      });
+
+      // Toggle current dropdown
+      if (isHidden) {
+        dropdown.classList.remove("hidden");
+      } else {
+        dropdown.classList.add("hidden");
+      }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest(".relative")) {
+        document.querySelectorAll('[id^="dropdown-"]').forEach((d) => {
+          d.classList.add("hidden");
+        });
+      }
+    });
+
+    // Reset filters functionality
+    function resetFilters() {
+      document.getElementById("search").value = "";
+      document.getElementById("filterKelas").value = "";
+      document.getElementById("filterStatus").value = "";
+      filterTable();
+    }
+
     // Real-time search dan filter
-    document.getElementById('search').addEventListener('keyup', filterTable);
-    document.getElementById('filterKelas').addEventListener('change', filterTable);
-    document.getElementById('filterStatus').addEventListener('change', filterTable);
+    document.getElementById("search").addEventListener("keyup", filterTable);
+    document
+      .getElementById("filterKelas")
+      .addEventListener("change", filterTable);
+    document
+      .getElementById("filterStatus")
+      .addEventListener("change", filterTable);
 
     function filterTable() {
-        const searchValue = document.getElementById('search').value.toLowerCase();
-        const kelasValue = document.getElementById('filterKelas').value;
-        const statusValue = document.getElementById('filterStatus').value;
-        
-        const rows = document.querySelectorAll('.student-row');
-        
-        rows.forEach(row => {
-            const name = row.getAttribute('data-name').toLowerCase();
-            const kelas = row.getAttribute('data-kelas');
-            const status = row.getAttribute('data-status');
-            
-            const matchName = name.includes(searchValue);
-            const matchKelas = !kelasValue || kelas === kelasValue;
-            const matchStatus = !statusValue || status === statusValue;
-            
-            row.style.display = matchName && matchKelas && matchStatus ? '' : 'none';
-        });
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      const kelasValue = document.getElementById("filterKelas").value;
+      const statusValue = document.getElementById("filterStatus").value;
+
+      const rows = document.querySelectorAll(".student-row");
+
+      rows.forEach((row) => {
+        const name = row.getAttribute("data-name").toLowerCase();
+        const kelas = row.getAttribute("data-kelas");
+        const status = row.getAttribute("data-status");
+
+        const matchName = name.includes(searchValue);
+        const matchKelas = !kelasValue || kelas === kelasValue;
+        const matchStatus = !statusValue || status === statusValue;
+
+        row.style.display =
+          matchName && matchKelas && matchStatus ? "" : "none";
+      });
     }
-</script>
-{% endblock %}
+
+    // Initialize default tab
+    document.addEventListener("DOMContentLoaded", function () {
+      switchTab("all");
+    });
+  </script>
+  {% endblock %}
+</div>

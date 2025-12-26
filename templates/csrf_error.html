@@ -1,0 +1,106 @@
+{% extends 'base.html' %} {% block title %}Error Keamanan - PonPay{% endblock %}
+{% block page_title %}Error Keamanan{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-shield-alt"></i> Error Keamanan - CSRF Token
+            Invalid
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <div class="mb-4">
+            <i
+              class="fas fa-exclamation-triangle text-danger"
+              style="font-size: 4rem"></i>
+          </div>
+
+          <h4 class="text-danger mb-3">Permintaan Tidak Valid</h4>
+
+          <p class="text-muted mb-4">
+            Sistem mendeteksi aktivitas yang mencurigakan. Ini mungkin terjadi
+            karena:
+          </p>
+
+          <ul class="text-left mb-4">
+            <li>Sesi Anda telah berakhir</li>
+            <li>Halaman terlalu lama tidak di-refresh</li>
+            <li>Ada masalah teknis sementara</li>
+            <li>Permintaan berasal dari sumber yang tidak sah</li>
+          </ul>
+
+          <div class="alert alert-warning">
+            <i class="fas fa-info-circle"></i>
+            <strong>Penting:</strong> Jika Anda terus mengalami error ini,
+            silakan logout dan login kembali.
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <a
+              href="javascript:window.location.reload()"
+              class="btn btn-primary">
+              <i class="fas fa-refresh"></i> Refresh Halaman
+            </a>
+            <a
+              href="{{ url_for('dashboard.index') }}"
+              class="btn btn-secondary">
+              <i class="fas fa-home"></i> Kembali ke Dashboard
+            </a>
+            <a
+              href="{{ url_for('auth.logout') }}"
+              class="btn btn-outline-danger">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Details (hidden by default) -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <button
+              class="btn btn-link p-0 text-decoration-none"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#technicalDetails">
+              <i class="fas fa-cog"></i> Detail Teknis (untuk Developer)
+            </button>
+          </h6>
+        </div>
+        <div class="collapse" id="technicalDetails">
+          <div class="card-body">
+            <small class="text-muted">
+              <strong>Error Type:</strong> CSRF Token Validation Failed<br />
+              <strong>HTTP Status:</strong> 400 Bad Request<br />
+              <strong>Timestamp:</strong> {{ datetime.now().strftime('%Y-%m-%d
+              %H:%M:%S') }}<br />
+              <strong>Protection:</strong> Flask-WTF CSRF Protection Active
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Auto-refresh setelah 30 detik jika user tidak melakukan apa-apa
+  let autoRefreshTimer = setTimeout(function () {
+    if (
+      confirm(
+        "Halaman akan di-refresh otomatis. Apakah Anda ingin melanjutkan?"
+      )
+    ) {
+      window.location.reload();
+    }
+  }, 30000);
+
+  // Clear timer jika user mengklik tombol
+  document.addEventListener("click", function () {
+    clearTimeout(autoRefreshTimer);
+  });
+</script>
+{% endblock %}

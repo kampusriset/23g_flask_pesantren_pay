@@ -1,8 +1,7 @@
 """
-Database Configuration dan Management (MySQL Version)
+Database Configuration dan Management (SQLite Version)
 """
-import mysql.connector
-from mysql.connector import Error
+import sqlite3
 from flask import g, current_app
 from datetime import datetime, timedelta
 import random
@@ -11,16 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def get_db():
     """Mendapatkan koneksi database"""
     if 'db' not in g:
-        try:
-            g.db = mysql.connector.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['MYSQL_DB']
-            )
-        except Error as e:
-            print(f"Error connecting to MySQL: {e}")
-            return None
+        g.db = sqlite3.connect(current_app.config['DATABASE'])
+        g.db.row_factory = sqlite3.Row  # Enable column access by name
     return g.db
 
 def close_db(e=None):
@@ -31,79 +22,65 @@ def close_db(e=None):
 
 def init_db():
     """Inisialisasi database dengan schema"""
-    # Create database if not exists
-    try:
-        conn = mysql.connector.connect(
-            host=current_app.config['MYSQL_HOST'],
-            user=current_app.config['MYSQL_USER'],
-            password=current_app.config['MYSQL_PASSWORD']
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {current_app.config['MYSQL_DB']}")
-        conn.close()
-    except Error as e:
-        print(f"Error creating database: {e}")
-        return
-
     db = get_db()
     c = db.cursor()
     
     # Tabel Users
     c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        username VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        email VARCHAR(255),
-        full_name VARCHAR(255),
-        role VARCHAR(50) DEFAULT 'user',
-        profile_picture VARCHAR(255),
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        email TEXT,
+        full_name TEXT,
+        role TEXT DEFAULT 'user',
+        profile_picture TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    
+
     # Tabel Students (Santri)
     c.execute('''CREATE TABLE IF NOT EXISTS students (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
-        nisn VARCHAR(50) UNIQUE,
-        kelas VARCHAR(50),
-        jenis_kelamin VARCHAR(20),
-        phone VARCHAR(20),
-        parent_name VARCHAR(255),
-        parent_phone VARCHAR(20),
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        nisn TEXT UNIQUE,
+        kelas TEXT,
+        jenis_kelamin TEXT,
+        phone TEXT,
+        parent_name TEXT,
+        parent_phone TEXT,
         alamat TEXT,
-        status VARCHAR(20) DEFAULT 'aktif',
-        photo VARCHAR(255),
+        status TEXT DEFAULT 'aktif',
+        photo TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    
+
     # Tabel Transactions
     c.execute('''CREATE TABLE IF NOT EXISTS transactions (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT NOT NULL,
-        student_id INT,
-        type VARCHAR(50) NOT NULL,
-        category VARCHAR(100) NOT NULL,
-        amount INT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        student_id INTEGER,
+        type TEXT NOT NULL,
+        category TEXT NOT NULL,
+        amount INTEGER NOT NULL,
         description TEXT,
         date DATE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (student_id) REFERENCES students(id)
     )''')
-    
+
     # Tabel Wallet (Saldo Pondok)
     c.execute('''CREATE TABLE IF NOT EXISTS wallet (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT NOT NULL,
-        balance INT DEFAULT 0,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        balance INTEGER DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )''')
-    
+
     # Tabel Settings
     c.execute('''CREATE TABLE IF NOT EXISTS settings (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        `key` VARCHAR(100) UNIQUE NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
         value TEXT
     )''')
     
@@ -113,11 +90,11 @@ def init_db():
         # Insert default user (admin)
         admin_pw = generate_password_hash('admin123')
         c.execute('''INSERT INTO users (username, password, email, full_name, role)
-                     VALUES (%s, %s, %s, %s, %s)''',
+                     VALUES (?, ?, ?, ?, ?)''',
                   ('admin', admin_pw, 'admin@ponpay.com', 'Admin PonPay', 'admin'))
-        
+
         # Insert default wallet
-        c.execute('INSERT INTO wallet (user_id, balance) VALUES (%s, %s)', (1, 25657000))
+        c.execute('INSERT INTO wallet (user_id, balance) VALUES (?, ?)', (1, 25657000))
 
         # Insert dummy data santri (20 santri)
         santri_data = [
@@ -145,12 +122,12 @@ def init_db():
         
         for data in santri_data:
             c.execute('''INSERT INTO students (name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_phone, alamat, status)
-                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''', data + ('aktif',))
-        
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', data + ('aktif',))
+
         # Insert default settings
-        c.execute('INSERT INTO settings (`key`, value) VALUES (%s, %s)', 
+        c.execute('INSERT INTO settings (key, value) VALUES (?, ?)',
                   ('pondok_name', 'Pondok Pesantren Al Huda'))
-        c.execute('INSERT INTO settings (`key`, value) VALUES (%s, %s)', 
+        c.execute('INSERT INTO settings (key, value) VALUES (?, ?)',
                   ('system_currency', 'IDR'))
     
     db.commit()
@@ -158,7 +135,7 @@ def init_db():
 
 def query_db(query, args=(), one=False):
     """Query database dengan parameter"""
-    cursor = get_db().cursor(dictionary=True)
+    cursor = get_db().cursor()
     cursor.execute(query, args)
     rv = cursor.fetchall()
     cursor.close()
@@ -180,26 +157,26 @@ def get_all_users():
     return query_db('SELECT id, username, email, full_name, role, profile_picture, created_at FROM users ORDER BY id')
 
 def get_user(user_id):
-    return query_db('SELECT * FROM users WHERE id = %s', (user_id,), one=True)
+    return query_db('SELECT * FROM users WHERE id = ?', (user_id,), one=True)
 
 def get_user_by_username(username):
-    return query_db('SELECT * FROM users WHERE username = %s', (username,), one=True)
+    return query_db('SELECT * FROM users WHERE username = ?', (username,), one=True)
 
 def create_user(username, password, email='', full_name='', role='user'):
     pw_hash = generate_password_hash(password)
-    return execute_db('INSERT INTO users (username, password, email, full_name, role) VALUES (%s, %s, %s, %s, %s)',
+    return execute_db('INSERT INTO users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)',
                       (username, pw_hash, email, full_name, role))
 
 def update_user(user_id, username, email, full_name, role):
-    return execute_db('UPDATE users SET username = %s, email = %s, full_name = %s, role = %s WHERE id = %s',
+    return execute_db('UPDATE users SET username = ?, email = ?, full_name = ?, role = ? WHERE id = ?',
                       (username, email, full_name, role, user_id))
 
 def set_user_password(user_id, new_password):
     pw_hash = generate_password_hash(new_password)
-    return execute_db('UPDATE users SET password = %s WHERE id = %s', (pw_hash, user_id))
+    return execute_db('UPDATE users SET password = ? WHERE id = ?', (pw_hash, user_id))
 
 def delete_user(user_id):
-    return execute_db('DELETE FROM users WHERE id = %s', (user_id,))
+    return execute_db('DELETE FROM users WHERE id = ?', (user_id,))
 
 def get_dashboard_stats(user_id=1):
     """Mendapatkan statistik dashboard"""
@@ -208,33 +185,33 @@ def get_dashboard_stats(user_id=1):
     
     # Total pemasukan bulan ini
     income = query_db('''
-        SELECT COALESCE(SUM(amount), 0) as total 
-        FROM transactions 
-        WHERE user_id = %s AND type = 'income' AND date >= %s
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM transactions
+        WHERE user_id = ? AND type = 'income' AND date >= ?
     ''', (user_id, start_of_month.strftime('%Y-%m-%d')), one=True)
-    
+
     # Total pengeluaran bulan ini
     expense = query_db('''
-        SELECT COALESCE(SUM(amount), 0) as total 
-        FROM transactions 
-        WHERE user_id = %s AND type = 'expense' AND date >= %s
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM transactions
+        WHERE user_id = ? AND type = 'expense' AND date >= ?
     ''', (user_id, start_of_month.strftime('%Y-%m-%d')), one=True)
-    
+
     # Jumlah transaksi bulan ini
     count = query_db('''
-        SELECT COUNT(*) as total 
-        FROM transactions 
-        WHERE user_id = %s AND date >= %s
+        SELECT COUNT(*) as total
+        FROM transactions
+        WHERE user_id = ? AND date >= ?
     ''', (user_id, start_of_month.strftime('%Y-%m-%d')), one=True)
-    
+
     # Saldo saat ini
-    wallet = query_db('SELECT balance FROM wallet WHERE user_id = %s', (user_id,), one=True)
-    
+    wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
+
     # Transaksi terakhir (5 transaksi)
     recent = query_db('''
-        SELECT * FROM transactions 
-        WHERE user_id = %s 
-        ORDER BY date DESC, created_at DESC 
+        SELECT * FROM transactions
+        WHERE user_id = ?
+        ORDER BY date DESC, created_at DESC
         LIMIT 5
     ''', (user_id,))
     
@@ -250,35 +227,35 @@ def get_monthly_stats(user_id=1, months=1):
     """Mendapatkan statistik per bulan"""
     today = datetime.now()
     start_date = today - timedelta(days=30*months)
-    
+
     data = query_db('''
-        SELECT 
-            DATE_FORMAT(date, '%%Y-%%m') as month,
+        SELECT
+            strftime('%%Y-%%m', date) as month,
             type,
             SUM(amount) as total
         FROM transactions
-        WHERE user_id = %s AND date >= %s
+        WHERE user_id = ? AND date >= ?
         GROUP BY month, type
         ORDER BY month
     ''', (user_id, start_date.strftime('%Y-%m-%d')))
-    
+
     return data
 
 def get_category_stats(user_id=1, trans_type='expense', months=1):
     """Mendapatkan statistik per kategori"""
     today = datetime.now()
     start_date = today - timedelta(days=30*months)
-    
+
     data = query_db('''
-        SELECT 
+        SELECT
             category,
             SUM(amount) as total
         FROM transactions
-        WHERE user_id = %s AND type = %s AND date >= %s
+        WHERE user_id = ? AND type = ? AND date >= ?
         GROUP BY category
         ORDER BY total DESC
     ''', (user_id, trans_type, start_date.strftime('%Y-%m-%d')))
-    
+
     return data
 
 
@@ -293,13 +270,13 @@ def get_all_students():
 
 def get_student(student_id):
     """Mendapatkan detail santri"""
-    return query_db('SELECT * FROM students WHERE id = %s', (student_id,), one=True)
+    return query_db('SELECT * FROM students WHERE id = ?', (student_id,), one=True)
 
 def get_student_payments(student_id):
     """Mendapatkan riwayat pembayaran santri"""
     return query_db('''
-        SELECT * FROM transactions 
-        WHERE student_id = %s AND type = 'income'
+        SELECT * FROM transactions
+        WHERE student_id = ? AND type = 'income'
         ORDER BY date DESC, created_at DESC
     ''', (student_id,))
 
@@ -307,32 +284,32 @@ def get_student_payment_stats(student_id):
     """Mendapatkan statistik pembayaran santri"""
     today = datetime.now()
     start_of_month = datetime(today.year, today.month, 1)
-    
+
     # Total pembayaran bulan ini
     month_payment = query_db('''
-        SELECT COALESCE(SUM(amount), 0) as total 
-        FROM transactions 
-        WHERE student_id = %s AND type = 'income' AND date >= %s
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM transactions
+        WHERE student_id = ? AND type = 'income' AND date >= ?
     ''', (student_id, start_of_month.strftime('%Y-%m-%d')), one=True)
-    
+
     # Total pembayaran semua waktu
     total_payment = query_db('''
-        SELECT COALESCE(SUM(amount), 0) as total 
-        FROM transactions 
-        WHERE student_id = %s AND type = 'income'
+        SELECT COALESCE(SUM(amount), 0) as total
+        FROM transactions
+        WHERE student_id = ? AND type = 'income'
     ''', (student_id,), one=True)
-    
+
     # Jumlah pembayaran
     payment_count = query_db('''
-        SELECT COUNT(*) as total 
-        FROM transactions 
-        WHERE student_id = %s AND type = 'income'
+        SELECT COUNT(*) as total
+        FROM transactions
+        WHERE student_id = ? AND type = 'income'
     ''', (student_id,), one=True)
-    
+
     # Pembayaran terakhir
     last_payment = query_db('''
-        SELECT * FROM transactions 
-        WHERE student_id = %s AND type = 'income'
+        SELECT * FROM transactions
+        WHERE student_id = ? AND type = 'income'
         ORDER BY date DESC LIMIT 1
     ''', (student_id,), one=True)
     
@@ -347,29 +324,29 @@ def add_student(name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_pho
     """Menambah santri baru"""
     return execute_db('''
         INSERT INTO students (name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_phone, alamat, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_phone, alamat, status))
 
 def update_student(student_id, name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_phone, alamat, status):
     """Update data santri"""
     return execute_db('''
-        UPDATE students 
-        SET name=%s, nisn=%s, kelas=%s, jenis_kelamin=%s, phone=%s, parent_name=%s, parent_phone=%s, alamat=%s, status=%s
-        WHERE id=%s
+        UPDATE students
+        SET name=?, nisn=?, kelas=?, jenis_kelamin=?, phone=?, parent_name=?, parent_phone=?, alamat=?, status=?
+        WHERE id=?
     ''', (name, nisn, kelas, jenis_kelamin, phone, parent_name, parent_phone, alamat, status, student_id))
 
 
 def update_student_photo(student_id, photo_path):
     """Update path to student photo"""
-    return execute_db('UPDATE students SET photo = %s WHERE id = %s', (photo_path, student_id))
+    return execute_db('UPDATE students SET photo = ? WHERE id = ?', (photo_path, student_id))
 
 def update_user_profile_picture(user_id, picture_path):
     """Update user's profile_picture path"""
-    return execute_db('UPDATE users SET profile_picture = %s WHERE id = %s', (picture_path, user_id))
+    return execute_db('UPDATE users SET profile_picture = ? WHERE id = ?', (picture_path, user_id))
 
 def delete_student(student_id):
     """Menghapus santri"""
-    return execute_db('DELETE FROM students WHERE id=%s', (student_id,))
+    return execute_db('DELETE FROM students WHERE id=?', (student_id,))
 
 
 def ensure_history_table():
@@ -378,11 +355,11 @@ def ensure_history_table():
     cur = db.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS history (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT,
-            action VARCHAR(50) NOT NULL,
-            target_type VARCHAR(50),
-            target_id INT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            action TEXT NOT NULL,
+            target_type TEXT,
+            target_id INTEGER,
             meta TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -395,13 +372,13 @@ def record_history(user_id, action, target_type=None, target_id=None, meta=None)
     """Record an action into history log."""
     return execute_db('''
         INSERT INTO history (user_id, action, target_type, target_id, meta)
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?)
     ''', (user_id, action, target_type, target_id, meta))
 
 
 def get_history(limit=200):
     """Get recent history entries ordered by newest first."""
-    return query_db('SELECT * FROM history ORDER BY created_at DESC LIMIT %s', (limit,))
+    return query_db('SELECT * FROM history ORDER BY created_at DESC LIMIT ?', (limit,))
 
 
 ### Bills / Tagihan helpers ###
@@ -410,13 +387,13 @@ def ensure_bills_table():
     cur = db.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS bills (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            student_id INT NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            amount INT NOT NULL,
-            due_date VARCHAR(20),
-            status VARCHAR(20) DEFAULT 'unpaid',
-            created_by INT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            due_date TEXT,
+            status TEXT DEFAULT 'unpaid',
+            created_by INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             paid_at TIMESTAMP NULL,
             FOREIGN KEY(student_id) REFERENCES students(id)
@@ -428,7 +405,7 @@ def ensure_bills_table():
 
 def create_bill(student_id, title, amount, due_date=None, created_by=None):
     return execute_db('''
-        INSERT INTO bills (student_id, title, amount, due_date, created_by) VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO bills (student_id, title, amount, due_date, created_by) VALUES (?, ?, ?, ?, ?)
     ''', (student_id, title, amount, due_date, created_by))
 
 
@@ -437,27 +414,27 @@ def get_all_bills():
 
 
 def get_bill(bill_id):
-    return query_db('SELECT * FROM bills WHERE id = %s', (bill_id,), one=True)
+    return query_db('SELECT * FROM bills WHERE id = ?', (bill_id,), one=True)
 
 
 def update_bill(bill_id, student_id, title, amount, due_date, status):
     return execute_db('''
-        UPDATE bills SET student_id = %s, title = %s, amount = %s, due_date = %s, status = %s WHERE id = %s
+        UPDATE bills SET student_id = ?, title = ?, amount = ?, due_date = ?, status = ? WHERE id = ?
     ''', (student_id, title, amount, due_date, status, bill_id))
 
 
 def delete_bill(bill_id):
-    return execute_db('DELETE FROM bills WHERE id = %s', (bill_id,))
+    return execute_db('DELETE FROM bills WHERE id = ?', (bill_id,))
 
 
 def mark_bill_paid(bill_id, paid_at=None):
     paid_at = paid_at or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     # set status and paid_at
-    return execute_db('UPDATE bills SET status = %s, paid_at = %s WHERE id = %s', ('paid', paid_at, bill_id))
+    return execute_db('UPDATE bills SET status = ?, paid_at = ? WHERE id = ?', ('paid', paid_at, bill_id))
 
 
 def get_student_bills(student_id):
-    return query_db('SELECT * FROM bills WHERE student_id = %s ORDER BY created_at DESC', (student_id,))
+    return query_db('SELECT * FROM bills WHERE student_id = ? ORDER BY created_at DESC', (student_id,))
 
 
 def get_unpaid_bills_count():
@@ -467,7 +444,7 @@ def get_unpaid_bills_count():
 
 def get_student_unpaid_amount(student_id):
     """Hitung total kekurangan pembayaran per santri"""
-    row = query_db('SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE student_id = %s AND status = "unpaid"', (student_id,), one=True)
+    row = query_db('SELECT COALESCE(SUM(amount), 0) as total FROM bills WHERE student_id = ? AND status = "unpaid"', (student_id,), one=True)
     return row['total'] if row else 0
 
 

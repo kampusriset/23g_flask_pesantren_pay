@@ -1,126 +1,112 @@
-{% extends 'base.html' %}
-
-{% block title %}Tambah Transaksi - PonPay{% endblock %}
-{% block page_title %}Tambah Transaksi{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title">Form Tambah Transaksi</h6>
-                </div>
-                <div class="card-body">
-                    <form method="POST">
-                        <div class="form-group mb-3">
-                            <label class="form-label">Jenis Transaksi</label>
-                            <select class="form-select" name="type" id="transType" required>
-                                <option value="">Pilih Jenis Transaksi</option>
-                                <option value="income">Pemasukan</option>
-                                <option value="expense">Pengeluaran</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Kategori</label>
-                            <select class="form-select" name="category" id="category" required>
-                                <option value="">Pilih Kategori</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Santri <small class="text-muted">(Opsional, jika pembayaran santri)</small></label>
-                            <select class="form-select" name="student_id" id="student_id">
-                                <option value="">-- Tidak ada santri --</option>
-                                {% if students %}
-                                    {% for student in students %}
-                                    <option value="{{ student['id'] }}">{{ student['name'] }} ({{ student['nisn'] }})</option>
-                                    {% endfor %}
-                                {% endif %}
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Nominal (Rupiah)</label>
-                            <input type="number" class="form-control" name="amount" placeholder="0" min="0" required>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Keterangan</label>
-                            <textarea class="form-control" name="description" rows="3" placeholder="Masukkan keterangan transaksi"></textarea>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Tanggal</label>
-                            <input type="date" class="form-control" name="date" value="{{ today }}" required>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save"></i> Simpan Transaksi
-                            </button>
-                            <a href="{{ url_for('transaction.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Batal
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title">Panduan Kategori</h6>
-                </div>
-                <div class="card-body">
-                    <h6 class="text-success mb-3"><i class="fas fa-arrow-down"></i> Kategori Pemasukan</h6>
-                    <ul class="list-unstyled ms-3">
-                        <li><i class="fas fa-check"></i> Pembayaran Santri</li>
-                        <li><i class="fas fa-check"></i> Donasi</li>
-                        <li><i class="fas fa-check"></i> Subsidi Pemerintah</li>
-                        <li><i class="fas fa-check"></i> Lainnya</li>
-                    </ul>
-
-                    <h6 class="text-danger mb-3 mt-4"><i class="fas fa-arrow-up"></i> Kategori Pengeluaran</h6>
-                    <ul class="list-unstyled ms-3">
-                        <li><i class="fas fa-check"></i> Pembelian Kebutuhan</li>
-                        <li><i class="fas fa-check"></i> Gaji Pengajar</li>
-                        <li><i class="fas fa-check"></i> Perbaikan Bangunan</li>
-                        <li><i class="fas fa-check"></i> Listrik & Air</li>
-                        <li><i class="fas fa-check"></i> Operasional</li>
-                    </ul>
-
-                    <div class="alert alert-info mt-4">
-                        <i class="fas fa-info-circle"></i> Pastikan data yang diisi sudah benar sebelum menyimpan
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% extends "base.html" %} {% block title %}Tambah Transaksi - PonPay{% endblock
+%} {% block page_title %}
+<div>
+  <h1 class="page-title">
+    <i class="fas fa-plus-circle"></i> Tambah Transaksi Baru
+  </h1>
 </div>
-{% endblock %}
+{% endblock %} {% block content %}
+<div class="main-content">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h6 class="mb-0"><i class="fas fa-form"></i> Form Transaksi</h6>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            <div class="form-group mb-3">
+              <label class="form-label">Tipe Transaksi *</label>
+              <select name="type" class="form-select" required>
+                <option value="">-- Pilih Tipe --</option>
+                <option value="income">Pemasukan</option>
+                <option value="expense">Pengeluaran</option>
+              </select>
+            </div>
 
-{% block extra_js %}
-<script>
-    const incomeCategories = ['Pembayaran Santri', 'Donasi', 'Subsidi Pemerintah', 'Lainnya'];
-    const expenseCategories = ['Pembelian Kebutuhan', 'Gaji Pengajar', 'Perbaikan Bangunan', 'Listrik & Air', 'Operasional'];
+            <div class="form-group mb-3">
+              <label class="form-label">Kategori *</label>
+              <input
+                type="text"
+                name="category"
+                class="form-control"
+                placeholder="Kategori transaksi"
+                required />
+            </div>
 
-    document.getElementById('transType').addEventListener('change', function() {
-        const categorySelect = document.getElementById('category');
-        categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
-        
-        const categories = this.value === 'income' ? incomeCategories : expenseCategories;
-        categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            categorySelect.appendChild(option);
-        });
-    });
+            <div class="form-group mb-3">
+              <label class="form-label">Jumlah (Rp) *</label>
+              <input
+                type="number"
+                name="amount"
+                class="form-control"
+                placeholder="0"
+                min="1"
+                required />
+            </div>
 
-    // Set today's date
-    document.querySelector('input[name="date"]').valueAsDate = new Date();
-</script>
+            <div class="form-group mb-3">
+              <label class="form-label">Keterangan</label>
+              <textarea
+                name="description"
+                class="form-control"
+                rows="3"
+                placeholder="Keterangan transaksi"></textarea>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Tanggal *</label>
+              <input
+                type="date"
+                name="date"
+                class="form-control"
+                value="{{ today }}"
+                required />
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Santri (Opsional)</label>
+              <select name="student_id" class="form-select">
+                <option value="">-- Pilih Santri --</option>
+                {% for student in students %}
+                <option value="{{ student.id }}">
+                  {{ student.name }} ({{ student.nisn }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a
+                href="{{ url_for('transaction.index') }}"
+                class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> Batal
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Simpan Transaksi
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Help Card -->
+      <div class="card mt-4 bg-light">
+        <div class="card-body">
+          <h6 class="mb-2">
+            <i class="fas fa-info-circle"></i> Informasi Penting
+          </h6>
+          <ul class="small mb-0">
+            <li>Isi semua field yang bertanda (*)</li>
+            <li>Jumlah dalam Rupiah tanpa titik atau koma</li>
+            <li>
+              Pilih santri jika transaksi berkaitan dengan pembayaran santri
+            </li>
+            <li>Transaksi akan langsung mempengaruhi saldo dompet pondok</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
