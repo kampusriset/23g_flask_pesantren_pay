@@ -6,103 +6,122 @@
   </h1>
 </div>
 {% endblock %} {% block content %}
-<div class="main-content">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-md-8 mx-auto">
-      <div class="card">
-        <div class="card-header bg-light">
-          <h6 class="mb-0"><i class="fas fa-form"></i> Form Transaksi</h6>
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <div class="card shadow-sm form-card">
+        <div class="card-header border-0">
+          <h5 class="mb-0">
+            <i class="fas fa-plus-circle text-primary"></i> Tambah Transaksi
+            Baru
+          </h5>
+          <small class="text-muted"
+            >Isi data transaksi secara lengkap dan akurat</small
+          >
         </div>
         <div class="card-body">
-          <form method="POST">
-            <div class="form-group mb-3">
-              <label class="form-label">Tipe Transaksi *</label>
-              <select name="type" class="form-select" required>
-                <option value="">-- Pilih Tipe --</option>
-                <option value="income">Pemasukan</option>
-                <option value="expense">Pengeluaran</option>
-              </select>
-            </div>
+          <form method="POST" class="transaction-form">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Tipe Transaksi *</label>
+                <select
+                  name="type"
+                  class="form-select form-control-lg"
+                  required
+                >
+                  <option value="">-- Pilih Tipe --</option>
+                  <option value="income">Pemasukan</option>
+                  <option value="expense">Pengeluaran</option>
+                </select>
+              </div>
 
-            <div class="form-group mb-3">
-              <label class="form-label">Kategori *</label>
-              <input
-                type="text"
-                name="category"
-                class="form-control"
-                placeholder="Kategori transaksi"
-                required />
-            </div>
+              <div class="col-md-6">
+                <label class="form-label">Kategori *</label>
+                <input
+                  type="text"
+                  name="category"
+                  class="form-control form-control-lg"
+                  placeholder="Contoh: Sumbangan, Donasi, Gaji"
+                  required
+                />
+              </div>
 
-            <div class="form-group mb-3">
-              <label class="form-label">Jumlah (Rp) *</label>
-              <input
-                type="number"
-                name="amount"
-                class="form-control"
-                placeholder="0"
-                min="1"
-                required />
-            </div>
+              <div class="col-md-6">
+                <label class="form-label">Jumlah (Rp) *</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text">Rp</span>
+                  <input
+                    type="number"
+                    name="amount"
+                    class="form-control"
+                    placeholder="0"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
 
-            <div class="form-group mb-3">
-              <label class="form-label">Keterangan</label>
-              <textarea
-                name="description"
-                class="form-control"
-                rows="3"
-                placeholder="Keterangan transaksi"></textarea>
-            </div>
+              <div class="col-md-6">
+                <label class="form-label">Tanggal *</label>
+                <input
+                  type="date"
+                  name="date"
+                  class="form-control form-control-lg"
+                  value="{{ today }}"
+                  required
+                />
+              </div>
 
-            <div class="form-group mb-3">
-              <label class="form-label">Tanggal *</label>
-              <input
-                type="date"
-                name="date"
-                class="form-control"
-                value="{{ today }}"
-                required />
-            </div>
+              <div class="col-12">
+                <label class="form-label">Keterangan</label>
+                <textarea
+                  name="description"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Tambahkan detail untuk catatan internal"
+                ></textarea>
+              </div>
 
-            <div class="form-group mb-3">
-              <label class="form-label">Santri (Opsional)</label>
-              <select name="student_id" class="form-select">
-                <option value="">-- Pilih Santri --</option>
-                {% for student in students %}
-                <option value="{{ student.id }}">
-                  {{ student.name }} ({{ student.nisn }})
-                </option>
-                {% endfor %}
-              </select>
-            </div>
+              <div class="col-12">
+                <label class="form-label">Santri (Opsional)</label>
+                <select name="student_id" class="form-select">
+                  <option value="">-- Pilih Santri --</option>
+                  {% for student in students %}
+                  <option value="{{ student.id }}">
+                    {{ student.name }} ({{ student.nisn }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <a
-                href="{{ url_for('transaction.index') }}"
-                class="btn btn-outline-secondary">
-                <i class="fas fa-times"></i> Batal
-              </a>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Simpan Transaksi
-              </button>
+              <div class="col-12 d-flex justify-content-end gap-2">
+                <a
+                  href="{{ url_for('transaction.index') }}"
+                  class="btn btn-outline-secondary"
+                >
+                  <i class="fas fa-times"></i> Batal
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Simpan Transaksi
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Help Card -->
-      <div class="card mt-4 bg-light">
+      <div class="card mt-3 help-card">
         <div class="card-body">
           <h6 class="mb-2">
-            <i class="fas fa-info-circle"></i> Informasi Penting
+            <i class="fas fa-info-circle text-info"></i> Informasi
           </h6>
-          <ul class="small mb-0">
-            <li>Isi semua field yang bertanda (*)</li>
-            <li>Jumlah dalam Rupiah tanpa titik atau koma</li>
+          <ul class="mb-0 small text-muted">
+            <li>Lengkapi field bertanda <strong>*</strong>.</li>
+            <li>Masukkan jumlah tanpa pemisah ribuan (contoh: 1500000).</li>
             <li>
-              Pilih santri jika transaksi berkaitan dengan pembayaran santri
+              Pilih Santri bila transaksi berhubungan dengan santri tertentu.
             </li>
-            <li>Transaksi akan langsung mempengaruhi saldo dompet pondok</li>
+            <li>Transaksi ini langsung mempengaruhi saldo Dompet Pondok.</li>
           </ul>
         </div>
       </div>

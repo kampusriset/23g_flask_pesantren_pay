@@ -10,12 +10,10 @@
   --primary-dark: #0f2e20;
   --primary-light: #2d6a4f;
   --primary-lighter: #52b788;
-  --primary-gradient: linear-gradient(
-    135deg,
-    #1a4d3a 0%,
-    #2d6a4f 50%,
-    #0f2e20 100%
-  );
+  --primary-gradient: linear-gradient(135deg,
+      #1a4d3a 0%,
+      #2d6a4f 50%,
+      #0f2e20 100%);
   --secondary-color: #2d6a4f;
   --accent-color: #52b788;
   --danger-color: #dc2626;
@@ -38,20 +36,34 @@
   --border-radius-lg: 16px;
   --base-font-size: 1rem;
   /* Enhanced Font Hierarchy */
-  --font-xs: 0.75rem; /* 12px */
-  --font-sm: 0.875rem; /* 14px */
-  --font-base: 1rem; /* 16px */
-  --font-lg: 1.125rem; /* 18px */
-  --font-xl: 1.25rem; /* 20px */
-  --font-2xl: 1.5rem; /* 24px */
-  --font-3xl: 1.875rem; /* 30px */
-  --font-4xl: 2.25rem; /* 36px */
-  --font-5xl: 3rem; /* 48px */
+  --font-xs: 0.75rem;
+  /* 12px */
+  --font-sm: 0.875rem;
+  /* 14px */
+  --font-base: 1rem;
+  /* 16px */
+  --font-lg: 1.125rem;
+  /* 18px */
+  --font-xl: 1.25rem;
+  /* 20px */
+  --font-2xl: 1.5rem;
+  /* 24px */
+  --font-3xl: 1.875rem;
+  /* 30px */
+  --font-4xl: 2.25rem;
+  /* 36px */
+  --font-5xl: 3rem;
+  /* 48px */
 
   /* Animation Variables */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Ticker settings */
+  --ticker-duration: 30s;
+  --ticker-blur: 8px;
+  --ticker-bg: rgba(255, 255, 255, 0.40);
+  --ticker-item-bg: rgba(255, 255, 255, 0.18);
 }
 
 * {
@@ -217,11 +229,251 @@ body {
 
 .btn-sidebar-toggle {
   display: none;
-  background: none;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.25rem 0.35rem;
   font-size: 1.71rem;
   color: var(--primary-color);
   cursor: pointer;
+  line-height: 1;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.btn-sidebar-toggle:focus,
+.btn-sidebar-collapse:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Ensure desktop collapse button has no visible box/background */
+.btn-sidebar-collapse {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.25rem 0.35rem;
+  font-size: 1.71rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  line-height: 1;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.btn-sidebar-collapse i {
+  display: inline-block;
+  transform-origin: center;
+  transition: transform var(--transition-normal), color var(--transition-normal);
+}
+
+.btn-sidebar-collapse.open i {
+  transform: rotate(90deg) scale(1.05);
+}
+
+/* ========== TOP TICKER (sliding) ========== */
+.top-ticker {
+  width: 100%;
+  background: var(--ticker-bg);
+  backdrop-filter: blur(var(--ticker-blur));
+  -webkit-backdrop-filter: blur(var(--ticker-blur));
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+}
+
+.top-ticker {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+.ticker-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.ticker-viewport {
+  display: block;
+}
+
+.ticker-track {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tickerScroll var(--ticker-duration) linear infinite;
+}
+
+.ticker-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 260px;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.75rem;
+  background: var(--ticker-item-bg);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+}
+
+.ticker-item {
+  color: rgba(15, 23, 42, 0.95);
+}
+
+.ticker-value {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.ticker-label {
+  font-size: 0.78rem;
+  color: rgba(15, 23, 42, 0.65);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ticker-value {
+  font-weight: 800;
+  font-size: 1.12rem;
+  color: var(--text-dark);
+}
+
+.ticker-income .ticker-value {
+  color: var(--success-color);
+}
+
+.ticker-expense .ticker-value {
+  color: var(--danger-color);
+}
+
+.ticker-balance .ticker-value {
+  color: var(--primary-color);
+}
+
+@keyframes tickerScroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Vertical float animations for ticker values */
+@keyframes floatUp {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatDown {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseScale {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ticker-income .ticker-value,
+.ticker-expense .ticker-value,
+.ticker-balance .ticker-value {
+  display: inline-block;
+  will-change: transform;
+}
+
+.ticker-income .ticker-value {
+  animation: floatUp 3.2s ease-in-out infinite;
+}
+
+.ticker-expense .ticker-value {
+  animation: floatDown 3.2s ease-in-out infinite;
+  animation-delay: 0.35s;
+}
+
+.ticker-balance .ticker-value {
+  animation: pulseScale 4.5s ease-in-out infinite;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .ticker-track,
+  .ticker-income .ticker-value,
+  .ticker-expense .ticker-value,
+  .ticker-balance .ticker-value {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ticker-item {
+    min-width: 160px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .top-ticker {
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Hamburger / Bars animation styling */
+.btn-sidebar-toggle i,
+.btn-sidebar-collapse i {
+  display: inline-block;
+  transform-origin: center;
+  transition: transform var(--transition-normal), color var(--transition-normal);
+}
+
+.btn-sidebar-toggle.open i,
+.btn-sidebar-collapse.open i {
+  transform: rotate(90deg) scale(1.05);
+  color: var(--primary-color);
+}
+
+.btn-sidebar-toggle:active i,
+.btn-sidebar-collapse:active i {
+  transform: scale(0.95);
 }
 
 .page-title {
@@ -336,22 +588,18 @@ body {
   overflow: hidden;
   border-radius: 1.5rem;
   margin-bottom: 2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(240, 253, 244, 0.8) 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(240, 253, 244, 0.8) 0%,
+      rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(82, 183, 136, 0.1);
 }
 
 .balance-card-main {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark) 0%,
-    var(--primary-color) 50%,
-    var(--primary-light) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 50%,
+      var(--primary-light) 100%);
   color: white;
   position: relative;
   border-radius: 1.5rem;
@@ -375,21 +623,15 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
-      circle at 20% 80%,
+  background: radial-gradient(circle at 20% 80%,
       rgba(82, 183, 136, 0.3) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
+      transparent 50%),
+    radial-gradient(circle at 80% 20%,
       rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 40% 40%,
+      transparent 50%),
+    radial-gradient(circle at 40% 40%,
       rgba(82, 183, 136, 0.2) 0%,
-      transparent 50%
-    );
+      transparent 50%);
   animation: glowPulse 4s ease-in-out infinite alternate;
 }
 
@@ -464,11 +706,9 @@ body {
 }
 
 .amount-value {
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.9) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -580,11 +820,9 @@ body {
 }
 
 .btn-primary-solid {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.8) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.8) 100%);
   color: var(--primary-color);
   border-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
@@ -613,6 +851,7 @@ body {
     opacity: 0;
     transform: translateY(40px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -623,16 +862,19 @@ body {
   from {
     opacity: 0.3;
   }
+
   to {
     opacity: 0.7;
   }
 }
 
 @keyframes badgePulse {
+
   0%,
   100% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 1;
   }
@@ -643,6 +885,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -650,21 +893,25 @@ body {
 }
 
 @keyframes iconFloat {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes particleFloat {
+
   0%,
   100% {
     opacity: 0;
     transform: translateY(0px) scale(0);
   }
+
   50% {
     opacity: 1;
     transform: translateY(-20px) scale(1);
@@ -673,11 +920,9 @@ body {
 
 /* ========== BALANCE CARD ========== */
 .balance-card {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark) 0%,
-    var(--primary-color) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-dark) 0%,
+      var(--primary-color) 100%);
   color: white;
   padding: 2.86rem;
   border-radius: 1.07rem;
@@ -775,6 +1020,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -786,6 +1032,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -794,11 +1041,9 @@ body {
 
 /* ========== STAT CARDS ========== */
 .stat-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: blur(10px);
   border-radius: 1.14rem;
   padding: 1.5rem;
@@ -820,12 +1065,15 @@ body {
 .stat-card:nth-child(1) {
   animation-delay: 0.1s;
 }
+
 .stat-card:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .stat-card:nth-child(3) {
   animation-delay: 0.3s;
 }
+
 .stat-card:nth-child(4) {
   animation-delay: 0.4s;
 }
@@ -890,11 +1138,9 @@ body {
 }
 
 .stat-icon.income {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-light)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-light));
   border-left: 0.29rem solid var(--primary-dark);
   box-shadow: 0 0.25rem 0.75rem rgba(26, 77, 58, 0.3);
 }
@@ -954,11 +1200,9 @@ body {
 
 /* Specific hover effects for different stat types */
 .stat-card:hover .stat-icon.income {
-  background: linear-gradient(
-    135deg,
-    var(--primary-light),
-    var(--primary-color)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-light),
+      var(--primary-color));
 }
 
 .stat-card:hover .stat-icon.expense {
@@ -981,11 +1225,9 @@ body {
     0 0.25rem 0.5rem rgba(0, 0, 0, 0.04);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
@@ -1523,6 +1765,69 @@ body {
     padding: 1.79rem;
   }
 
+  /* Additional responsive tweaks for dashboard */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  /* Make top ticker non-sticky and more compact on small screens */
+  .top-ticker {
+    position: relative;
+    top: auto;
+    padding: 0.36rem 0.6rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.6rem;
+  }
+
+  .ticker-track {
+    animation-duration: calc(var(--ticker-duration) * 1.3);
+  }
+
+  .ticker-item {
+    min-width: 140px;
+    padding: 0.45rem 0.6rem;
+    gap: 0.15rem;
+  }
+
+  .ticker-label {
+    font-size: 0.72rem;
+  }
+
+  .ticker-value {
+    font-size: 1rem;
+  }
+
+  /* Stack stat-cards contents to save vertical space and improve readability */
+  .stat-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.86rem;
+    min-height: 88px;
+  }
+
+  .stat-card .stat-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.1rem;
+    border-radius: 0.6rem;
+  }
+
+  /* Make chart smaller on phones */
+  .card-chart {
+    min-height: 18rem;
+  }
+
+  canvas#revenueChart {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Reduce hero spacing */
+  .balance-card-main .balance-card-content {
+    padding: 1.4rem;
+  }
+
   .balance-header {
     flex-direction: column;
   }
@@ -1860,11 +2165,9 @@ body {
 
 /* ========== MODERNIZED TRANSACTION TABLE STYLES ========== */
 .transaction-table {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: blur(10px);
   border-radius: 1.14rem;
   overflow: hidden;
@@ -1891,11 +2194,9 @@ body {
 }
 
 .transaction-table .table thead th {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-dark));
   color: white;
   font-weight: 600;
   font-size: 0.86rem;
@@ -1908,11 +2209,9 @@ body {
 }
 
 .transaction-table .table thead th:hover {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark),
-    var(--primary-color)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-dark),
+      var(--primary-color));
   transform: translateY(-0.07rem);
 }
 
@@ -1923,11 +2222,9 @@ body {
 }
 
 .transaction-table .table tbody tr:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(241, 248, 246, 0.8) 0%,
-    rgba(241, 248, 246, 0.6) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(241, 248, 246, 0.8) 0%,
+      rgba(241, 248, 246, 0.6) 100%);
   transform: translateX(0.36rem);
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
 }
@@ -1939,11 +2236,9 @@ body {
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(
-    180deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
+  background: linear-gradient(180deg,
+      var(--primary-color),
+      var(--accent-color));
 }
 
 .transaction-table .table tbody tr:last-child {
@@ -2125,7 +2420,7 @@ body {
     margin-bottom: 1rem;
   }
 
-  .row > [class^="col-"] {
+  .row>[class^="col-"] {
     margin-bottom: 1rem;
   }
 
@@ -2241,4 +2536,423 @@ body {
   .gap-mobile {
     gap: 0.5rem !important;
   }
+}
+
+/* Align dashboard responsive behavior with students page */
+@media (max-width: 768px) {
+
+  /* tables and typography */
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* balance card */
+  .balance-card-main .balance-card-content {
+    padding: 1.2rem;
+  }
+
+  .balance-amount {
+    font-size: 2.2rem;
+  }
+
+  /* stat cards compact */
+  .stat-card {
+    flex-direction: row;
+    align-items: center;
+    min-height: 88px;
+  }
+
+  .stat-card .stat-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  /* buttons stack small */
+  .btn-action, .btn-primary-solid, .btn-primary-ghost, .btn-secondary-ghost {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* chart smaller */
+  .card-chart {
+    min-height: 20rem;
+  }
+
+  /* ticker adjustments */
+  .top-ticker {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .ticker-item {
+    min-width: 180px;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .ticker-label {
+    font-size: 0.72rem;
+  }
+
+  .ticker-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .table {
+    font-size: 0.75rem;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.25rem;
+  }
+
+  .balance-amount {
+    font-size: 1.6rem;
+  }
+
+  .balance-card-main .balance-card-content {
+    padding: 0.9rem;
+  }
+
+  .ticker-item {
+    min-width: 120px;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .ticker-label {
+    font-size: 0.68rem;
+  }
+
+  .ticker-value {
+    font-size: 0.95rem;
+  }
+
+  .stat-card {
+    padding: 0.9rem;
+    min-height: 72px;
+  }
+
+  .stat-value {
+    font-size: 1.05rem;
+  }
+}
+
+/* Shrink overall dashboard scale: constrain content width and reduce large paddings */
+.page-content {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Slightly reduce sidebar impact on content width on very wide screens */
+@media (min-width: 1200px) {
+  .main-content {
+    margin-left: 20rem;
+  }
+
+  .page-content {
+    max-width: 1000px;
+  }
+}
+
+/* Reduce hero / balance card size */
+.balance-card-main {
+  min-height: 220px;
+}
+
+.balance-card-main .balance-card-content {
+  padding: 2rem;
+}
+
+.balance-amount {
+  font-size: 2.8rem;
+}
+
+/* Make stat cards more compact */
+.stat-card {
+  padding: 0.9rem;
+  min-height: 92px;
+}
+
+.stat-card .stat-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+}
+
+/* Reduce chart height */
+.card-chart {
+  min-height: 20rem;
+}
+
+/* Ticker smaller and less tall */
+.top-ticker {
+  min-height: 44px;
+  padding: 0.35rem 0.6rem;
+}
+
+.ticker-item {
+  min-width: 220px;
+  padding: 0.5rem 0.85rem;
+}
+
+/* Reduce global large paddings */
+.card-body {
+  padding: 1rem;
+}
+
+/* Buttons: avoid oversized paddings on desktop */
+.btn-primary-ghost, .btn-primary-solid, .btn-secondary-ghost {
+  padding: 0.6rem 1rem;
+}
+
+@media (min-width: 1400px) {
+
+  /* keep layout centered and not too wide on very large screens */
+  .page-content {
+    max-width: 1200px;
+  }
+}
+
+/* Final tweak: ensure main content doesn't feel oversized on medium screens */
+@media (max-width: 992px) {
+  .balance-amount {
+    font-size: 2.2rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+}
+
+/* ===== Form / Add Transaction styling ===== */
+.form-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.form-card .card-header {
+  background: linear-gradient(90deg, rgba(82, 183, 136, 0.08), rgba(45, 80, 22, 0.02));
+  padding: 1rem 1.25rem;
+}
+
+.form-card .card-header h5 {
+  margin: 0;
+}
+
+.transaction-form .form-label {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.transaction-form .form-control-lg,
+.transaction-form .form-select.form-control-lg {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+}
+
+.help-card {
+  border-left: 4px solid rgba(82, 183, 136, 0.18);
+}
+
+.help-card .card-body {
+  padding: 0.9rem 1rem;
+}
+
+.input-group-text {
+  background: #f8faf8;
+  border-radius: 8px 0 0 8px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.transaction-form .btn {
+  min-width: 140px;
+}
+
+@media (max-width: 576px) {
+  .transaction-form .form-control-lg {
+    padding: 0.5rem;
+  }
+
+  .form-card .card-header {
+    padding: 0.75rem;
+  }
+}
+
+/* Improved hover style for plus icons used in buttons (fa-plus) */
+.btn .fas.fa-plus,
+.btn-action .fas.fa-plus,
+.btn-primary-solid .fas.fa-plus,
+.balance-actions .fas.fa-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.18rem;
+  border-radius: 0.35rem;
+  transition: transform 0.18s ease, color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+  will-change: transform, color;
+}
+
+.btn .fas.fa-plus:hover,
+.btn-action:hover .fas.fa-plus,
+.btn-primary-solid:hover .fas.fa-plus,
+.balance-actions a:hover .fas.fa-plus {
+  transform: translateY(-3px) scale(1.08);
+  color: #ffffff;
+  background-color: rgba(45, 80, 22, 1);
+  box-shadow: 0 8px 20px rgba(45, 80, 22, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .btn .fas.fa-plus,
+  .btn-action .fas.fa-plus,
+  .btn-primary-solid .fas.fa-plus {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Dark mode palette (user-provided):
+   2C3930  (very dark base)
+   3F4F44  (primary)
+   A27B5C  (accent)
+   DCD7C9  (light / text)
+*/
+body.dark-mode {
+  --primary-dark: #2C3930;
+  --primary-color: #3F4F44;
+  --primary-light: #A27B5C;
+  --primary-lighter: #DCD7C9;
+
+  /* Derived tokens */
+  --card-bg: #2C3731;
+  --light-bg: #1b211c;
+  --border-color: rgba(220, 215, 201, 0.06);
+  --text-dark: var(--primary-lighter);
+  --text-muted: rgba(41, 40, 39, 0.7);
+  --accent-color: var(--primary-light);
+
+  background-color: var(--light-bg);
+  color: var(--text-dark);
+}
+
+/* Sidebar, navbar and cards */
+body.dark-mode .sidebar {
+  background: linear-gradient(180deg, var(--primary-dark) 0%, #19221d 100%);
+  color: var(--primary-lighter);
+}
+
+body.dark-mode .top-navbar {
+  background: var(--card-bg);
+  color: var(--primary-lighter);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .card,
+body.dark-mode .form-card,
+body.dark-mode .balance-card {
+  background-color: var(--card-bg);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+/* Text and headings */
+body.dark-mode,
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode th,
+body.dark-mode td,
+body.dark-mode .card-body {
+  color: var(--text-dark) !important;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .balance-amount,
+body.dark-mode .stat-value {
+  color: var(--primary-lighter) !important;
+}
+
+body.dark-mode,
+body.dark-mode .small,
+body.dark-mode small {
+  color: var(--text-muted) !important;
+}
+
+/* Links & interactive */
+body.dark-mode a,
+body.dark-mode .nav-link,
+body.dark-mode .dropdown-item {
+  color: var(--primary-light) !important;
+}
+
+/* Buttons */
+body.dark-mode .btn,
+body.dark-mode .btn-primary-ghost,
+body.dark-mode .btn-primary-solid,
+body.dark-mode .btn-action {
+  color: var(--primary-lighter) !important;
+}
+
+/* Tables */
+body.dark-mode .table,
+body.dark-mode .table th,
+body.dark-mode .table td {
+  color: var(--text-dark) !important;
+}
+
+/* Ensure prominent counts (e.g. total students) are bright */
+body.dark-mode .stat-card .stat-value,
+body.dark-mode .text-primary-600,
+body.dark-mode .text-3xl {}
+
+/* Tweak semantic text colors for dark background */
+body.dark-mode .text-danger {}
+
+body.dark-mode .text-success {
+  color: #bfe8b5 !important;
+}
+
+body.dark-mode .text-warning {
+  color: #efdbbb !important;
+}
+
+/* Smooth transitions */
+body.dark-mode,
+.sidebar,
+.top-navbar,
+.card {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
