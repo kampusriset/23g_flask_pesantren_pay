@@ -1,6 +1,66 @@
 {% extends 'base.html' %} {% block title %}Dashboard - PonPay{% endblock %} {%
 block page_title %}Dashboard{% endblock %} {% block content %}
 <div class="container-fluid">
+  <!-- Top Ticker: Pemasukan / Pengeluaran / Saldo -->
+  <div class="top-ticker mb-4" aria-hidden="false">
+    <div class="ticker-viewport">
+      <div class="ticker-track">
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-success">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Pemasukan</small
+            ><strong>{{ stats.total_income|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-danger">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Pengeluaran</small
+            ><strong>{{ stats.total_expense|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-primary">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+          </div>
+        </div>
+        <!-- duplicate for continuous loop -->
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-success">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Pemasukan</small
+            ><strong>{{ stats.total_income|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-danger">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Pengeluaran</small
+            ><strong>{{ stats.total_expense|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon icon-animate text-primary">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Hero Section with Main Balance Card -->
   <div class="hero-section mb-5">
     <div class="row">
@@ -40,19 +100,22 @@ block page_title %}Dashboard{% endblock %} {% block content %}
             <div class="balance-actions">
               <a
                 href="{{ url_for('wallet.index') }}"
-                class="btn btn-primary-ghost">
+                class="btn btn-primary-ghost"
+              >
                 <i class="fas fa-eye"></i>
                 <span>Lihat Detail</span>
               </a>
               <a
                 href="{{ url_for('transaction.add') }}"
-                class="btn btn-primary-solid">
+                class="btn btn-primary-solid"
+              >
                 <i class="fas fa-plus"></i>
                 <span>Tambah Transaksi</span>
               </a>
               <a
                 href="{{ url_for('statistics.index') }}"
-                class="btn btn-secondary-ghost">
+                class="btn btn-secondary-ghost"
+              >
                 <i class="fas fa-chart-line"></i>
                 <span>Analytics</span>
               </a>
@@ -161,7 +224,8 @@ block page_title %}Dashboard{% endblock %} {% block content %}
     <div class="col-12">
       <div class="card">
         <div
-          class="card-header d-flex justify-content-between align-items-center">
+          class="card-header d-flex justify-content-between align-items-center"
+        >
           <h6 class="card-title">Riwayat Transaksi Terakhir</h6>
           <a
             href="{{ url_for('transaction.index') }}"
@@ -184,7 +248,8 @@ block page_title %}Dashboard{% endblock %} {% block content %}
               <tbody>
                 {% for trans in stats.recent_transactions %}
                 <tr
-                  class="transaction-row {% if trans['type'] == 'income' %}income-row{% else %}expense-row{% endif %}">
+                  class="transaction-row {% if trans['type'] == 'income' %}income-row{% else %}expense-row{% endif %}"
+                >
                   <td class="transaction-date">
                     <div class="date-display">
                       <span class="date-day"
@@ -200,9 +265,11 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                   </td>
                   <td>
                     <span
-                      class="badge-modern {% if trans['type'] == 'income' %}badge-income{% else %}badge-expense{% endif %}">
+                      class="badge-modern {% if trans['type'] == 'income' %}badge-income{% else %}badge-expense{% endif %}"
+                    >
                       <i
-                        class="fas {% if trans['type'] == 'income' %}fa-plus-circle{% else %}fa-minus-circle{% endif %} me-1"></i>
+                        class="fas {% if trans['type'] == 'income' %}fa-plus-circle{% else %}fa-minus-circle{% endif %} me-1"
+                      ></i>
                       {{ trans['category'] }}
                     </span>
                   </td>
@@ -214,7 +281,8 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                   <td class="text-end transaction-amount">
                     <div class="amount-wrapper">
                       <span
-                        class="amount-value {% if trans['type'] == 'income' %}text-success{% else %}text-danger{% endif %}">
+                        class="amount-value {% if trans['type'] == 'income' %}text-success{% else %}text-danger{% endif %}"
+                      >
                         {% if trans['type'] == 'income' %}
                         <i class="fas fa-arrow-up me-1"></i>
                         {% else %}
@@ -225,7 +293,8 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                   </td>
                   <td>
                     <span
-                      class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}">
+                      class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}"
+                    >
                       {% if trans['type'] == 'income' %}
                       <i class="fas fa-arrow-trend-up me-1"></i>Pemasukan {%
                       else %}
