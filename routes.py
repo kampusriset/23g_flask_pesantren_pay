@@ -619,16 +619,15 @@ settings_bp = Blueprint('settings', __name__, url_prefix='/settings')
 students_bp = Blueprint('students', __name__, url_prefix='/students')
 
 @settings_bp.route('/')
-@admin_required
 def index():
     """Halaman pengaturan"""
     user_id = session.get('user_id', 1)
 
     user = query_db('SELECT * FROM users WHERE id = ?', (user_id,), one=True)
     settings = query_db('SELECT `key`, `value` FROM settings')
-    
+
     settings_dict = {row['key']: row['value'] for row in settings}
-    
+
     return render_template('settings.html', user=user, settings=settings_dict)
 
 @settings_bp.route('/update-profile', methods=['POST'])
