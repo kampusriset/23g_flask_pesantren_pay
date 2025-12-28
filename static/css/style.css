@@ -211,7 +211,9 @@ body {
 }
 
 .top-navbar {
-  background: white;
+
+  backdrop-filter: blur(var(--ticker-blur));
+  -webkit-backdrop-filter: blur(var(--ticker-blur));
   padding: 1.07rem 2.14rem;
   display: flex;
   justify-content: space-between;
@@ -287,7 +289,7 @@ body {
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
   position: sticky;
   top: 0;
-  z-index: 1050;
+  z-index: 1000;
 }
 
 .top-ticker {
@@ -550,6 +552,7 @@ body {
 
 .dropdown-toggle::after {
   display: none;
+  z-index: 1000;
 }
 
 .dropdown-toggle {
@@ -710,7 +713,6 @@ body {
       #ffffff 0%,
       rgba(255, 255, 255, 0.9) 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
@@ -2138,9 +2140,12 @@ body {
 
   .dropdown-menu {
     font-size: 0.86rem;
+    z-index: 3000 !important;
+
   }
 
   .dropdown-item {
+    z-index: 3000 !important;
     padding: 0.4rem 1rem;
   }
 
