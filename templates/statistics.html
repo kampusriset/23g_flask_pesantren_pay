@@ -98,13 +98,14 @@ block page_title %}Statistik Keuangan{% endblock %} {% block content %}
 </div>
 {% endblock %} {% block extra_js %}
 <script>
-  let colors = JSON.parse("{{ colors|safe }}");
-  let expenseLabels = JSON.parse("{{ expense_labels|safe }}");
-  let expenseValues = JSON.parse("{{ expense_values|safe }}");
-  let incomeLabels = JSON.parse("{{ income_labels|safe }}");
-  let incomeValues = JSON.parse("{{ income_values|safe }}");
-  let classLabels = JSON.parse("{{ class_labels|safe }}");
-  let classValues = JSON.parse("{{ class_values|safe }}");
+// Menggunakan tanda kutip tunggal agar tidak tabrakan dengan tanda kutip ganda di dalam JSON
+  let colors = JSON.parse('{{ colors|safe }}' || '[]');
+  let expenseLabels = JSON.parse('{{ expense_labels|safe }}' || '[]');
+  let expenseValues = JSON.parse('{{ expense_values|safe }}' || '[]');
+  let incomeLabels = JSON.parse('{{ income_labels|safe }}' || '[]');
+  let incomeValues = JSON.parse('{{ income_values|safe }}' || '[]');
+  let classLabels = JSON.parse('{{ class_labels|safe }}' || '[]');
+  let classValues = JSON.parse('{{ class_values|safe }}' || '[]');
 
   // Expense Pie Chart
   if (expenseLabels.length > 0) {
@@ -117,7 +118,7 @@ block page_title %}Statistik Keuangan{% endblock %} {% block content %}
           {
             data: expenseValues,
             backgroundColor: colors,
-            borderColor: "#fff",
+            borderColor: "#FF0000",
             borderWidth: 2,
           },
         ],
@@ -150,7 +151,7 @@ block page_title %}Statistik Keuangan{% endblock %} {% block content %}
           {
             data: incomeValues,
             backgroundColor: colors,
-            borderColor: "#fff",
+            borderColor: "#FF0000",
             borderWidth: 2,
           },
         ],
