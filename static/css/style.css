@@ -2977,29 +2977,7 @@ body.dark-mode,
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-/* DEFAULT: sidebar normal */
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 320px;      /* disesuaikan dengan sidebar */
-  right: 0;
-  height: 64px;
-  z-index: 1050;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
-}
 
-
-/* konten tidak ketutup */
-.main-content {
-  padding-top: 80px;
-}
-
-.sidebar.collapsed ~ .top-navbar {
-  left: 80px;
-}
 
 
 
