@@ -55,6 +55,7 @@
             <a
               class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
               href="{{ url_for('dashboard.index') }}"
+              data-tooltip="Dashboard"
             >
               <i class="fas fa-home"></i>
               <span>Dashboard</span>
@@ -64,6 +65,7 @@
             <a
               class="nav-link {% if request.endpoint == 'students.index' %}active{% endif %}"
               href="{{ url_for('students.index') }}"
+              data-tooltip="Data Santri"
             >
               <i class="fas fa-users"></i>
               <span>Data Santri</span>
@@ -73,6 +75,7 @@
             <a
               class="nav-link {% if request.endpoint == 'wallet.index' %}active{% endif %}"
               href="{{ url_for('wallet.index') }}"
+              data-tooltip="Dompet Pondok"
             >
               <i class="fas fa-wallet"></i>
               <span>Dompet Pondok</span>
@@ -86,6 +89,7 @@
               role="button"
               aria-expanded="false"
               aria-controls="nav-transaction"
+              data-tooltip="Transaksi"
             >
               <span
                 ><i class="fas fa-exchange-alt"></i>
@@ -121,6 +125,7 @@
             <a
               class="nav-link {% if request.endpoint == 'statistics.index' %}active{% endif %}"
               href="{{ url_for('statistics.index') }}"
+              data-tooltip="Statistik"
             >
               <i class="fas fa-chart-bar"></i>
               <span>Statistik</span>
@@ -130,6 +135,7 @@
             <a
               class="nav-link {% if request.endpoint == 'history.index' %}active{% endif %}"
               href="{{ url_for('history.index') }}"
+              data-tooltip="Riwayat"
             >
               <i class="fas fa-history"></i>
               <span>Riwayat</span>
@@ -146,6 +152,7 @@
               role="button"
               aria-expanded="false"
               aria-controls="nav-settings"
+              data-tooltip="Pengaturan"
             >
               <span><i class="fas fa-cog"></i> <span>Pengaturan</span></span>
               <i class="fas fa-chevron-down"></i>

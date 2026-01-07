@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeTooltips();
   initializeAnimations();
   initializeTicker();
+  initializeNavbarScroll(); // Add scroll effect for navbar
 });
 
 /**
@@ -182,6 +183,32 @@ function initializeTicker() {
 }
 
 /**
+ * Initialize Navbar Scroll Effect
+ * Adds 'scrolled' class to navbar when user scrolls down
+ */
+function initializeNavbarScroll() {
+  const navbar = document.querySelector(".top-navbar");
+
+  if (!navbar) return;
+
+  let lastScrollTop = 0;
+
+  // Listen to scroll event on window
+  window.addEventListener("scroll", function () {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Add scrolled class when scrolling down past 50px
+    if (scrollTop > 50) {
+      navbar.classList.add("scrolled");
+    } else {
+      navbar.classList.remove("scrolled");
+    }
+
+    lastScrollTop = scrollTop;
+  }, { passive: true }); // passive for better scroll performance
+}
+
+/**
  * Format Currency to Rupiah
  */
 function formatRupiah(number) {
@@ -229,15 +256,14 @@ function showToast(message, type = "info") {
     "top: 20px; right: 20px; z-index: 9999; min-width: 300px;";
   toast.innerHTML = `
         <div class="d-flex align-items-center gap-2">
-            <i class="fas fa-${
-              type === "success"
-                ? "check-circle"
-                : type === "danger"
-                ? "exclamation-circle"
-                : type === "warning"
-                ? "exclamation-triangle"
-                : "info-circle"
-            }"></i>
+            <i class="fas fa-${type === "success"
+      ? "check-circle"
+      : type === "danger"
+        ? "exclamation-circle"
+        : type === "warning"
+          ? "exclamation-triangle"
+          : "info-circle"
+    }"></i>
             <span>${message}</span>
         </div>
     `;
