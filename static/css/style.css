@@ -3213,6 +3213,7 @@ body.dark-mode,
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
+<<<<<<< HEAD
 /* ========== NAVBAR STICKY RESPONSIVE RULES ========== */
 
 /* When sidebar is collapsed (desktop) */
@@ -3229,6 +3230,9 @@ body.dark-mode,
 .sidebar.hidden~.main-content {
   margin-left: 0;
 }
+=======
+
+>>>>>>> fa54bd229823639c7c1cdb5c95e7a0f0cb8a3f7d
 
 .sidebar.hidden~.main-content .top-navbar {
   left: 0;

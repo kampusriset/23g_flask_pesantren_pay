@@ -2,72 +2,69 @@
 block page_title %}Dashboard{% endblock %} {% block content %}
 <div class="container-fluid">
   <!-- Top Ticker: Pemasukan / Pengeluaran / Saldo -->
-   <head>
-  <style>
-    .top-ticker {
-      position: static;
-    }
-  </style>
 
-  <div class="top-ticker mb-4" aria-hidden="false">
-    <div class="ticker-viewport">
-      <div class="ticker-track">
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-success">
-            <i class="fas fa-arrow-down"></i>
+  <head>
+    <style>
+      .top-ticker {
+        position: static;
+      }
+    </style>
+
+    <div class="top-ticker mb-4" aria-hidden="false">
+      <div class="ticker-viewport">
+        <div class="ticker-track">
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-success">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Pemasukan</small><strong>{{ stats.total_income|rupiah }}</strong>
+            </div>
           </div>
-          <div class="ticker-text">
-            <small>Pemasukan</small
-            ><strong>{{ stats.total_income|rupiah }}</strong>
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-danger">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Pengeluaran</small><strong>{{ stats.total_expense|rupiah }}</strong>
+            </div>
           </div>
-        </div>
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-danger">
-            <i class="fas fa-arrow-up"></i>
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-primary">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+            </div>
           </div>
-          <div class="ticker-text">
-            <small>Pengeluaran</small
-            ><strong>{{ stats.total_expense|rupiah }}</strong>
+          <!-- duplicate for continuous loop -->
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-success">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Pemasukan</small><strong>{{ stats.total_income|rupiah }}</strong>
+            </div>
           </div>
-        </div>
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-primary">
-            <i class="fas fa-wallet"></i>
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-danger">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Pengeluaran</small><strong>{{ stats.total_expense|rupiah }}</strong>
+            </div>
           </div>
-          <div class="ticker-text">
-            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
-          </div>
-        </div>
-        <!-- duplicate for continuous loop -->
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-success">
-            <i class="fas fa-arrow-down"></i>
-          </div>
-          <div class="ticker-text">
-            <small>Pemasukan</small
-            ><strong>{{ stats.total_income|rupiah }}</strong>
-          </div>
-        </div>
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-danger">
-            <i class="fas fa-arrow-up"></i>
-          </div>
-          <div class="ticker-text">
-            <small>Pengeluaran</small
-            ><strong>{{ stats.total_expense|rupiah }}</strong>
-          </div>
-        </div>
-        <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-primary">
-            <i class="fas fa-wallet"></i>
-          </div>
-          <div class="ticker-text">
-            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+          <div class="ticker-item">
+            <div class="ticker-icon icon-animate text-primary">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="ticker-text">
+              <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </head>
   <!-- Hero Section with Main Balance Card -->
   <div class="hero-section mb-5">
@@ -84,9 +81,7 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                 </div>
                 <h1 class="balance-amount" data-count="{{ stats.balance }}">
                   <span class="currency-symbol">Rp</span>
-                  <span class="amount-value"
-                    >{{ stats.balance|rupiah|replace('Rp ', '') }}</span
-                  >
+                  <span class="amount-value">{{ stats.balance|rupiah|replace('Rp ', '') }}</span>
                 </h1>
                 <p class="balance-subtitle">
                   <i class="fas fa-clock me-1"></i>
@@ -106,24 +101,15 @@ block page_title %}Dashboard{% endblock %} {% block content %}
               </div>
             </div>
             <div class="balance-actions">
-              <a
-                href="{{ url_for('wallet.index') }}"
-                class="btn btn-primary-ghost"
-              >
+              <a href="{{ url_for('wallet.index') }}" class="btn btn-primary-ghost">
                 <i class="fas fa-eye"></i>
                 <span>Lihat Detail</span>
               </a>
-              <a
-                href="{{ url_for('transaction.add') }}"
-                class="btn btn-primary-solid"
-              >
+              <a href="{{ url_for('transaction.add') }}" class="btn btn-primary-solid">
                 <i class="fas fa-plus"></i>
                 <span>Tambah Transaksi</span>
               </a>
-              <a
-                href="{{ url_for('statistics.index') }}"
-                class="btn btn-secondary-ghost"
-              >
+              <a href="{{ url_for('statistics.index') }}" class="btn btn-secondary-ghost">
                 <i class="fas fa-chart-line"></i>
                 <span>Analytics</span>
               </a>
@@ -231,15 +217,9 @@ block page_title %}Dashboard{% endblock %} {% block content %}
   <div class="row">
     <div class="col-12">
       <div class="card">
-        <div
-          class="card-header d-flex justify-content-between align-items-center"
-        >
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="card-title">Riwayat Transaksi Terakhir</h6>
-          <a
-            href="{{ url_for('transaction.index') }}"
-            class="btn btn-sm btn-outline-primary"
-            >Lihat Semua</a
-          >
+          <a href="{{ url_for('transaction.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -256,28 +236,19 @@ block page_title %}Dashboard{% endblock %} {% block content %}
               <tbody>
                 {% for trans in stats.recent_transactions %}
                 <tr
-                  class="transaction-row {% if trans['type'] == 'income' %}income-row{% else %}expense-row{% endif %}"
-                >
+                  class="transaction-row {% if trans['type'] == 'income' %}income-row{% else %}expense-row{% endif %}">
                   <td class="transaction-date">
                     <div class="date-display">
-                      <span class="date-day"
-                        >{{ (trans['date']|format_date).split()[0] }}</span
-                      >
-                      <span class="date-month"
-                        >{{ (trans['date']|format_date).split()[1] }}</span
-                      >
+                      <span class="date-day">{{ (trans['date']|format_date).split()[0] }}</span>
+                      <span class="date-month">{{ (trans['date']|format_date).split()[1] }}</span>
                     </div>
-                    <small class="date-year text-muted"
-                      >{{ (trans['date']|format_date).split()[2] }}</small
-                    >
+                    <small class="date-year text-muted">{{ (trans['date']|format_date).split()[2] }}</small>
                   </td>
                   <td>
                     <span
-                      class="badge-modern {% if trans['type'] == 'income' %}badge-income{% else %}badge-expense{% endif %}"
-                    >
+                      class="badge-modern {% if trans['type'] == 'income' %}badge-income{% else %}badge-expense{% endif %}">
                       <i
-                        class="fas {% if trans['type'] == 'income' %}fa-plus-circle{% else %}fa-minus-circle{% endif %} me-1"
-                      ></i>
+                        class="fas {% if trans['type'] == 'income' %}fa-plus-circle{% else %}fa-minus-circle{% endif %} me-1"></i>
                       {{ trans['category'] }}
                     </span>
                   </td>
@@ -289,8 +260,7 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                   <td class="text-end transaction-amount">
                     <div class="amount-wrapper">
                       <span
-                        class="amount-value {% if trans['type'] == 'income' %}text-success{% else %}text-danger{% endif %}"
-                      >
+                        class="amount-value {% if trans['type'] == 'income' %}text-success{% else %}text-danger{% endif %}">
                         {% if trans['type'] == 'income' %}
                         <i class="fas fa-arrow-up me-1"></i>
                         {% else %}
@@ -301,8 +271,7 @@ block page_title %}Dashboard{% endblock %} {% block content %}
                   </td>
                   <td>
                     <span
-                      class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}"
-                    >
+                      class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}">
                       {% if trans['type'] == 'income' %}
                       <i class="fas fa-arrow-trend-up me-1"></i>Pemasukan {%
                       else %}
@@ -336,191 +305,191 @@ block page_title %}Dashboard{% endblock %} {% block content %}
 <script>
   // Count-up animation for balance
   function animateValue(obj, start, end, duration) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-          if (!startTimestamp) startTimestamp = timestamp;
-          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-          obj.innerHTML = 'Rp ' + Math.floor(progress * (end - start) + start).toLocaleString('id-ID');
-          if (progress < 1) {
-              window.requestAnimationFrame(step);
-          }
-      };
-      window.requestAnimationFrame(step);
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      obj.innerHTML = 'Rp ' + Math.floor(progress * (end - start) + start).toLocaleString('id-ID');
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
   }
 
   // Initialize count-up animation when page loads
-  document.addEventListener('DOMContentLoaded', function() {
-      const balanceElement = document.querySelector('.balance-amount');
-      if (balanceElement && balanceElement.dataset.count) {
-          const targetValue = parseInt(balanceElement.dataset.count);
-          animateValue(balanceElement, 0, targetValue, 2000);
-      }
+  document.addEventListener('DOMContentLoaded', function () {
+    const balanceElement = document.querySelector('.balance-amount');
+    if (balanceElement && balanceElement.dataset.count) {
+      const targetValue = parseInt(balanceElement.dataset.count);
+      animateValue(balanceElement, 0, targetValue, 2000);
+    }
   });
 
-  const months = {{ months|safe }};
-  const incomeData = {{ income_data|safe }};
-  const expenseData = {{ expense_data|safe }};
+  const months = {{ months| safe }};
+  const incomeData = {{ income_data| safe }};
+  const expenseData = {{ expense_data| safe }};
 
   const ctx = document.getElementById('revenueChart').getContext('2d');
   const revenueChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-          labels: months,
-          datasets: [
-              {
-                  label: 'Pemasukan',
-                  data: incomeData,
-                  borderColor: '#2D5016',
-                  backgroundColor: 'rgba(45, 80, 22, 0.15)',
-                  borderWidth: 3,
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#2D5016',
-                  pointBorderColor: '#fff',
-                  pointBorderWidth: 3,
-                  pointRadius: 6,
-                  pointHoverRadius: 8,
-                  pointHoverBackgroundColor: '#1a2e0f',
-                  pointHoverBorderColor: '#fff',
-                  pointHoverBorderWidth: 3,
-                  hoverBorderWidth: 4
-              },
-              {
-                  label: 'Pengeluaran',
-                  data: expenseData,
-                  borderColor: '#B91C1C',
-                  backgroundColor: 'rgba(185, 28, 28, 0.15)',
-                  borderWidth: 3,
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#B91C1C',
-                  pointBorderColor: '#fff',
-                  pointBorderWidth: 3,
-                  pointRadius: 6,
-                  pointHoverRadius: 8,
-                  pointHoverBackgroundColor: '#7f1d1d',
-                  pointHoverBorderColor: '#fff',
-                  pointHoverBorderWidth: 3,
-                  hoverBorderWidth: 4
-              }
-          ]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-              legend: {
-                  display: true,
-                  position: 'top',
-                  labels: {
-                      usePointStyle: true,
-                      padding: 20,
-                      font: {
-                          size: 13,
-                          weight: '600',
-                          family: 'Inter, sans-serif'
-                      },
-                      color: '#1a1a1a'
-                  }
-              },
-              tooltip: {
-                  enabled: true,
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  titleColor: '#1a1a1a',
-                  bodyColor: '#1a1a1a',
-                  borderColor: 'rgba(45, 80, 22, 0.2)',
-                  borderWidth: 1,
-                  cornerRadius: 8,
-                  displayColors: true,
-                  padding: 12,
-                  titleFont: {
-                      size: 14,
-                      weight: 'bold',
-                      family: 'Inter, sans-serif'
-                  },
-                  bodyFont: {
-                      size: 13,
-                      family: 'Inter, sans-serif'
-                  },
-                  callbacks: {
-                      title: function(context) {
-                          return 'Bulan: ' + context[0].label;
-                      },
-                      label: function(context) {
-                          let label = context.dataset.label || '';
-                          if (label) {
-                              label += ': ';
-                          }
-                          label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
-                          return label;
-                      },
-                      afterLabel: function(context) {
-                          if (context.datasetIndex === 0) {
-                              return 'Pemasukan bulan ini';
-                          } else {
-                              return 'Pengeluaran bulan ini';
-                          }
-                      }
-                  }
-              }
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) {
-                          return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
-                      },
-                      font: {
-                          size: 12,
-                          weight: '500',
-                          family: 'Inter, sans-serif'
-                      },
-                      color: '#6b7280'
-                  },
-                  grid: {
-                      color: 'rgba(45, 80, 22, 0.08)',
-                      lineWidth: 1,
-                      drawBorder: false
-                  },
-                  border: {
-                      color: 'rgba(45, 80, 22, 0.2)',
-                      width: 1
-                  }
-              },
-              x: {
-                  ticks: {
-                      font: {
-                          size: 12,
-                          weight: '500',
-                          family: 'Inter, sans-serif'
-                      },
-                      color: '#6b7280'
-                  },
-                  grid: {
-                      color: 'rgba(45, 80, 22, 0.08)',
-                      lineWidth: 1,
-                      drawBorder: false
-                  },
-                  border: {
-                      color: 'rgba(45, 80, 22, 0.2)',
-                      width: 1
-                  }
-              }
-          },
-          interaction: {
-              intersect: false,
-              mode: 'index'
-          },
-          hover: {
-              mode: 'index',
-              intersect: false
-          },
-          animation: {
-              duration: 1000,
-              easing: 'easeInOutQuart'
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'Pemasukan',
+          data: incomeData,
+          borderColor: '#2D5016',
+          backgroundColor: 'rgba(45, 80, 22, 0.15)',
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#2D5016',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointHoverBackgroundColor: '#1a2e0f',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3,
+          hoverBorderWidth: 4
+        },
+        {
+          label: 'Pengeluaran',
+          data: expenseData,
+          borderColor: '#B91C1C',
+          backgroundColor: 'rgba(185, 28, 28, 0.15)',
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#B91C1C',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointHoverBackgroundColor: '#7f1d1d',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3,
+          hoverBorderWidth: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: {
+              size: 13,
+              weight: '600',
+              family: 'Inter, sans-serif'
+            },
+            color: '#1a1a1a'
           }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: '#1a1a1a',
+          bodyColor: '#1a1a1a',
+          borderColor: 'rgba(45, 80, 22, 0.2)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: true,
+          padding: 12,
+          titleFont: {
+            size: 14,
+            weight: 'bold',
+            family: 'Inter, sans-serif'
+          },
+          bodyFont: {
+            size: 13,
+            family: 'Inter, sans-serif'
+          },
+          callbacks: {
+            title: function (context) {
+              return 'Bulan: ' + context[0].label;
+            },
+            label: function (context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+              return label;
+            },
+            afterLabel: function (context) {
+              if (context.datasetIndex === 0) {
+                return 'Pemasukan bulan ini';
+              } else {
+                return 'Pengeluaran bulan ini';
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+            },
+            font: {
+              size: 12,
+              weight: '500',
+              family: 'Inter, sans-serif'
+            },
+            color: '#6b7280'
+          },
+          grid: {
+            color: 'rgba(45, 80, 22, 0.08)',
+            lineWidth: 1,
+            drawBorder: false
+          },
+          border: {
+            color: 'rgba(45, 80, 22, 0.2)',
+            width: 1
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: 12,
+              weight: '500',
+              family: 'Inter, sans-serif'
+            },
+            color: '#6b7280'
+          },
+          grid: {
+            color: 'rgba(45, 80, 22, 0.08)',
+            lineWidth: 1,
+            drawBorder: false
+          },
+          border: {
+            color: 'rgba(45, 80, 22, 0.2)',
+            width: 1
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      hover: {
+        mode: 'index',
+        intersect: false
+      },
+      animation: {
+        duration: 1000,
+        easing: 'easeInOutQuart'
       }
+    }
   });
 </script>
 {% endblock %}
