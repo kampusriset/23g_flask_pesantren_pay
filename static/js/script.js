@@ -23,6 +23,13 @@ function initializeSidebar() {
     toggleBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       if (sidebar) {
+        // If on mobile and sidebar is hidden via desktop pref, temporarily show it
+        if (window.innerWidth <= 768 && sidebar.classList.contains("hidden")) {
+          sidebar.classList.remove("hidden");
+          sidebar.dataset.hiddenTemp = "true";
+          sidebar.setAttribute("aria-hidden", "false");
+        }
+
         sidebar.classList.toggle("active");
         document.body.classList.toggle("sidebar-open");
         // animate hamburger icon and update ARIA
@@ -44,6 +51,12 @@ function initializeSidebar() {
       ) {
         sidebar.classList.remove("active");
         document.body.classList.remove("sidebar-open");
+        // restore hidden state if it was temporarily removed for mobile
+        if (sidebar.dataset.hiddenTemp === "true") {
+          sidebar.classList.add("hidden");
+          delete sidebar.dataset.hiddenTemp;
+          sidebar.setAttribute("aria-hidden", "true");
+        }
         // ensure hamburger returns to normal state
         if (toggleBtn) {
           toggleBtn.classList.remove("open");
@@ -67,6 +80,12 @@ function initializeSidebar() {
             setTimeout(() => {
               sidebar.classList.remove("active");
               document.body.classList.remove("sidebar-open");
+              // restore hidden state if it was temporarily removed for mobile
+              if (sidebar.dataset.hiddenTemp === "true") {
+                sidebar.classList.add("hidden");
+                delete sidebar.dataset.hiddenTemp;
+                sidebar.setAttribute("aria-hidden", "true");
+              }
             }, 100);
           }
         }
@@ -583,36 +602,44 @@ function initializeSidebarCollapse() {
 
   if (collapseBtn && sidebar) {
     collapseBtn.addEventListener("click", function () {
-      sidebar.classList.toggle("collapsed");
+      // Toggle hidden (desktop) state - sidebar fully disappears
+      sidebar.classList.toggle("hidden");
       collapseBtn.classList.toggle("open");
       const expanded = String(collapseBtn.classList.contains("open"));
       collapseBtn.setAttribute("aria-expanded", expanded);
 
+      // Update aria-hidden for sidebar
+      sidebar.setAttribute("aria-hidden", sidebar.classList.contains("hidden") ? "true" : "false");
+
       // Adjust main content margin
-      if (sidebar.classList.contains("collapsed")) {
-        mainContent.style.marginLeft = "5.00rem";
+      if (sidebar.classList.contains("hidden")) {
+        mainContent.style.marginLeft = "0";
       } else {
         mainContent.style.marginLeft = "20.00rem";
       }
 
-      // Save state to localStorage
+      // Save state to localStorage (use new key 'sidebarHidden')
       localStorage.setItem(
-        "sidebarCollapsed",
-        sidebar.classList.contains("collapsed")
+        "sidebarHidden",
+        sidebar.classList.contains("hidden")
       );
     });
   }
 
-  // Load saved state
-  const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
-  if (isCollapsed && sidebar) {
-    sidebar.classList.add("collapsed");
+  // Load saved state (migrate old 'sidebarCollapsed' if present)
+  const savedHidden = localStorage.getItem("sidebarHidden");
+  const savedCollapsed = localStorage.getItem("sidebarCollapsed");
+  const isHidden = savedHidden === "true" || (!savedHidden && savedCollapsed === "true");
+
+  if (isHidden && sidebar) {
+    sidebar.classList.add("hidden");
+    sidebar.setAttribute("aria-hidden", "true");
     if (collapseBtn) {
       collapseBtn.classList.add("open");
       collapseBtn.setAttribute("aria-expanded", "true");
     }
     if (mainContent) {
-      mainContent.style.marginLeft = "5.00rem";
+      mainContent.style.marginLeft = "0";
     }
   }
 }

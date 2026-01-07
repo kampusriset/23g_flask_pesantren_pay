@@ -109,6 +109,21 @@ body {
   width: 5rem;
 }
 
+/* Hidden (desktop) - completely hide sidebar and let content expand */
+.sidebar.hidden {
+  transform: translateX(-100%);
+  width: 0;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Support main-content expansion via sibling rule when sidebar is hidden */
+.sidebar.hidden ~ .main-content {
+  margin-left: 0 !important;
+}
+
 .sidebar.collapsed .sidebar-header {
   padding: 2.14rem 0.86rem;
 }
