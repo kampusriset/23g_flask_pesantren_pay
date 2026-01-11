@@ -5,35 +5,37 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
 :root {
-  /* Enhanced Color Palette */
-  --primary-color: #1a4d3a;
-  --primary-dark: #0f2e20;
-  --primary-light: #2d6a4f;
-  --primary-lighter: #52b788;
-  --primary-gradient: linear-gradient(135deg,
-      #1a4d3a 0%,
-      #2d6a4f 50%,
-      #0f2e20 100%);
-  --secondary-color: #2d6a4f;
-  --accent-color: #52b788;
+  /* Emerald Soft – Modern Fintech SaaS Theme */
+  --primary-color: #1f8a5b;
+  --primary-dark: #15704a;
+  --primary-light: #34b77a;
+  --primary-lighter: #e9f6ef;
+  --primary-gradient: linear-gradient(
+    135deg,
+    #1f8a5b 0%,
+    #34b77a 50%,
+    #15704a 100%
+  );
+  --secondary-color: #34b77a;
+  --accent-color: #e9f6ef;
   --danger-color: #dc2626;
   --warning-color: #f59e0b;
   --success-color: #059669;
   --info-color: #0891b2;
-  --light-bg: #f0fdf4;
+  --light-bg: #f4fbf7;
   --card-bg: #ffffff;
-  --border-color: #a7f3d0;
-  --text-muted: #64748b;
-  --text-dark: #0f172a;
+  --border-color: #e3efe8;
+  --text-muted: #6b7280;
+  --text-dark: #1f2937;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --border-radius: 12px;
-  --border-radius-lg: 16px;
+    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --border-radius: 16px;
+  --border-radius-lg: 20px;
   --base-font-size: 1rem;
   /* Enhanced Font Hierarchy */
   --font-xs: 0.75rem;
@@ -62,7 +64,7 @@
   /* Ticker settings */
   --ticker-duration: 30s;
   --ticker-blur: 8px;
-  --ticker-bg: rgba(255, 255, 255, 0.40);
+  --ticker-bg: rgba(255, 255, 255, 0.4);
   --ticker-item-bg: rgba(255, 255, 255, 0.18);
 }
 
@@ -120,7 +122,7 @@ body {
 }
 
 /* Support main-content expansion via sibling rule when sidebar is hidden */
-.sidebar.hidden~.main-content {
+.sidebar.hidden ~ .main-content {
   margin-left: 0 !important;
 }
 
@@ -186,7 +188,6 @@ body {
 }
 
 .sidebar.collapsed .sidebar-footer {
-
   padding: 1.43rem 0.86rem;
   text-align: center;
 }
@@ -329,7 +330,7 @@ body {
 .btn-sidebar-collapse .fa-bars::before,
 .btn-sidebar-toggle .fa-bars::after,
 .btn-sidebar-collapse .fa-bars::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   width: 24px;
@@ -543,7 +544,6 @@ body {
 
 /* Respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
-
   .ticker-track,
   .ticker-income .ticker-value,
   .ticker-expense .ticker-value,
@@ -620,7 +620,7 @@ body {
 }
 
 .profile-avatar::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 2px;
   right: 2px;
@@ -634,7 +634,6 @@ body {
 }
 
 @keyframes pulse-dot {
-
   0%,
   100% {
     opacity: 1;
@@ -646,7 +645,6 @@ body {
 }
 
 .profile-avatar img {
-
   width: 2.86rem;
   height: 2.86rem;
   border-radius: 50%;
@@ -740,18 +738,22 @@ body {
   overflow: hidden;
   border-radius: 1.5rem;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg,
-      rgba(240, 253, 244, 0.8) 0%,
-      rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(240, 253, 244, 0.8) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   backdrop-filter: blur(20px);
   border: 1px solid rgba(82, 183, 136, 0.1);
 }
 
 .balance-card-main {
-  background: linear-gradient(135deg,
-      var(--primary-dark) 0%,
-      var(--primary-color) 50%,
-      var(--primary-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary-color) 50%,
+    var(--primary-light) 100%
+  );
   color: white;
   position: relative;
   border-radius: 1.5rem;
@@ -775,15 +777,21 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 80%,
+  background: radial-gradient(
+      circle at 20% 80%,
       rgba(82, 183, 136, 0.3) 0%,
-      transparent 50%),
-    radial-gradient(circle at 80% 20%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
       rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%),
-    radial-gradient(circle at 40% 40%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
       rgba(82, 183, 136, 0.2) 0%,
-      transparent 50%);
+      transparent 50%
+    );
   animation: glowPulse 4s ease-in-out infinite alternate;
 }
 
@@ -858,9 +866,11 @@ body {
 }
 
 .amount-value {
-  background: linear-gradient(135deg,
-      #ffffff 0%,
-      rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -971,9 +981,11 @@ body {
 }
 
 .btn-primary-solid {
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.8) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
   color: var(--primary-color);
   border-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
@@ -1020,7 +1032,6 @@ body {
 }
 
 @keyframes badgePulse {
-
   0%,
   100% {
     opacity: 0.8;
@@ -1044,7 +1055,6 @@ body {
 }
 
 @keyframes iconFloat {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -1056,7 +1066,6 @@ body {
 }
 
 @keyframes particleFloat {
-
   0%,
   100% {
     opacity: 0;
@@ -1071,9 +1080,11 @@ body {
 
 /* ========== BALANCE CARD ========== */
 .balance-card {
-  background: linear-gradient(135deg,
-      var(--primary-dark) 0%,
-      var(--primary-color) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary-color) 100%
+  );
   color: white;
   padding: 2.86rem;
   border-radius: 1.07rem;
@@ -1180,7 +1191,11 @@ body {
 }
 
 .btn-primary-solid {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-light)
+  );
   color: white;
   box-shadow: 0 4px 12px rgba(26, 77, 58, 0.2);
 }
@@ -1200,7 +1215,11 @@ body {
 }
 
 .btn-action {
-  background: linear-gradient(135deg, rgba(26, 77, 58, 0.08), rgba(45, 106, 79, 0.06));
+  background: linear-gradient(
+    135deg,
+    rgba(26, 77, 58, 0.08),
+    rgba(45, 106, 79, 0.06)
+  );
   color: var(--primary-color);
   border: 1px solid rgba(26, 77, 58, 0.15);
   padding: 1rem 1.25rem;
@@ -1214,7 +1233,11 @@ body {
 .btn-primary-solid:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 20px rgba(26, 77, 58, 0.35);
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-light),
+    var(--primary-color)
+  );
 }
 
 .btn-primary-ghost:hover {
@@ -1231,7 +1254,11 @@ body {
 }
 
 .btn-action:hover {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-light)
+  );
   color: white;
   border-color: var(--primary-color);
   transform: translateX(5px);
@@ -1258,7 +1285,6 @@ body {
 }
 
 @keyframes slideInUp {
-
   from {
     opacity: 0;
     transform: translateY(30px);
@@ -1284,9 +1310,11 @@ body {
 
 /* ========== STAT CARDS ========== */
 .stat-card {
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   backdrop-filter: blur(10px);
   border-radius: 1.14rem;
   padding: 1.5rem;
@@ -1381,9 +1409,11 @@ body {
 }
 
 .stat-icon.income {
-  background: linear-gradient(135deg,
-      var(--primary-color),
-      var(--primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-light)
+  );
   border-left: 0.29rem solid var(--primary-dark);
   box-shadow: 0 0.25rem 0.75rem rgba(26, 77, 58, 0.3);
 }
@@ -1443,9 +1473,11 @@ body {
 
 /* Specific hover effects for different stat types */
 .stat-card:hover .stat-icon.income {
-  background: linear-gradient(135deg,
-      var(--primary-light),
-      var(--primary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-light),
+    var(--primary-color)
+  );
 }
 
 .stat-card:hover .stat-icon.expense {
@@ -1468,9 +1500,11 @@ body {
     0 0.25rem 0.5rem rgba(0, 0, 0, 0.04);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
@@ -2382,7 +2416,6 @@ body {
   .dropdown-menu {
     font-size: 0.86rem;
     z-index: 3000 !important;
-
   }
 
   .dropdown-item {
@@ -2411,9 +2444,11 @@ body {
 
 /* ========== MODERNIZED TRANSACTION TABLE STYLES ========== */
 .transaction-table {
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
   backdrop-filter: blur(10px);
   border-radius: 1.14rem;
   overflow: hidden;
@@ -2440,9 +2475,11 @@ body {
 }
 
 .transaction-table .table thead th {
-  background: linear-gradient(135deg,
-      var(--primary-color),
-      var(--primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
   color: white;
   font-weight: 600;
   font-size: 0.86rem;
@@ -2455,9 +2492,11 @@ body {
 }
 
 .transaction-table .table thead th:hover {
-  background: linear-gradient(135deg,
-      var(--primary-dark),
-      var(--primary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark),
+    var(--primary-color)
+  );
   transform: translateY(-0.07rem);
 }
 
@@ -2468,9 +2507,11 @@ body {
 }
 
 .transaction-table .table tbody tr:hover {
-  background: linear-gradient(135deg,
-      rgba(241, 248, 246, 0.8) 0%,
-      rgba(241, 248, 246, 0.6) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(241, 248, 246, 0.8) 0%,
+    rgba(241, 248, 246, 0.6) 100%
+  );
   transform: translateX(0.36rem);
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
 }
@@ -2482,9 +2523,11 @@ body {
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(180deg,
-      var(--primary-color),
-      var(--accent-color));
+  background: linear-gradient(
+    180deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
 }
 
 .transaction-table .table tbody tr:last-child {
@@ -2666,7 +2709,7 @@ body {
     margin-bottom: 1rem;
   }
 
-  .row>[class^="col-"] {
+  .row > [class^="col-"] {
     margin-bottom: 1rem;
   }
 
@@ -2786,7 +2829,6 @@ body {
 
 /* Align dashboard responsive behavior with students page */
 @media (max-width: 768px) {
-
   /* tables and typography */
   .table {
     font-size: 0.85rem;
@@ -2983,7 +3025,6 @@ body {
 }
 
 @media (min-width: 1400px) {
-
   /* keep layout centered and not too wide on very large screens */
   .page-content {
     max-width: 1200px;
@@ -3008,7 +3049,11 @@ body {
 }
 
 .form-card .card-header {
-  background: linear-gradient(90deg, rgba(82, 183, 136, 0.08), rgba(45, 80, 22, 0.02));
+  background: linear-gradient(
+    90deg,
+    rgba(82, 183, 136, 0.08),
+    rgba(45, 80, 22, 0.02)
+  );
   padding: 1rem 1.25rem;
 }
 
@@ -3065,7 +3110,8 @@ body {
   justify-content: center;
   padding: 0.18rem;
   border-radius: 0.35rem;
-  transition: transform 0.18s ease, color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.18s ease, color 0.18s ease,
+    background-color 0.18s ease, box-shadow 0.18s ease;
   will-change: transform, color;
 }
 
@@ -3080,7 +3126,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .btn .fas.fa-plus,
   .btn-action .fas.fa-plus,
   .btn-primary-solid .fas.fa-plus {
@@ -3089,20 +3134,14 @@ body {
   }
 }
 
-/* Dark mode palette (user-provided):
-   2C3930  (very dark base)
-   3F4F44  (primary)
-   A27B5C  (accent)
-   DCD7C9  (light / text)
-*/
 body.dark-mode {
-  --primary-dark: #2C3930;
-  --primary-color: #3F4F44;
-  --primary-light: #A27B5C;
-  --primary-lighter: #DCD7C9;
+  --primary-dark: #2c3930;
+  --primary-color: #3f4f44;
+  --primary-light: #a27b5c;
+  --primary-lighter: #dcd7c9;
 
   /* Derived tokens */
-  --card-bg: #2C3731;
+  --card-bg: #2c3731;
   --light-bg: #1b211c;
   --border-color: rgba(220, 215, 201, 0.06);
   --text-dark: var(--primary-lighter);
@@ -3210,32 +3249,8 @@ body.dark-mode,
 .sidebar,
 .top-navbar,
 .card {
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-}
-
-<<<<<<< HEAD
-/* ========== NAVBAR STICKY RESPONSIVE RULES ========== */
-
-/* When sidebar is collapsed (desktop) */
-.sidebar.collapsed~.main-content {
-  margin-left: 4.5rem;
-}
-
-.sidebar.collapsed~.main-content .top-navbar {
-  left: 4.5rem;
-  /* 72px collapsed width */
-}
-
-/* When sidebar is hidden (desktop) */
-.sidebar.hidden~.main-content {
-  margin-left: 0;
-}
-=======
-
->>>>>>> fa54bd229823639c7c1cdb5c95e7a0f0cb8a3f7d
-
-.sidebar.hidden~.main-content .top-navbar {
-  left: 0;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 /* Dark mode navbar background - override the default */
