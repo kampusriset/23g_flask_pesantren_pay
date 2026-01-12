@@ -60,8 +60,9 @@ def init_app():
         except Exception:
             pass
         try:
-            from db import ensure_bills_table
+            from db import ensure_bills_table, ensure_transactions_bill_id_column
             ensure_bills_table()
+            ensure_transactions_bill_id_column()
         except Exception:
             pass
         

@@ -938,6 +938,64 @@ def export_excel():
     )
 
 
+@students_bp.route('/download-template')
+def download_template():
+    """Download template Excel kosong untuk import santri"""
+    # Create workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Template Import Santri"
+    
+    # Define styles
+    header_fill = PatternFill(start_color="6366F1", end_color="6366F1", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Add headers
+    headers = ['No.', 'Nama Santri (Wajib)', 'NISN', 'Kelas', 'Jenis Kelamin', 'No. HP', 'Nama Orang Tua', 'No. HP Orang Tua', 'Alamat', 'Status (aktif/non-aktif)']
+    ws.append(headers)
+    
+    # Style headers
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = header_alignment
+        cell.border = border
+    
+    # Add example row (optional)
+    ws.append([1, 'Contoh Nama', '1234567890', 'Kelas 1', 'Laki-laki', '08123456789', 'Hasan', '08123456789', 'Jl. Contoh No. 123', 'aktif'])
+    
+    # Set column widths
+    ws.column_dimensions['A'].width = 5
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 12
+    ws.column_dimensions['E'].width = 15
+    ws.column_dimensions['F'].width = 15
+    ws.column_dimensions['G'].width = 20
+    ws.column_dimensions['H'].width = 15
+    ws.column_dimensions['I'].width = 30
+    ws.column_dimensions['J'].width = 20
+    
+    # Save to bytes
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='Template_Import_Santri.xlsx'
+    )
+
+
 @students_bp.route('/import-excel', methods=['GET', 'POST'])
 def import_excel():
     """Import data santri dari Excel dengan validasi duplikasi"""

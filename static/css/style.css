@@ -57,6 +57,10 @@
   --ticker-bg: rgba(255, 255, 255, 0.8);
   --ticker-item-bg: rgba(255, 255, 255, 0.9);
   --ticker-blur: 10px;
+
+  /* Legacy / Missing variables */
+  --light-bg: #f8fafc;
+  --text-dark: #1e293b;
 }
 
 [data-theme="dark"] {
@@ -300,6 +304,10 @@ body {
         margin-left: 0 !important;
     }
 
+    .main-content.expanded .top-navbar {
+        left: 0 !important;
+    }
+
     .sidebar {
         transition: transform 0.28s ease, opacity 0.28s ease;
     }
@@ -396,7 +404,7 @@ body {
   box-shadow: 0 0.14rem 0.57rem rgba(0, 0, 0, 0.05);
   background: rgba(255, 255, 255, 0.95);
   z-index: 900;
-  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navbar-left {
@@ -3072,12 +3080,8 @@ body {
 
 /* Slightly reduce sidebar impact on content width on very wide screens */
 @media (min-width: 1200px) {
-  .main-content {
-    margin-left: 20rem;
-  }
-
   .page-content {
-    max-width: 1000px;
+    max-width: 1200px;
   }
 }
 

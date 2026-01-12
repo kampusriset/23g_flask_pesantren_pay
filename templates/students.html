@@ -617,84 +617,6 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
           </div>
         </div>
       </div>
-
-      <!-- Belum Bayar Tab -->
-      <div
-        class="tab-pane fade"
-        id="belum-bayar-pane"
-        role="tabpanel"
-        tabindex="0">
-        <div class="card">
-          {% set belum_bayar_list = [] %} {% for student in students %} {% if
-          student.month_payment == 0 %} {% set _ =
-          belum_bayar_list.append(student) %} {% endif %} {% endfor %} {% if
-          belum_bayar_list|length > 0 %}
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th style="width: 5%">No.</th>
-                  <th>Nama Santri</th>
-                  <th>NISN</th>
-                  <th>Kelas</th>
-                  <th>Orang Tua</th>
-                  <th>No. Telepon</th>
-                  <th style="width: 18%">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for student in belum_bayar_list %}
-                <tr style="background-color: #fffbeb">
-                  <td>{{ loop.index }}</td>
-                  <td>
-                    <strong>{{ student.name }}</strong>
-                    <br />
-                    <small class="text-muted">{{ student.nisn }}</small>
-                  </td>
-                  <td><code>{{ student.nisn }}</code></td>
-                  <td>
-                    <span
-                      class="badge"
-                      style="background-color: #fef08a; color: #713f12"
-                      >{{ student.kelas }}</span
-                    >
-                  </td>
-                  <td>
-                    <strong>{{ student.parent_name }}</strong>
-                    <br />
-                    <small class="text-muted">{{ student.alamat }}</small>
-                  </td>
-                  <td>
-                    <a
-                      href="tel:{{ student.parent_phone }}"
-                      style="color: #6366f1; text-decoration: none">
-                      <i class="fas fa-phone"></i> {{ student.parent_phone }}
-                    </a>
-                  </td>
-                  <td>
-                    <a
-                      href="{{ url_for('students.detail', student_id=student.id) }}"
-                      class="btn btn-sm btn-primary">
-                      <i class="fas fa-plus-circle"></i> Catat Bayar
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <div class="text-center py-5">
-            <div style="font-size: 3rem; color: #d1d5db; margin-bottom: 10px">
-              <i class="fas fa-check-double"></i>
-            </div>
-            <h5 style="color: #6b7280">Semua Santri Sudah Bayar</h5>
-            <p style="color: #9ca3af">
-              Semua santri telah melakukan pembayaran bulan ini. Bagus!
-            </p>
-          </div>
-          {% endif %}
-        </div>
       </div>
     </div>
   </div>
@@ -702,49 +624,23 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
   <script>
     // Tab switching functionality
     function switchTab(tabName) {
-      // Update tab buttons
       const allTab = document.getElementById("all-tab");
       const belumBayarTab = document.getElementById("belum-bayar-tab");
-      const allPane = document.getElementById("all-pane");
-      const belumBayarPane = document.getElementById("belum-bayar-pane");
 
       if (tabName === "all") {
-        allTab.classList.add(
-          "active-tab",
-          "bg-white",
-          "text-primary-600",
-          "shadow-sm"
-        );
+        allTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
         allTab.classList.remove("text-gray-600", "hover:text-gray-900");
-        belumBayarTab.classList.remove(
-          "active-tab",
-          "bg-white",
-          "text-primary-600",
-          "shadow-sm"
-        );
+        belumBayarTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
         belumBayarTab.classList.add("text-gray-600", "hover:text-gray-900");
-
-        allPane.classList.add("active-tab-content");
-        belumBayarPane.classList.remove("active-tab-content");
-      } else if (tabName === "belum-bayar") {
-        belumBayarTab.classList.add(
-          "active-tab",
-          "bg-white",
-          "text-primary-600",
-          "shadow-sm"
-        );
+        window.currentTab = 'all';
+      } else {
+        belumBayarTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
         belumBayarTab.classList.remove("text-gray-600", "hover:text-gray-900");
-        allTab.classList.remove(
-          "active-tab",
-          "bg-white",
-          "text-primary-600",
-          "shadow-sm"
-        );
+        allTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
         allTab.classList.add("text-gray-600", "hover:text-gray-900");
-
-        belumBayarPane.classList.add("active-tab-content");
-        allPane.classList.remove("active-tab-content");
+        window.currentTab = 'unpaid';
       }
+      filterTable();
     }
 
     // Details toggle functionality
@@ -811,21 +707,43 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
       const searchValue = document.getElementById("search").value.toLowerCase();
       const kelasValue = document.getElementById("filterKelas").value;
       const statusValue = document.getElementById("filterStatus").value;
+      const currentTab = window.currentTab || 'all';
 
       const rows = document.querySelectorAll(".student-row");
+      let visibleCount = 0;
 
       rows.forEach((row) => {
         const name = row.getAttribute("data-name").toLowerCase();
         const kelas = row.getAttribute("data-kelas");
         const status = row.getAttribute("data-status");
+        const paidAmount = parseInt(row.getAttribute("data-paid") || "0");
 
         const matchName = name.includes(searchValue);
         const matchKelas = !kelasValue || kelas === kelasValue;
         const matchStatus = !statusValue || status === statusValue;
+        const matchTab = currentTab === 'all' || paidAmount === 0;
 
-        row.style.display =
-          matchName && matchKelas && matchStatus ? "" : "none";
+        if (matchName && matchKelas && matchStatus && matchTab) {
+          row.style.display = "";
+          visibleCount++;
+        } else {
+          row.style.display = "none";
+        }
       });
+
+      // Show empty message if no rows visible
+      const emptyRow = document.getElementById("emptyRow");
+      if (visibleCount === 0) {
+        if (!emptyRow) {
+          const tbody = document.getElementById("studentTableBody");
+          const tr = document.createElement("tr");
+          tr.id = "emptyRow";
+          tr.innerHTML = `<td colspan="6" class="px-6 py-12 text-center text-gray-500">Tidak ada data yang cocok dengan filter</td>`;
+          tbody.appendChild(tr);
+        }
+      } else if (emptyRow) {
+        emptyRow.remove();
+      }
     }
 
     // Initialize default tab
@@ -834,4 +752,3 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
     });
   </script>
   {% endblock %}
-</div>

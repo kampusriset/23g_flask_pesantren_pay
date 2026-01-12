@@ -405,6 +405,23 @@ def ensure_bills_table():
     cur.close()
 
 
+def ensure_transactions_bill_id_column():
+    """Ensure bill_id column exists in transactions table."""
+    db = get_db()
+    cur = db.cursor()
+    try:
+        cur.execute("PRAGMA table_info(transactions)")
+        columns = [row[1] for row in cur.fetchall()]
+        if 'bill_id' not in columns:
+            cur.execute("ALTER TABLE transactions ADD COLUMN bill_id INTEGER")
+            db.commit()
+    except Exception:
+        pass
+    finally:
+        cur.close()
+
+
+
 def create_bill(student_id, title, amount, due_date=None, created_by=None):
     return execute_db('''
         INSERT INTO bills (student_id, title, amount, due_date, created_by) VALUES (?, ?, ?, ?, ?)
