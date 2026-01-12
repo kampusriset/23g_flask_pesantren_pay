@@ -1245,8 +1245,13 @@ def index_payments():
     if session.get('role') not in ('admin', 'staff'):
         return redirect(url_for('dashboard.index'))
     # List bills
-    bills = get_all_bills()
-    bills = [dict(b) for b in bills] if bills else []
+    bills_data = get_all_bills()
+    bills = []
+    from db import get_bill_total_paid
+    for b in bills_data:
+        b_dict = dict(b)
+        b_dict['paid_amount'] = get_bill_total_paid(b['id'])
+        bills.append(b_dict)
     return render_template('payments_list.html', bills=bills)
 
 
@@ -1328,8 +1333,13 @@ def edit_bill_view(bill_id):
             pass
         return redirect(url_for('payments.index_payments'))
 
-    students = get_all_students()
-    students = [dict(s) for s in students] if students else []
+    students_data = get_all_students()
+    students = []
+    for s in students_data:
+        s_dict = dict(s)
+        s_dict['unpaid_amount'] = get_student_unpaid_amount(s['id'])
+        students.append(s_dict)
+
     try:
         bill = dict(bill)
     except Exception:
@@ -1349,57 +1359,76 @@ def delete_bill_view(bill_id):
     return redirect(url_for('payments.index_payments'))
 
 
-@payments_bp.route('/mark-paid/<int:bill_id>', methods=['POST'])
-def mark_paid_view(bill_id):
+@payments_bp.route('/pay/<int:bill_id>', methods=['POST'])
+def pay_bill_view(bill_id):
     if session.get('role') not in ('admin', 'staff'):
         return redirect(url_for('dashboard.index'))
     bill = get_bill(bill_id)
     if not bill:
         return redirect(url_for('payments.index_payments'))
 
-    # If already paid, do nothing
     try:
-        status = bill['status']
-    except Exception:
-        status = None
-
-    if status == 'paid':
-        return redirect(url_for('payments.index_payments'))
-
-    # Mark as paid in bills table
-    mark_bill_paid(bill_id)
-
-    # Create a corresponding transaction and update wallet
-    try:
+        amount_to_pay = int(request.form.get('amount', 0))
+        if amount_to_pay <= 0:
+            flash('Jumlah pembayaran harus lebih dari 0', 'warning')
+            return redirect(url_for('payments.index_payments'))
+            
         user_id = session.get('user_id', 1)
         student_id = bill['student_id']
-        amount = int(bill['amount']) if bill.get('amount') is not None else 0
-        title = bill.get('title') if isinstance(bill, dict) else bill['title']
+        title = bill['title']
         today = datetime.now().strftime('%Y-%m-%d')
 
-        # Insert transaction (income)
-        trans_id = execute_db(
-            '''INSERT INTO transactions (user_id, student_id, type, category, amount, description, date)
-               VALUES (?, ?, ?, ?, ?, ?, ?)''',
-            (user_id, student_id, 'income', 'Pembayaran Santri', amount, title, today)
+        # Insert transaction (income) linked to bill
+        execute_db(
+            '''INSERT INTO transactions (user_id, student_id, type, category, amount, description, date, bill_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (user_id, student_id, 'income', 'Pembayaran Santri', amount_to_pay, title, today, bill_id)
         )
 
-        # Update wallet balance for the user who receives the payment
+        # Update wallet balance
         wallet = query_db('SELECT balance FROM wallet WHERE user_id = ?', (user_id,), one=True)
         current_balance = wallet['balance'] if wallet else 0
-        new_balance = current_balance + amount
+        new_balance = current_balance + amount_to_pay
         execute_db('UPDATE wallet SET balance = ? WHERE user_id = ?', (new_balance, user_id))
 
-        record_history(user_id, 'pay', 'bill', bill_id, f"{title}:{amount}")
-        flash(f"Tagihan '{title}' berhasil ditandai lunas", 'success')
-    except Exception:
-        # Don't break the flow on failures to record transaction/history
-        try:
-            record_history(session.get('user_id'), 'pay', 'bill', bill_id, None)
-        except Exception:
-            pass
-        flash('Terjadi masalah saat memproses pembayaran. Silakan cek log.', 'danger')
+        # Check if bill is now fully paid
+        from db import get_bill_total_paid
+        total_paid = get_bill_total_paid(bill_id)
+        if total_paid >= bill['amount']:
+            mark_bill_paid(bill_id)
+            flash(f"Pembayaran Rp {amount_to_pay:,.0f} berhasil. Tagihan '{title}' sekarang Lunas.", 'success')
+        else:
+            flash(f"Pembayaran Rp {amount_to_pay:,.0f} berhasil. Sisa tagihan: Rp {(bill['amount'] - total_paid):,.0f}", 'success')
+
+        record_history(user_id, 'pay', 'bill', bill_id, f"{title}:{amount_to_pay}")
+    except Exception as e:
+        flash(f'Terjadi masalah saat memproses pembayaran: {str(e)}', 'danger')
 
     return redirect(url_for('payments.index_payments'))
+
+
+@payments_bp.route('/receipt/<int:bill_id>')
+def bill_receipt(bill_id):
+    """Lookup transaction for a bill and redirect to receipt"""
+    bill = get_bill(bill_id)
+    if not bill or bill['status'] != 'paid':
+        flash('Tagihan belum dibayar atau tidak ditemukan', 'warning')
+        return redirect(url_for('payments.index_payments'))
+    
+    # Try to find the latest transaction that matches this bill
+    # We use amount and description (title) and student_id
+    query = '''
+        SELECT id FROM transactions 
+        WHERE student_id = ? AND amount = ? AND (description = ? OR description LIKE ?)
+        AND type = 'income'
+        ORDER BY created_at DESC LIMIT 1
+    '''
+    trans = query_db(query, (bill['student_id'], bill['amount'], bill['title'], f"%{bill['title']}%"), one=True)
+    
+    if trans:
+        return redirect(url_for('transaction.receipt', id=trans['id']))
+    else:
+        flash('Kuitansi transaksi tidak ditemukan untuk tagihan ini', 'danger')
+        return redirect(url_for('payments.index_payments'))
 
 

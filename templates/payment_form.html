@@ -2,8 +2,10 @@
 page_title %}Form Tagihan{% endblock %} {% block content %}
 <div class="card">
   <div class="card-body">
+    <h5 class="card-title mb-4">{{ 'Edit Tagihan' if bill else 'Tambah Tagihan Baru' }}</h5>
     <form method="post">
-      <!-- Class Filter -->
+      {% if not bill %}
+      <!-- Class Filter (Only for Create) -->
       <div class="mb-3">
         <label class="form-label">Filter Kelas (opsional)</label>
         <select id="classSelect" class="form-select">
@@ -83,9 +85,20 @@ page_title %}Form Tagihan{% endblock %} {% block content %}
           {% endfor %}
         </div>
       </div>
+      {% else %}
+      <!-- Single Student for Edit -->
+      <div class="mb-3">
+        <label class="form-label">Santri</label>
+        <select name="student_id" class="form-select" required>
+            {% for s in students %}
+            <option value="{{ s.id }}" {% if s.id == bill.student_id %}selected{% endif %}>{{ s.name }} ({{ s.kelas }})</option>
+            {% endfor %}
+        </select>
+      </div>
+      {% endif %}
 
       <!-- Tagihan Details -->
-      <hr />
+      {% if not bill %}<hr />{% endif %}
       <div class="mb-3">
         <label class="form-label">Judul Tagihan</label>
         <input
@@ -93,6 +106,7 @@ page_title %}Form Tagihan{% endblock %} {% block content %}
           name="title"
           class="form-control"
           placeholder="Contoh: SPP Bulan November"
+          value="{{ bill.title if bill else '' }}"
           required />
       </div>
 
@@ -104,18 +118,29 @@ page_title %}Form Tagihan{% endblock %} {% block content %}
             name="amount"
             class="form-control"
             placeholder="0"
+            value="{{ bill.amount if bill else '' }}"
             required />
         </div>
         <div class="col-md-6 mb-3">
           <label class="form-label">Jatuh Tempo</label>
-          <input type="date" name="due_date" class="form-control" />
+          <input type="date" name="due_date" class="form-control" value="{{ bill.due_date if bill else '' }}" />
         </div>
       </div>
+
+      {% if bill %}
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+            <option value="unpaid" {% if bill.status == 'unpaid' %}selected{% endif %}>Belum Lunas</option>
+            <option value="paid" {% if bill.status == 'paid' %}selected{% endif %}>Lunas</option>
+        </select>
+      </div>
+      {% endif %}
 
       <!-- Action Buttons -->
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> Buat Tagihan
+          <i class="fas fa-save"></i> {{ 'Simpan Perubahan' if bill else 'Buat Tagihan' }}
         </button>
         <a
           href="{{ url_for('payments.index_payments') }}"

@@ -63,9 +63,11 @@ def init_db():
         amount INTEGER NOT NULL,
         description TEXT,
         date DATE NOT NULL,
+        bill_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (student_id) REFERENCES students(id)
+        FOREIGN KEY (student_id) REFERENCES students(id),
+        FOREIGN KEY (bill_id) REFERENCES bills(id)
     )''')
 
     # Tabel Wallet (Saldo Pondok)
@@ -458,3 +460,8 @@ def get_bill_stats_by_class():
         GROUP BY s.kelas
         ORDER BY total_unpaid DESC
     ''')
+
+def get_bill_total_paid(bill_id):
+    """Hitung total yang sudah dibayar untuk satu tagihan"""
+    row = query_db('SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE bill_id = ? AND type = "income"', (bill_id,), one=True)
+    return row['total'] if row else 0

@@ -10,114 +10,145 @@
                 <a href="{{ url_for('payments.create_bill_view') }}" class="btn btn-primary">Buat Tagihan</a>
             </div>
         </div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Santri</th>
-                    <th>Judul</th>
-                    <th>Jumlah</th>
-                    <th>Jatuh Tempo</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for b in bills %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ b.student_name }} ({{ b.student_nisn }})</td>
-                    <td>{{ b.title }}</td>
-                    <td>{{ b.amount|rupiah }}</td>
-                    <td>{{ b.due_date or '-' }}</td>
-                    <td>
-                        {% if b.status == 'paid' %}
-                            <span class="badge bg-success">Lunas</span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark">Belum Bayar</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form action="{{ url_for('payments.delete_bill_view', bill_id=b.id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Hapus tagihan ini?');">
-                            <button class="btn btn-sm btn-danger">Hapus</button>
-                        </form>
-                        {% if b.status != 'paid' %}
-                                                <button type="button" class="btn btn-sm btn-success btn-mark-paid" data-bill-id="{{ b.id }}" data-bill-title="{{ b.title }}" data-bill-amount="{{ b.amount }}" style="margin-left:6px;">Tandai Lunas</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% else %}
-                <tr><td colspan="7">Belum ada tagihan.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Santri</th>
+                        <th>Judul</th>
+                        <th>Total Tagihan</th>
+                        <th>Terbayar</th>
+                        <th>Sisa</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bills %}
+                    {% set remaining = b.amount - b.paid_amount %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ b.student_name }}</strong><br>
+                            <small class="text-muted">{{ b.student_nisn }}</small>
+                        </td>
+                        <td>{{ b.title }}</td>
+                        <td>{{ b.amount|rupiah }}</td>
+                        <td class="text-success">{{ b.paid_amount|rupiah }}</td>
+                        <td class="text-danger fw-bold">{{ remaining|rupiah }}</td>
+                        <td>{{ b.due_date or '-' }}</td>
+                        <td>
+                            {% if b.status == 'paid' %}
+                                <span class="badge bg-success">Lunas</span>
+                            {% elif b.paid_amount > 0 %}
+                                <span class="badge bg-info text-white">Cicilan</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Belum Bayar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                {% if b.status != 'paid' %}
+                                    <button type="button" class="btn btn-sm btn-success btn-pay" 
+                                            data-bill-id="{{ b.id }}" 
+                                            data-bill-title="{{ b.title }}" 
+                                            data-bill-remaining="{{ remaining }}"
+                                            data-student-name="{{ b.student_name }}">
+                                        <i class="fas fa-money-bill-wave"></i> Bayar
+                                    </button>
+                                {% endif %}
+                                
+                                {% if b.paid_amount > 0 %}
+                                    <a href="{{ url_for('payments.bill_receipt', bill_id=b.id) }}" class="btn btn-sm btn-info text-white" target="_blank" title="Cetak Kuitansi Terakhir">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                {% endif %}
+
+                                <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Tagihan">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <form action="{{ url_for('payments.delete_bill_view', bill_id=b.id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Hapus tagihan ini?');">
+                                    <button class="btn btn-sm btn-outline-danger" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9" class="text-center">Belum ada tagihan.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- Confirmation Modal for Mark Paid -->
-<div class="modal fade" id="markPaidModal" tabindex="-1" aria-labelledby="markPaidModalLabel" aria-hidden="true">
+<!-- Payment Modal -->
+<div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="markPaidModalLabel">Konfirmasi Tandai Lunas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="payModalLabel">Input Pembayaran</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p id="markPaidModalText">Apakah Anda yakin ingin menandai tagihan ini sebagai lunas?</p>
-                <form id="markPaidForm" method="post" action="">
-                    <!-- form action will be set dynamically -->
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" id="markPaidConfirmBtn" class="btn btn-success">Ya, Tandai Lunas</button>
-            </div>
+            <form id="payForm" method="post" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label d-block text-muted small">Santri</label>
+                        <h6 id="modalStudentName" class="fw-bold">-</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block text-muted small">Tagihan</label>
+                        <h6 id="modalBillTitle" class="fw-bold">-</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah Pembayaran (Rp)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" name="amount" id="payAmountInput" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="form-text text-danger" id="remainingText">Sisa tagihan: Rp 0</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success px-4">Bayar Sekarang</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-        const modal = new bootstrap.Modal(document.getElementById('markPaidModal'));
-        let currentAction = null;
+    const payModal = new bootstrap.Modal(document.getElementById('payModal'));
+    const payForm = document.getElementById('payForm');
+    const payAmountInput = document.getElementById('payAmountInput');
+    const remainingText = document.getElementById('remainingText');
+    const modalStudentName = document.getElementById('modalStudentName');
+    const modalBillTitle = document.getElementById('modalBillTitle');
 
-        document.querySelectorAll('.btn-mark-paid').forEach(btn => {
-                btn.addEventListener('click', function() {
-                        const billId = this.dataset.billId;
-                        const title = this.dataset.billTitle;
-                        const amount = this.dataset.billAmount;
-                        const form = document.getElementById('markPaidForm');
-                        form.innerHTML = '';
-                        form.action = `{{ url_for('payments.index_payments') }}`.replace('/payments', `/payments`) + `/mark-paid/${billId}`;
-                        // Add CSRF token here if you use CSRF
-                        document.getElementById('markPaidModalText').textContent = `Tandai tagihan "${title}" (${amount}) sebagai lunas?`;
-                        currentAction = form.action;
-                        modal.show();
-                });
-        });
+    document.querySelectorAll('.btn-pay').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const billId = this.dataset.billId;
+            const title = this.dataset.billTitle;
+            const remaining = this.dataset.billRemaining;
+            const studentName = this.dataset.studentName;
 
-        document.getElementById('markPaidConfirmBtn').addEventListener('click', function() {
-                if (!currentAction) return;
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                // Submit POST via fetch to avoid needing hidden form fields
-                fetch(currentAction, { 
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken
-                    }
-                })
-                        .then(resp => {
-                                if (resp.redirected) {
-                                        window.location = resp.url;
-                                } else {
-                                        window.location.reload();
-                                }
-                        }).catch(err => {
-                                console.error(err);
-                                showToast('Gagal menandai lunas', 'danger');
-                        });
+            payForm.action = `{{ url_for('payments.index_payments') }}`.replace('/payments', `/payments`) + `/pay/${billId}`;
+            modalStudentName.textContent = studentName;
+            modalBillTitle.textContent = title;
+            payAmountInput.value = remaining;
+            payAmountInput.max = remaining; // Optional: restrict max payment?
+            remainingText.textContent = `Sisa tagihan: Rp ${parseInt(remaining).toLocaleString('id-ID')}`;
+            
+            payModal.show();
         });
+    });
 });
 </script>
 {% endblock %}
