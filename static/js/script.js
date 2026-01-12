@@ -507,15 +507,24 @@ document.head.appendChild(style);
                 if(text) text.textContent = "Dark Mode";
             }
         }
+        
+        // Broadcast event for charts etc
+        const event = new CustomEvent('themeChanged', { detail: { isDark } });
+        document.dispatchEvent(event);
     }
 
-    // Initialize state
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-        applyTheme(true);
-    } else {
-        applyTheme(false);
+    // Initialize state (Redundant check but keeps UI sync)
+    function initTheme() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+            applyTheme(savedTheme === "dark");
+        } else {
+             // Respect System Prefs if no saved theme
+            const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            applyTheme(systemDark);
+        }
     }
+    initTheme();
 
     if(toggleButton) {
         toggleButton.addEventListener("click", function(e) {
@@ -531,6 +540,16 @@ document.head.appendChild(style);
             }
         });
     }
+
+    // Listen for System Changes
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', event => {
+        // Only auto-switch if user hasn't manually overridden (optional choice, 
+        // but here we can let system rule if no localStorage is set, 
+        // or just let it override. Let's strictly follow system ONLY if no localStorage is present)
+        if (!localStorage.getItem("theme")) {
+            applyTheme(event.matches);
+        }
+    });
 
 
 /**

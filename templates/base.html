@@ -11,7 +11,26 @@
   <title>{% block title %}PonPay - Dashboard{% endblock %}</title>
   <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet' />
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' />
-  <link rel='stylesheet' href='{{ url_for('static', filename='css/style.css') }}' />
+  <link rel='stylesheet' href='{{ url_for('static', filename='css/style.css' ) }}' />
+  <script>
+    // Instant Dark Mode Init (Prevent FOUC)
+    (function () {
+      const getTheme = () => {
+        const persisted = localStorage.getItem('theme');
+        if (persisted) return persisted;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+
+      const theme = getTheme();
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.classList.add('dark'); // Tailwind compat
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   {% block extra_css %}{% endblock %}
 </head>
 
@@ -21,7 +40,7 @@
     <nav class='sidebar' id='sidebar' aria-hidden='false'>
       <div class='sidebar-header'>
         <div class='logo-section'>
-          <img src='{{ url_for('static', filename='images/logo.png') }}' alt='Logo Al Huda' style='
+          <img src='{{ url_for('static', filename='images/logo.png' ) }}' alt='Logo Al Huda' style='
                 width: 40px;
                 height: 40px;
                 margin-right: 10px;
@@ -34,37 +53,32 @@
 
       <ul class='nav flex-column sidebar-nav' id='sidebarNav'>
         <li class='nav-item'>
-          <a class='nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}'
-            href='{{ url_for('dashboard.index') }}'>
+          <a class='nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}' href='{{ url_for('dashboard.index') }}'>
             <i class='fas fa-home'></i>
             <span>Dashboard</span>
           </a>
         </li>
         <li class='nav-item'>
-          <a class='nav-link {% if request.endpoint == 'students.index' %}active{% endif %}'
-            href='{{ url_for('students.index') }}'>
+          <a class='nav-link {% if request.endpoint == 'students.index' %}active{% endif %}' href='{{ url_for('students.index') }}'>
             <i class='fas fa-users'></i>
             <span>Data Santri</span>
           </a>
         </li>
         <li class='nav-item'>
-          <a class='nav-link {% if request.endpoint == 'wallet.index' %}active{% endif %}'
-            href='{{ url_for('wallet.index') }}'>
+          <a class='nav-link {% if request.endpoint == 'wallet.index' %}active{% endif %}' href='{{ url_for('wallet.index') }}'>
             <i class='fas fa-wallet'></i>
             <span>Dompet Pondok</span>
           </a>
         </li>
         <li class='nav-item'>
-          <a class='nav-link d-flex justify-content-between align-items-center {% if request.endpoint and request.endpoint.startswith('transaction') %}active{% endif %}'
-            data-bs-toggle='collapse' href='#nav-transaction' role='button' aria-expanded='false'
-            aria-controls='nav-transaction'>
+          <a class='nav-link d-flex justify-content-between align-items-center {% if request.endpoint and request.endpoint.startswith('transaction') %}active{% endif %}' data-bs-toggle='collapse' href='#nav-transaction' role='button'
+            aria-expanded='false' aria-controls='nav-transaction'>
             <span><i class='fas fa-exchange-alt'></i>
               <span>Transaksi</span></span>
             <i class='fas fa-chevron-down'></i>
           </a>
-          <div
-            class='collapse {% if request.endpoint and (request.endpoint.startswith('transaction') or request.endpoint.startswith('payments')) %}show{% endif %}'
-            id='nav-transaction'>
+          <div class='collapse {% if request.endpoint and (request.endpoint.startswith('transaction') or
+            request.endpoint.startswith('payments')) %}show{% endif %}' id='nav-transaction'>
             <ul class='nav flex-column ms-3'>
               <li class='nav-item'>
                 <a class='nav-link {% if request.endpoint == 'transaction.index' %}active{% endif %}'
@@ -80,33 +94,28 @@
           </div>
         </li>
         <li class='nav-item'>
-          <a class='nav-link {% if request.endpoint == 'statistics.index' %}active{% endif %}'
-            href='{{ url_for('statistics.index') }}'>
+          <a class='nav-link {% if request.endpoint == 'statistics.index' %}active{% endif %}' href='{{ url_for('statistics.index') }}'>
             <i class='fas fa-chart-bar'></i>
             <span>Statistik</span>
           </a>
         </li>
         <li class='nav-item'>
-          <a class='nav-link {% if request.endpoint == 'history.index' %}active{% endif %}'
-            href='{{ url_for('history.index') }}'>
+          <a class='nav-link {% if request.endpoint == 'history.index' %}active{% endif %}' href='{{ url_for('history.index') }}'>
             <i class='fas fa-history'></i>
             <span>Riwayat</span>
           </a>
         </li>
         <li class='nav-item'>
-          <a class='nav-link d-flex justify-content-between align-items-center {% if request.endpoint and request.endpoint.startswith('settings') %}active{% endif %}'
-            data-bs-toggle='collapse' href='#nav-settings' role='button' aria-expanded='false'
-            aria-controls='nav-settings'>
+          <a class='nav-link d-flex justify-content-between align-items-center {% if request.endpoint and request.endpoint.startswith('settings') %}active{% endif %}' data-bs-toggle='collapse' href='#nav-settings' role='button'
+            aria-expanded='false' aria-controls='nav-settings'>
             <span><i class='fas fa-cog'></i> <span>Pengaturan</span></span>
             <i class='fas fa-chevron-down'></i>
           </a>
-          <div
-            class='collapse {% if request.endpoint and (request.endpoint.startswith('settings') or request.endpoint.startswith('users')) %}show{% endif %}'
-            id='nav-settings'>
+          <div class='collapse {% if request.endpoint and (request.endpoint.startswith('settings') or
+            request.endpoint.startswith('users')) %}show{% endif %}' id='nav-settings'>
             <ul class='nav flex-column ms-3'>
               <li class='nav-item'>
-                <a class='nav-link {% if request.endpoint == 'settings.index' %}active{% endif %}'
-                  href='{{ url_for('settings.index') }}'>Profil Saya</a>
+                <a class='nav-link {% if request.endpoint == 'settings.index' %}active{% endif %}' href='{{ url_for('settings.index') }}'>Profil Saya</a>
               </li>
               <li class='nav-item'>
                 {% if session.get('role') == 'admin' %}
@@ -146,11 +155,12 @@
             <div class='user-profile-inner d-flex align-items-center'>
               <div class='profile-avatar'>
                 {% set avatar_name = session.get('full_name') or 'User' %}
-                {% set avatar_fallback = ('https://ui-avatars.com/api/?name=' ~ avatar_name ~ '&background=6366F1&color=fff') %}
+                {% set avatar_fallback = ('https://ui-avatars.com/api/?name=' ~ avatar_name ~
+                '&background=6366F1&color=fff') %}
                 {% if session.get('profile_picture') %}
-                <img src="{{ url_for('static', filename=session['profile_picture']) }}?t={{ session.get('profile_picture_timestamp', 0) }}"
-                    alt="Profile"
-                    onerror="this.src='{{ avatar_fallback }}'">
+                <img
+                  src="{{ url_for('static', filename=session['profile_picture']) }}?t={{ session.get('profile_picture_timestamp', 0) }}"
+                  alt="Profile" onerror="this.src='{{ avatar_fallback }}'">
                 {% else %}
                 <img src="{{ avatar_fallback }}" alt="Profile" />
                 {% endif %}
