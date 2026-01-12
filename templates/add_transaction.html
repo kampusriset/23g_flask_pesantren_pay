@@ -237,20 +237,28 @@
     const amountDisplay = document.getElementById('displayAmountInput');
     const amountIcon = document.querySelector('.amount-currency'); // Span Rp
 
-    // Check for Dark Mode from localStorage (handled by base.html usually, but let's sync)
-    if (localStorage.getItem('darkMode') === 'true' || document.body.classList.contains('dark-mode')) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // Unified Dark Mode Sync (Standardized to use 'theme' key)
+    function syncDarkMode() {
+      const currentTheme = localStorage.getItem('theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+      if (currentTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
 
-    // Listen for dark mode toggle clicks to sync Tailwind 'dark' class
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-      darkModeToggle.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-      });
-    }
+    syncDarkMode();
+
+    // Listen for dark mode toggle clicks or storage changes
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') syncDarkMode();
+    });
+
+    document.addEventListener('themeChanged', (e) => {
+      syncDarkMode();
+    });
 
     // 1. Cleave JS
     const cleave = new Cleave('#displayAmountInput', {

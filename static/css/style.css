@@ -3875,3 +3875,171 @@ body.dark-mode .top-navbar.scrolled {
 #sidebarCollapseBtn:hover {
     background-color:#1A2E0F;
 }
+
+/* ========================================
+   STATISTICS PAGE - SEGMENTED CONTROL
+   ======================================== */
+.segmented-control {
+    display: inline-flex;
+    background-color: var(--bg-surface);
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    gap: 0.25rem;
+}
+
+.segmented-control .btn-segment {
+    border: none;
+    background: transparent;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.6rem;
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: var(--transition-normal);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.segmented-control .btn-segment:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+}
+
+.segmented-control .btn-segment.active {
+    background-color: var(--bg-card);
+    color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .segmented-control .btn-segment.active {
+    background-color: var(--bg-elevated);
+    color: var(--primary-color);
+}
+
+/* ========================================
+   STATISTICS PAGE - CHART ENHANCEMENTS
+   ======================================== */
+.chart-container-large {
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
+
+.chart-container-medium {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-legend-custom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.chart-insight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: var(--font-xs);
+    font-weight: 600;
+}
+
+.insight-positive {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+
+.insight-negative {
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+/* Tooltip Enhancements */
+.chartjs-tooltip {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-emphasis) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.75rem !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ========================================
+   STATISTICS PAGE - PREMIUM POLISH
+   ======================================== */
+.card-chart {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.card-chart:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl) !important;
+}
+
+.btn-segment {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-segment::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.btn-segment.active::after {
+    width: 60%;
+    left: 20%;
+}
+
+/* Skeleton/Loading states & Empty States */
+.empty-chart-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-chart-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Chart Canvas responsive fix */
+canvas {
+    max-width: 100%;
+}
+

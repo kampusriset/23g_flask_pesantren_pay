@@ -1,78 +1,86 @@
-{% extends 'base.html' %} {% block title %}Statistik - PonPay{% endblock %} {%
-block page_title %}Statistik Keuangan{% endblock %} {% block content %}
+{% extends 'base.html' %}
+
+{% block title %}Statistik - PonPay{% endblock %}
+
+{% block page_title %}Statistik Keuangan{% endblock %}
+
+{% block content %}
 <div class="container-fluid">
-  <!-- Filter Period -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="btn-group" role="group">
-            <a
-              href="{{ url_for('statistics.index', period=1) }}"
-              class="btn btn-outline-primary {% if filter_period == '1' %}active{% endif %}"
-              >1 Bulan</a
-            >
-            <a
-              href="{{ url_for('statistics.index', period=3) }}"
-              class="btn btn-outline-primary {% if filter_period == '3' %}active{% endif %}"
-              >3 Bulan</a
-            >
-            <a
-              href="{{ url_for('statistics.index', period=6) }}"
-              class="btn btn-outline-primary {% if filter_period == '6' %}active{% endif %}"
-              >6 Bulan</a
-            >
-            <a
-              href="{{ url_for('statistics.index', period=12) }}"
-              class="btn btn-outline-primary {% if filter_period == '12' %}active{% endif %}"
-              >1 Tahun</a
-            >
-          </div>
-        </div>
+  <!-- Header with Segmented Control -->
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+      <h4 class="fw-bold mb-0">Analisis Keuangan</h4>
+      <p class="text-secondary small mb-0">Lihat ringkasan performa keuangan pesantren Anda</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+      <div class="segmented-control">
+        <a href="{{ url_for('statistics.index', period=1) }}"
+          class="btn-segment {% if filter_period == '1' %}active{% endif %}" data-bs-toggle="tooltip"
+          title="Data 30 hari terakhir">1 Bulan</a>
+        <a href="{{ url_for('statistics.index', period=3) }}"
+          class="btn-segment {% if filter_period == '3' %}active{% endif %}" data-bs-toggle="tooltip"
+          title="Data 90 hari terakhir">3 Bulan</a>
+        <a href="{{ url_for('statistics.index', period=6) }}"
+          class="btn-segment {% if filter_period == '6' %}active{% endif %}" data-bs-toggle="tooltip"
+          title="Data 180 hari terakhir">6 Bulan</a>
+        <a href="{{ url_for('statistics.index', period=12) }}"
+          class="btn-segment {% if filter_period == '12' %}active{% endif %}" data-bs-toggle="tooltip"
+          title="Data 365 hari terakhir">1 Tahun</a>
       </div>
     </div>
   </div>
 
-  <!-- Charts Row -->
-  <div class="row mb-4">
-    <!-- Pengeluaran Chart -->
+  <!-- Main Charts Row -->
+  <div class="row g-4 mb-4">
+    <!-- Pemasukan Classification -->
     <div class="col-lg-6">
-      <div class="card card-chart">
-        <div class="card-header">
-          <h6 class="card-title">Klasifikasi Pengeluaran</h6>
-        </div>
-        <div class="card-body">
-          <div style="position: relative; height: 300px">
-            <canvas id="expenseChart"></canvas>
+      <div class="card card-chart border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="card-title fw-bold mb-0">Klasifikasi Pemasukan</h6>
+            <span class="badge badge-income rounded-pill px-3 py-2">Masuk</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Pemasukan Chart -->
-    <div class="col-lg-6">
-      <div class="card card-chart">
-        <div class="card-header">
-          <h6 class="card-title">Klasifikasi Pemasukan</h6>
-        </div>
-        <div class="card-body">
-          <div style="position: relative; height: 300px">
+        <div class="card-body px-4 pb-4">
+          <div class="chart-container-medium mt-3">
             <canvas id="incomeChart"></canvas>
           </div>
+          <div id="incomeLegend" class="chart-legend-custom"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pengeluaran Classification -->
+    <div class="col-lg-6">
+      <div class="card card-chart border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="card-title fw-bold mb-0">Klasifikasi Pengeluaran</h6>
+            <span class="badge badge-expense rounded-pill px-3 py-2">Keluar</span>
+          </div>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="chart-container-medium mt-3">
+            <canvas id="expenseChart"></canvas>
+          </div>
+          <div id="expenseLegend" class="chart-legend-custom"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Expense vs Income Comparison -->
-  <div class="row mb-4">
+  <!-- Comparison Chart Full Width -->
+  <div class="row g-4 mb-4">
     <div class="col-12">
-      <div class="card card-chart">
-        <div class="card-header">
-          <h6 class="card-title">Perbandingan Pemasukan vs Pengeluaran</h6>
+      <div class="card card-chart border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="card-title fw-bold mb-0">Arus Kas: Pemasukan vs Pengeluaran</h6>
+            <div id="comparisonInsight"></div>
+          </div>
         </div>
-        <div class="card-body">
-          <div style="position: relative; height: 350px">
+        <div class="card-body px-4 pb-4">
+          <div class="chart-container-large mt-3">
             <canvas id="comparisonChart"></canvas>
           </div>
         </div>
@@ -81,14 +89,17 @@ block page_title %}Statistik Keuangan{% endblock %} {% block content %}
   </div>
 
   <!-- Unpaid Bills per Class -->
-  <div class="row">
+  <div class="row g-4 mb-4">
     <div class="col-12">
-      <div class="card card-chart">
-        <div class="card-header">
-          <h6 class="card-title">Tunggakan Pembayaran per Kelas</h6>
+      <div class="card card-chart border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="card-title fw-bold mb-0">Tunggakan Pembayaran per Kelas</h6>
+            <span class="text-secondary small">Diurutkan berdasarkan nominal tertinggi</span>
+          </div>
         </div>
-        <div class="card-body">
-          <div style="position: relative; height: 400px">
+        <div class="card-body px-4 pb-4">
+          <div class="chart-container-large mt-3">
             <canvas id="classUnpaidChart"></canvas>
           </div>
         </div>
@@ -96,193 +107,329 @@ block page_title %}Statistik Keuangan{% endblock %} {% block content %}
     </div>
   </div>
 </div>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-// Menggunakan tanda kutip tunggal agar tidak tabrakan dengan tanda kutip ganda di dalam JSON
-  let colors = JSON.parse('{{ colors|safe }}' || '[]');
-  let expenseLabels = JSON.parse('{{ expense_labels|safe }}' || '[]');
-  let expenseValues = JSON.parse('{{ expense_values|safe }}' || '[]');
-  let incomeLabels = JSON.parse('{{ income_labels|safe }}' || '[]');
-  let incomeValues = JSON.parse('{{ income_values|safe }}' || '[]');
-  let classLabels = JSON.parse('{{ class_labels|safe }}' || '[]');
-  let classValues = JSON.parse('{{ class_values|safe }}' || '[]');
+  // Data from Backend
+  const incomeLabels = JSON.parse('{{ income_labels|safe }}' || '[]');
+  const incomeValues = JSON.parse('{{ income_values|safe }}' || '[]');
+  const expenseLabels = JSON.parse('{{ expense_labels|safe }}' || '[]');
+  const expenseValues = JSON.parse('{{ expense_values|safe }}' || '[]');
+  const classLabelsRaw = JSON.parse('{{ class_labels|safe }}' || '[]');
+  const classValuesRaw = JSON.parse('{{ class_values|safe }}' || '[]');
 
-  // Expense Pie Chart
-  if (expenseLabels.length > 0) {
-    const expenseCtx = document.getElementById("expenseChart").getContext("2d");
-    new Chart(expenseCtx, {
-      type: "doughnut",
-      data: {
-        labels: expenseLabels,
-        datasets: [
-          {
-            data: expenseValues,
-            backgroundColor: colors,
-            borderColor: "#FF0000",
-            borderWidth: 2,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: { size: 11 },
-            },
-          },
-        },
-      },
-    });
-  }
+  // Utility: Format Rupiah
+  const formatIDR = (val) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0
+    }).format(val);
+  };
 
-  // Income Pie Chart
-  if (incomeLabels.length > 0) {
+  // Color Palette - Fintech Styles
+  const incomeColors = ['#166534', '#15803d', '#16a34a', '#22c55e', '#4ade80', '#86efac'];
+  const expenseColors = ['#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#f87171', '#fca5a5'];
+
+  // Theme Detection
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+  const textColor = isDarkMode ? '#9ca3af' : '#64748b';
+
+  // Chart.js Shared Config
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.color = textColor;
+  Chart.defaults.animation.duration = 1500;
+  Chart.defaults.animation.easing = 'easeOutQuart';
+
+  // Helper: Show Empty State
+  const showEmptyState = (canvasId, message) => {
+    const canvas = document.getElementById(canvasId);
+    const parent = canvas.parentElement;
+    parent.innerHTML = `
+            <div class="empty-chart-state">
+                <i class="fas fa-chart-pie"></i>
+                <p class="mb-0 fw-medium">${message}</p>
+                <small class="text-secondary">Tidak ada data untuk periode ini</small>
+            </div>
+        `;
+  };
+
+  // Helper: Create Custom Legend
+  const createLegend = (chart, id, colors) => {
+    const legendContainer = document.getElementById(id);
+    if (!legendContainer) return;
+    const data = chart.data.datasets[0].data;
+    const labels = chart.data.labels;
+    const total = data.reduce((a, b) => a + b, 0);
+
+    legendContainer.innerHTML = labels.map((label, i) => {
+      const percentage = total > 0 ? ((data[i] / total) * 100).toFixed(1) : 0;
+      return `
+                <div class="legend-item" title="${formatIDR(data[i])}">
+                    <div class="legend-color" style="background-color: ${colors[i % colors.length]}"></div>
+                    <span class="text-truncate" style="max-width: 100px">${label}</span>
+                    <span class="fw-bold">${percentage}%</span>
+                </div>
+            `;
+    }).join('');
+  };
+
+  // 1. Income Chart (Donut)
+  if (incomeLabels.length > 0 && incomeValues.some(v => v > 0)) {
     const incomeCtx = document.getElementById("incomeChart").getContext("2d");
-    new Chart(incomeCtx, {
+    const incomeChart = new Chart(incomeCtx, {
       type: "doughnut",
       data: {
         labels: incomeLabels,
+        datasets: [{
+          data: incomeValues,
+          backgroundColor: incomeColors,
+          borderWidth: 0,
+          hoverOffset: 20,
+          spacing: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+            titleColor: isDarkMode ? '#fff' : '#1e293b',
+            bodyColor: isDarkMode ? '#cbd5e1' : '#64748b',
+            borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: (context) => ` ${context.label}: ${formatIDR(context.raw)}`
+            }
+          }
+        }
+      }
+    });
+    createLegend(incomeChart, 'incomeLegend', incomeColors);
+  } else {
+    showEmptyState('incomeChart', 'Belum ada data pemasukan');
+  }
+
+  // 2. Expense Chart (Donut)
+  if (expenseLabels.length > 0 && expenseValues.some(v => v > 0)) {
+    const expenseCtx = document.getElementById("expenseChart").getContext("2d");
+    const expenseChart = new Chart(expenseCtx, {
+      type: "doughnut",
+      data: {
+        labels: expenseLabels,
+        datasets: [{
+          data: expenseValues,
+          backgroundColor: expenseColors,
+          borderWidth: 0,
+          hoverOffset: 20,
+          spacing: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+            titleColor: isDarkMode ? '#fff' : '#1e293b',
+            bodyColor: isDarkMode ? '#cbd5e1' : '#64748b',
+            borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: (context) => ` ${context.label}: ${formatIDR(context.raw)}`
+            }
+          }
+        }
+      }
+    });
+    createLegend(expenseChart, 'expenseLegend', expenseColors);
+  } else {
+    showEmptyState('expenseChart', 'Belum ada data pengeluaran');
+  }
+
+  // 3. Comparison Chart (Horizontal Bar)
+  const totalIncome = incomeValues.reduce((a, b) => a + b, 0);
+  const totalExpense = expenseValues.reduce((a, b) => a + b, 0);
+  const netBalance = totalIncome - totalExpense;
+
+  // Set Insight Badge
+  const insightContainer = document.getElementById('comparisonInsight');
+  if (totalIncome > 0 || totalExpense > 0) {
+    if (netBalance >= 0) {
+      insightContainer.innerHTML = `<span class="chart-insight-badge insight-positive shadow-sm"><i class="fas fa-arrow-trend-up"></i> Surplus ${formatIDR(netBalance)}</span>`;
+    } else {
+      insightContainer.innerHTML = `<span class="chart-insight-badge insight-negative shadow-sm"><i class="fas fa-arrow-trend-down"></i> Defisit ${formatIDR(Math.abs(netBalance))}</span>`;
+    }
+  }
+
+  if (totalIncome > 0 || totalExpense > 0) {
+    const comparisonCtx = document.getElementById("comparisonChart").getContext("2d");
+    new Chart(comparisonCtx, {
+      type: "bar",
+      data: {
+        labels: ["Total Arus Kas"],
         datasets: [
           {
-            data: incomeValues,
-            backgroundColor: colors,
-            borderColor: "#FF0000",
-            borderWidth: 2,
+            label: "Pemasukan",
+            data: [totalIncome],
+            backgroundColor: '#166534',
+            borderRadius: 12,
+            barThickness: 'flex',
+            maxBarThickness: 50
           },
-        ],
+          {
+            label: "Pengeluaran",
+            data: [totalExpense],
+            backgroundColor: '#dc2626',
+            borderRadius: 12,
+            barThickness: 'flex',
+            maxBarThickness: 50
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 25, boxWidth: 10 }
+          },
+          tooltip: {
+            padding: 12,
+            callbacks: {
+              label: (context) => ` ${context.dataset.label}: ${formatIDR(context.raw)}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor, drawBorder: false },
+            ticks: {
+              padding: 10,
+              callback: (value) => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'rb'
+            }
+          },
+          y: {
+            display: false,
+            grid: { display: false }
+          }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw: (chart) => {
+          const { ctx, data } = chart;
+          chart.data.datasets.forEach((dataset, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((bar, index) => {
+              const val = data.datasets[i].data[index];
+              if (val > 0) {
+                ctx.fillStyle = isDarkMode ? '#fff' : '#1e293b';
+                ctx.font = 'bold 13px "Plus Jakarta Sans"';
+                ctx.textAlign = 'left';
+                ctx.fillText(formatIDR(val), bar.x + 12, bar.y + 5);
+              }
+            });
+          });
+        }
+      }]
+    });
+  } else {
+    showEmptyState('comparisonChart', 'Tidak ada transaksi untuk dibandingkan');
+  }
+
+  // 4. Class Unpaid Chart (Sorted Vertical Bar with Gradients)
+  if (classValuesRaw.some(v => v > 0)) {
+    // Combine and sort
+    const classData = classLabelsRaw.map((label, i) => ({ label, value: classValuesRaw[i] }))
+      .filter(d => d.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    const sortedLabels = classData.map(d => d.label);
+    const sortedValues = classData.map(d => d.value);
+
+    const classCtx = document.getElementById("classUnpaidChart").getContext("2d");
+    const classGradient = classCtx.createLinearGradient(0, 0, 0, 400);
+    classGradient.addColorStop(0, '#dc2626');
+    classGradient.addColorStop(1, '#fca5a5');
+
+    new Chart(classCtx, {
+      type: "bar",
+      data: {
+        labels: sortedLabels,
+        datasets: [{
+          label: "Total Tunggakan",
+          data: sortedValues,
+          backgroundColor: classGradient,
+          borderRadius: 12,
+          barThickness: 'flex',
+          maxBarThickness: 40
+        }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: { size: 11 },
-            },
-          },
+          legend: { display: false },
+          tooltip: {
+            padding: 12,
+            callbacks: {
+              label: (context) => ` Tunggakan: ${formatIDR(context.raw)}`
+            }
+          }
         },
+        scales: {
+          y: {
+            grid: { color: gridColor, drawBorder: false },
+            beginAtZero: true,
+            ticks: {
+              padding: 10,
+              callback: (value) => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'rb'
+            }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
       },
+      plugins: [{
+        afterDatasetsDraw: (chart) => {
+          const { ctx, data } = chart;
+          ctx.fillStyle = textColor;
+          ctx.font = 'bold 11px "Plus Jakarta Sans"';
+          ctx.textAlign = 'center';
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const val = data.datasets[0].data[index];
+            if (val > 0) {
+              ctx.fillText(formatIDR(val), bar.x, bar.y - 12);
+            }
+          });
+        }
+      }]
     });
+  } else {
+    showEmptyState('classUnpaidChart', 'Tidak ada tunggakan pembayaran');
   }
 
-  // Comparison Bar Chart
-  const comparisonCtx = document
-    .getElementById("comparisonChart")
-    .getContext("2d");
-  new Chart(comparisonCtx, {
-    type: "bar",
-    data: {
-      labels: ["Total"],
-      datasets: [
-        {
-          label: "Pemasukan",
-          data: [
-            incomeValues.length > 0
-              ? incomeValues.reduce((a, b) => a + b, 0)
-              : 0,
-          ],
-          backgroundColor: "#2E7D32",
-        },
-        {
-          label: "Pengeluaran",
-          data: [
-            expenseValues.length > 0
-              ? expenseValues.reduce((a, b) => a + b, 0)
-              : 0,
-          ],
-          backgroundColor: "#D32F2F",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: "y",
-      plugins: {
-        legend: {
-          position: "top",
-          labels: {
-            usePointStyle: true,
-            padding: 15,
-            font: { size: 12, weight: "bold" },
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            callback: function (value) {
-              return "Rp " + (value / 1000000).toFixed(1) + "M";
-            },
-          },
-        },
-      },
-    },
-  });
 
-  // Class Unpaid Bar Chart
-  const classUnpaidCtx = document
-    .getElementById("classUnpaidChart")
-    .getContext("2d");
-  new Chart(classUnpaidCtx, {
-    type: "bar",
-    data: {
-      labels: classLabels,
-      datasets: [
-        {
-          label: "Total Tunggakan",
-          data: classValues,
-          backgroundColor: "rgba(211, 47, 47, 0.7)",
-          borderColor: "#D32F2F",
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              let label = context.dataset.label || "";
-              if (label) {
-                label += ": ";
-              }
-              if (context.parsed.y !== null) {
-                label += new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  maximumFractionDigits: 0,
-                }).format(context.parsed.y);
-              }
-              return label;
-            },
-          },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function (value) {
-              return "Rp " + (value / 1000).toFixed(0) + "rb";
-            },
-          },
-        },
-      },
-    },
+  // Initialize Tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 </script>
 {% endblock %}
