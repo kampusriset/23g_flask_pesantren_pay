@@ -1,14 +1,14 @@
-{% extends 'base.html' %} {% block title %}Dashboard - PonPay{% endblock %} {%
-block page_title %}Dashboard{% endblock %} {% block content %}
+{% extends 'base.html' %} {% block title %}Dashboard - PonPay{% endblock %}
+{% block extra_css %}
+<style>
+  .top-ticker {
+    position: static;
+  }
+</style>
+{% endblock %}
+{% block page_title %}Dashboard{% endblock %} {% block content %}
 <div class="container-fluid">
   <!-- Top Ticker: Pemasukan / Pengeluaran / Saldo -->
-
-  <head>
-    <style>
-      .top-ticker {
-        position: static;
-      }
-    </style>
 
     <div class="top-ticker mb-4" aria-hidden="false">
       <div class="ticker-viewport">
@@ -65,7 +65,7 @@ block page_title %}Dashboard{% endblock %} {% block content %}
         </div>
       </div>
     </div>
-  </head>
+    </div>
   <!-- Hero Section with Main Balance Card -->
   <div class="hero-section mb-5">
     <div class="row">
