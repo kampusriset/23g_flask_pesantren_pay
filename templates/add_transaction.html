@@ -1,131 +1,337 @@
-{% extends "base.html" %} {% block title %}Tambah Transaksi - PonPay{% endblock
-%} {% block page_title %}
-<div>
-  <h1 class="page-title">
-    <i class="fas fa-plus-circle"></i> Tambah Transaksi Baru
-  </h1>
+{% extends "base.html" %}
+
+{% block title %}Tambah Transaksi - PonPay{% endblock %}
+
+{% block extra_css %}
+<!-- Tom Select CSS (Searchable Dropdown) -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class', // Enable dark mode manually via class
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: 'var(--primary-lighter)',
+            100: '#d1fae5',
+            500: 'var(--primary-light)', // Green 500
+            600: 'var(--primary-color)', // Green 800 (Main)
+            700: 'var(--primary-dark)',
+          },
+          danger: {
+            50: '#fef2f2',
+            100: '#fee2e2',
+            500: 'var(--danger-color)', // Red 500
+            600: '#b91c1c',
+          },
+          dark: {
+            800: 'var(--bg-card)', // Adaptive Card BG
+            900: 'var(--bg-body)', // Adaptive Body BG
+            700: 'var(--border-color)', // Adaptive Border
+          }
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+        },
+        boxShadow: {
+          'soft': 'var(--shadow-xl)',
+          'glow-success': '0 0 20px rgba(16, 185, 129, 0.3)',
+          'glow-danger': '0 0 20px rgba(239, 68, 68, 0.3)',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  /* Custom overrides that are hard to do with just utilities */
+  .form-card {
+    border-top: 5px solid transparent;
+    /* Animated border top */
+  }
+
+  /* Tom Select Overrides for Tailwind */
+  .ts-control {
+    @apply w-full rounded-xl border-gray-200 px-4 py-3 shadow-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 !important;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ts-dropdown {
+    @apply rounded-xl shadow-xl border-none z-50 overflow-hidden mt-2 dark:bg-gray-800 dark:text-gray-200 !important;
+  }
+
+  .ts-dropdown .active {
+    @apply bg-primary-500 text-white !important;
+  }
+
+  /* Animations */
+  @keyframes slide-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.5s ease-out forwards;
+  }
+
+  /* Hide number input spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}
+<div class="flex items-center gap-3">
+  <div class="bg-white p-2 rounded-full shadow-sm text-emerald-600 dark:bg-gray-800 dark:text-emerald-400">
+    <i class="fas fa-plus fa-lg"></i>
+  </div>
+  <div>
+    <h5 class="m-0 font-bold text-gray-800 dark:text-white text-xl">Tambah Transaksi</h5>
+    <small class="text-gray-500 dark:text-gray-400">Catat arus kas masuk dan keluar</small>
+  </div>
 </div>
-{% endblock %} {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-8 col-md-10 mx-auto">
-      <div class="card shadow-sm form-card">
-        <div class="card-header border-0">
-          <h5 class="mb-0">
-            <i class="fas fa-plus-circle text-primary"></i> Tambah Transaksi
-            Baru
-          </h5>
-          <small class="text-muted"
-            >Isi data transaksi secara lengkap dan akurat</small
-          >
-        </div>
-        <div class="card-body">
-          <form method="POST" class="transaction-form">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Tipe Transaksi *</label>
-                <select
-                  name="type"
-                  class="form-select form-control-lg"
-                  required
-                >
-                  <option value="">-- Pilih Tipe --</option>
-                  <option value="income">Pemasukan</option>
-                  <option value="expense">Pengeluaran</option>
-                </select>
-              </div>
+{% endblock %}
 
-              <div class="col-md-6">
-                <label class="form-label">Kategori *</label>
-                <input
-                  type="text"
-                  name="category"
-                  class="form-control form-control-lg"
-                  placeholder="Contoh: Sumbangan, Donasi, Gaji"
-                  required
-                />
-              </div>
+{% block content %}
+<div class="container mx-auto px-4 py-6" id="transactionPage">
+  <div class="flex justify-center">
+    <div class="w-full max-w-3xl">
 
-              <div class="col-md-6">
-                <label class="form-label">Jumlah (Rp) *</label>
-                <div class="input-group input-group-lg">
-                  <span class="input-group-text">Rp</span>
-                  <input
-                    type="number"
-                    name="amount"
-                    class="form-control"
-                    placeholder="0"
-                    min="1"
-                    required
-                  />
+      <form method="POST" class="needs-validation" id="transactionForm" novalidate>
+        <input type="hidden" name="amount" id="realAmountInput" required>
+
+        <!-- Main Card -->
+        <div
+          class="form-card bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-soft transition-all duration-300 overflow-hidden group animate-slide-down">
+          <div class="p-6 md:p-10">
+
+            <!-- Transaction Type (Segmented Control) -->
+            <div class="mb-8">
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Jenis Transaksi</label>
+              <div class="bg-gray-100 dark:bg-gray-700/50 p-1.5 rounded-xl flex relative">
+                <!-- Income Option -->
+                <div class="flex-1 relative">
+                  <input type="radio" name="type" id="type-income" value="income" class="peer hidden" required>
+                  <label for="type-income"
+                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-emerald-400 peer-checked:to-emerald-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i class="fas fa-arrow-down mr-2"></i> Pemasukan
+                  </label>
+                </div>
+                <!-- Expense Option -->
+                <div class="flex-1 relative">
+                  <input type="radio" name="type" id="type-expense" value="expense" class="peer hidden" required>
+                  <label for="type-expense"
+                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-red-400 peer-checked:to-red-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i class="fas fa-arrow-up mr-2"></i> Pengeluaran
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div class="col-md-6">
-                <label class="form-label">Tanggal *</label>
-                <input
-                  type="date"
-                  name="date"
-                  class="form-control form-control-lg"
-                  value="{{ today }}"
-                  required
-                />
+            <!-- Amount Input (Hero) -->
+            <div class="mb-8">
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nominal Uang</label>
+              <div class="relative group">
+                <span
+                  class="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-lg text-gray-400 group-focus-within:text-emerald-500 transition-colors">Rp</span>
+                <input type="text" id="displayAmountInput" placeholder="0" autocomplete="off" inputmode="numeric"
+                  class="w-full pl-14 pr-4 py-4 text-3xl font-extrabold bg-transparent border-2 border-transparent border-b-gray-200 focus:border-b-emerald-500 focus:outline-none text-gray-800 dark:text-white dark:border-b-gray-700 transition-colors placeholder-gray-300">
+              </div>
+              <div class="mt-2 text-sm text-gray-500 dark:text-gray-400" id="amountWords">Nol Rupiah</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Category Input -->
+              <div class="col-span-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
+                <input type="text" name="category" list="categoryList" placeholder="Contoh: SPP, Sumbangan" required
+                  class="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                <datalist id="categoryList">
+                  <option value="SPP Santri">
+                  <option value="Uang Makan">
+                  <option value="Donasi">
+                  <option value="Gaji Guru">
+                  <option value="Listrik & Air">
+                  <option value="Belanja Dapur">
+                  <option value="Pembangunan">
+                  <option value="Operasional Kantor">
+                </datalist>
               </div>
 
-              <div class="col-12">
-                <label class="form-label">Keterangan</label>
-                <textarea
-                  name="description"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Tambahkan detail untuk catatan internal"
-                ></textarea>
+              <!-- Date Input -->
+              <div class="col-span-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Transaksi</label>
+                <input type="date" name="date" value="{{ today }}" required
+                  class="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
               </div>
 
-              <div class="col-12">
-                <label class="form-label">Santri (Opsional)</label>
-                <select name="student_id" class="form-select">
-                  <option value="">-- Pilih Santri --</option>
+              <!-- Student Dropdown -->
+              <div class="col-span-1 md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Santri Terkait <span
+                    class="text-gray-400 font-normal ml-1">(Opsional)</span></label>
+                <select name="student_id" id="studentSelect" placeholder="Cari nama santri..." class="hidden">
+                  <option value="">-- Tidak ada santri terkait --</option>
                   {% for student in students %}
-                  <option value="{{ student.id }}">
-                    {{ student.name }} ({{ student.nisn }})
-                  </option>
+                  <option value="{{ student.id }}">{{ student.name }} ({{ student.nisn }})</option>
                   {% endfor %}
                 </select>
               </div>
 
-              <div class="col-12 d-flex justify-content-end gap-2">
-                <a
-                  href="{{ url_for('transaction.index') }}"
-                  class="btn btn-outline-secondary"
-                >
-                  <i class="fas fa-times"></i> Batal
-                </a>
-                <button type="submit" class="btn btn-primary">
-                  <i class="fas fa-save"></i> Simpan Transaksi
-                </button>
+              <!-- Description -->
+              <div class="col-span-1 md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Catatan /
+                  Keterangan</label>
+                <textarea name="description" rows="3" placeholder="Tambahkan detail transaksi..."
+                  class="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
               </div>
             </div>
-          </form>
-        </div>
-      </div>
 
-      <div class="card mt-3 help-card">
-        <div class="card-body">
-          <h6 class="mb-2">
-            <i class="fas fa-info-circle text-info"></i> Informasi
-          </h6>
-          <ul class="mb-0 small text-muted">
-            <li>Lengkapi field bertanda <strong>*</strong>.</li>
-            <li>Masukkan jumlah tanpa pemisah ribuan (contoh: 1500000).</li>
-            <li>
-              Pilih Santri bila transaksi berhubungan dengan santri tertentu.
-            </li>
-            <li>Transaksi ini langsung mempengaruhi saldo Dompet Pondok.</li>
-          </ul>
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 mt-10 pt-6 border-t border-gray-100 dark:border-gray-700">
+              <a href="{{ url_for('transaction.index') }}"
+                class="px-6 py-3 rounded-xl font-semibold text-gray-500 hover:bg-gray-100 transition-colors dark:text-gray-400 dark:hover:bg-gray-700">
+                Batal
+              </a>
+              <button type="submit" id="submitBtn"
+                class="px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-emerald-500/30 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 hover:shadow-emerald-500/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
+                <i class="fas fa-check-circle"></i> <span>Simpan Transaksi</span>
+              </button>
+            </div>
+
+          </div>
+          <!-- Decorative bottom bar, color changes via JS -->
+          <div class="h-1.5 w-full bg-emerald-500 transition-colors duration-500" id="cardBottomBar"></div>
         </div>
-      </div>
+      </form>
+
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pageContainer = document.getElementById('transactionPage');
+    const form = document.getElementById('transactionForm');
+    const realAmountInput = document.getElementById('realAmountInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const cardBottomBar = document.getElementById('cardBottomBar');
+    const amountDisplay = document.getElementById('displayAmountInput');
+    const amountIcon = document.querySelector('.amount-currency'); // Span Rp
+
+    // Check for Dark Mode from localStorage (handled by base.html usually, but let's sync)
+    if (localStorage.getItem('darkMode') === 'true' || document.body.classList.contains('dark-mode')) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Listen for dark mode toggle clicks to sync Tailwind 'dark' class
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+      darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+    }
+
+    // 1. Cleave JS
+    const cleave = new Cleave('#displayAmountInput', {
+      numeral: true,
+      numeralThousandsGroupStyle: 'thousand',
+      prefix: '',
+      delimiter: '.',
+      numeralDecimalMark: ',',
+      onValueChanged: function (e) {
+        realAmountInput.value = e.target.rawValue;
+        updateSubmitButtonState();
+      }
+    });
+
+    // 2. Tom Select
+    new TomSelect("#studentSelect", {
+      create: false,
+      sortField: { field: "text", direction: "asc" },
+      placeholder: "Cari nama atau NISN...",
+      plugins: ['dropdown_input'],
+      // Tailwind-friendly classes injected via CSS override above or config
+    });
+
+    // 3. Dynamic Theme Handling
+    const radioInputs = document.querySelectorAll('input[name="type"]');
+
+    function updateTheme(type) {
+      // Reset base classes
+      submitBtn.className = "px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5";
+
+      if (type === 'income') {
+        // Green / Emerald Theme
+        submitBtn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-600', 'hover:from-emerald-400', 'hover:to-emerald-500', 'shadow-emerald-500/30', 'hover:shadow-emerald-500/50');
+        submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> <span>Simpan Pemasukan</span>';
+
+        cardBottomBar.className = "h-1.5 w-full bg-emerald-500 transition-colors duration-500";
+
+        // Input Focus Colors
+        amountDisplay.classList.remove('focus:border-b-red-500');
+        amountDisplay.classList.add('focus:border-b-emerald-500');
+
+      } else if (type === 'expense') {
+        // Red Theme
+        submitBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-red-600', 'hover:from-red-400', 'hover:to-red-500', 'shadow-red-500/30', 'hover:shadow-red-500/50');
+        submitBtn.innerHTML = '<i class="fas fa-minus-circle"></i> <span>Simpan Pengeluaran</span>';
+
+        cardBottomBar.className = "h-1.5 w-full bg-red-500 transition-colors duration-500";
+
+        // Input Focus Colors
+        amountDisplay.classList.remove('focus:border-b-emerald-500');
+        amountDisplay.classList.add('focus:border-b-red-500');
+      }
+    }
+
+    radioInputs.forEach(input => {
+      input.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          updateTheme(e.target.value);
+        }
+      });
+    });
+
+    // 4. Validation
+    function updateSubmitButtonState() {
+      // Optional: Disable button if empty
+    }
+
+    form.addEventListener('submit', function (e) {
+      if (!realAmountInput.value) {
+        e.preventDefault();
+        amountDisplay.classList.add('border-b-red-500'); // Error state
+        amountDisplay.focus();
+      } else {
+        submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...';
+        submitBtn.disabled = true;
+      }
+    });
+
+    amountDisplay.addEventListener('input', () => {
+      amountDisplay.classList.remove('border-b-red-500');
+    });
+  });
+</script>
 {% endblock %}

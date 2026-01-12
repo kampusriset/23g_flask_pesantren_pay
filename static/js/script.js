@@ -400,66 +400,13 @@ function initializeEventListeners() {
     });
   }
 
-  // Dark mode toggle button
-  const darkToggle = document.getElementById("darkModeToggle");
-  if (darkToggle) {
-    darkToggle.addEventListener("click", function () {
-      toggleDarkMode();
-    });
-    // initialize UI state
-    updateDarkModeToggleUI();
-  }
+
 }
 
 // Call event listeners initialization
 initializeEventListeners();
 
-/**
- * Dark Mode Toggle (Optional)
- */
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-  const enabled = document.body.classList.contains("dark-mode");
-  localStorage.setItem("darkMode", enabled);
-  updateDarkModeToggleUI();
-}
 
-/**
- * Load Dark Mode preference
- */
-function loadDarkModePreference() {
-  if (localStorage.getItem("darkMode") === "true") {
-    document.body.classList.add("dark-mode");
-  }
-  // Update UI of toggle button if present
-  updateDarkModeToggleUI();
-}
-
-// Load dark mode preference on page load
-window.addEventListener("load", loadDarkModePreference);
-
-/**
- * Update dark mode toggle button UI (icon + aria-pressed)
- */
-function updateDarkModeToggleUI() {
-  const btn = document.getElementById("darkModeToggle");
-  if (!btn) return;
-  const icon = btn.querySelector("i");
-  const enabled = document.body.classList.contains("dark-mode");
-  btn.setAttribute("aria-pressed", String(enabled));
-  if (icon) {
-    icon.classList.remove("fa-moon", "fa-sun");
-    icon.classList.add(enabled ? "fa-sun" : "fa-moon");
-  }
-  // adjust button appearance
-  if (enabled) {
-    btn.classList.remove("btn-outline-secondary");
-    btn.classList.add("btn-secondary");
-  } else {
-    btn.classList.remove("btn-secondary");
-    btn.classList.add("btn-outline-secondary");
-  }
-}
 
 /**
  * Animations CSS
@@ -528,38 +475,63 @@ style.textContent = `
         }
     }
 
-    /* Dark Mode */
-    body.dark-mode {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-    }
 
-    body.dark-mode .card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .form-control,
-    body.dark-mode .form-select {
-        background-color: #3d3d3d;
-        color: #e0e0e0;
-        border-color: #4d4d4d;
-    }
-
-    body.dark-mode .table {
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .table-light {
-        background-color: #3d3d3d;
-    }
-
-    body.dark-mode .top-navbar {
-        background-color: #2d2d2d;
-        border-color: #4d4d4d;
-    }
 `;
 document.head.appendChild(style);
+
+    // Dark Mode Toggle Logic
+    const toggleButton = document.getElementById("darkModeToggle");
+    const html = document.documentElement;
+    const body = document.body;
+
+    // Helper: Apply Theme State
+    function applyTheme(isDark) {
+        if (isDark) {
+            html.setAttribute("data-theme", "dark");
+            html.classList.add("dark");      // Tailwind
+            body.classList.add("dark-mode"); // Bootstrap/Legacy
+            if(toggleButton) {
+                const icon = toggleButton.querySelector("i");
+                const text = toggleButton.querySelector("span");
+                if(icon) icon.classList.replace("fa-moon", "fa-sun");
+                if(text) text.textContent = "Light Mode";
+            }
+        } else {
+            html.removeAttribute("data-theme");
+            html.classList.remove("dark");
+            body.classList.remove("dark-mode");
+            if(toggleButton) {
+                const icon = toggleButton.querySelector("i");
+                const text = toggleButton.querySelector("span");
+                if(icon) icon.classList.replace("fa-sun", "fa-moon");
+                if(text) text.textContent = "Dark Mode";
+            }
+        }
+    }
+
+    // Initialize state
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        applyTheme(true);
+    } else {
+        applyTheme(false);
+    }
+
+    if(toggleButton) {
+        toggleButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            const isCurrentlyDark = html.getAttribute("data-theme") === "dark";
+            
+            if (isCurrentlyDark) {
+                applyTheme(false);
+                localStorage.setItem("theme", "light");
+            } else {
+                applyTheme(true);
+                localStorage.setItem("theme", "dark");
+            }
+        });
+    }
+
 
 /**
  * Real-time Clock

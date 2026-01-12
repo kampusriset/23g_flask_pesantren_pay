@@ -5,68 +5,155 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
 :root {
-  /* Emerald Soft – Modern Fintech SaaS Theme */
-  --primary-color: #1f8a5b;
-  --primary-dark: #15704a;
-  --primary-light: #34b77a;
-  --primary-lighter: #e9f6ef;
-  --primary-gradient: linear-gradient(
-    135deg,
-    #1f8a5b 0%,
-    #34b77a 50%,
-    #15704a 100%
-  );
-  --secondary-color: #34b77a;
-  --accent-color: #e9f6ef;
+  /* Islamic Finance Green Theme - Light Mode */
+  --primary-color: #166534; /* Green 800 */
+  --primary-dark: #14532d; /* Green 900 */
+  --primary-light: #22c55e; /* Green 500 */
+  --primary-lighter: #86efac; /* Green 300 (Accent) */
+  
+  --primary-gradient: linear-gradient(135deg, #166534 0%, #15803d 100%);
+  
+  --secondary-color: #22c55e;
+  --accent-color: #86efac;
+  
   --danger-color: #dc2626;
   --warning-color: #f59e0b;
-  --success-color: #059669;
+  --success-color: #166534;
   --info-color: #0891b2;
-  --light-bg: #f4fbf7;
-  --card-bg: #ffffff;
-  --border-color: #e3efe8;
-  --text-muted: #6b7280;
-  --text-dark: #1f2937;
+  
+  --bg-body: #f8fafc; /* Slate 50 */
+  --bg-card: #ffffff;
+  --bg-sidebar: #166534;
+  
+  --text-primary: #1e293b; /* Slate 800 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --text-muted: #94a3b8;
+  --text-on-primary: #ffffff;
+  
+  --border-color: #e2e8f0; /* Slate 200 */
+  
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --border-radius: 16px;
-  --border-radius-lg: 20px;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  --border-radius: 0.75rem; /* 12px - Modern */
   --base-font-size: 1rem;
-  /* Enhanced Font Hierarchy */
+  
+  /* Font Variables remain same */
   --font-xs: 0.75rem;
-  /* 12px */
   --font-sm: 0.875rem;
-  /* 14px */
   --font-base: 1rem;
-  /* 16px */
   --font-lg: 1.125rem;
-  /* 18px */
   --font-xl: 1.25rem;
-  /* 20px */
   --font-2xl: 1.5rem;
-  /* 24px */
   --font-3xl: 1.875rem;
-  /* 30px */
   --font-4xl: 2.25rem;
-  /* 36px */
   --font-5xl: 3rem;
-  /* 48px */
 
-  /* Animation Variables */
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Ticker settings */
-  --ticker-duration: 30s;
-  --ticker-blur: 8px;
-  --ticker-bg: rgba(255, 255, 255, 0.4);
-  --ticker-item-bg: rgba(255, 255, 255, 0.18);
+  
+  /* Ticker vars */
+  --ticker-bg: rgba(255, 255, 255, 0.8);
+  --ticker-item-bg: rgba(255, 255, 255, 0.9);
+  --ticker-blur: 10px;
 }
+
+[data-theme="dark"] {
+  /* Islamic Finance Green Theme - Dark Mode */
+  --primary-color: #22c55e; /* Green 500 - Brighter for dark mode */
+  --primary-dark: #16a34a; /* Green 600 */
+  --primary-light: #4ade80; /* Green 400 */
+  --primary-lighter: #86efac;
+  
+  --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Dark gradient for sidebar */
+  
+  --bg-body: #0f172a; /* Slate 900 */
+  --bg-card: #1e293b; /* Slate 800 */
+  --bg-sidebar: #0f172a;
+  
+  --text-primary: #f8fafc; /* Slate 50 */
+  --text-secondary: #cbd5e1; /* Slate 300 */
+  --text-muted: #64748b;
+  --text-on-primary: #ffffff;
+  
+  --border-color: #334155; /* Slate 700 */
+  
+  --shadow-sm: none;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  
+  --ticker-bg: rgba(15, 23, 42, 0.8);
+  --ticker-item-bg: rgba(30, 41, 59, 0.8);
+}
+
+/* Bootstrap Dark Mode Overrides */
+[data-theme="dark"] .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--primary-light);
+    color: white;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--bg-body);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--bg-card);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    color: var(--text-primary);
+    background-color: rgba(255,255,255,0.05);
+}
+
+[data-theme="dark"] .close,
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .border-bottom {
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .bg-white {
+    background-color: var(--bg-card) !important;
+}
+
 
 * {
   margin: 0;
@@ -285,7 +372,7 @@ body {
 .main-content {
   flex: 1;
   margin-left: 16rem;
-  padding-top: 5rem;
+  padding-top: 7.5rem;
   /* space for fixed navbar */
   display: flex;
   flex-direction: column;
