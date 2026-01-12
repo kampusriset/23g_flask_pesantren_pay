@@ -192,6 +192,32 @@ body {
   text-align: center;
 }
 
+/* =================================
+   Desktop hide behavior for sidebar
+   - When the user clicks the desktop toggle we add
+     .hidden-desktop to the sidebar and .expanded to main-content
+   - This makes the sidebar disappear and lets content take full width
+*/
+@media (min-width: 992px) {
+    .sidebar.hidden-desktop {
+        transform: translateX(-120%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        width: 0;
+        transition: transform 0.28s ease, opacity 0.28s ease, visibility 0.28s;
+        border-radius: 0;
+    }
+
+    .main-content.expanded {
+        margin-left: 0 !important;
+    }
+
+    .sidebar {
+        transition: transform 0.28s ease, opacity 0.28s ease;
+    }
+}
+
 .sidebar-header {
   padding: 2.14rem 1.43rem;
   border-bottom: 0.14rem solid rgba(255, 255, 255, 0.1);
@@ -3277,4 +3303,19 @@ body.dark-mode .top-navbar.scrolled {
   .main-content {
     margin-left: 0 !important;
   }
+}
+
+/* WARNA HIJAU UNTUK TOMBOL SIDEBAR */
+.btn-sidebar-toggle,
+#sidebarCollapseBtn {
+    background-color: #1A2E0F;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+.btn-sidebar-toggle:hover,
+#sidebarCollapseBtn:hover {
+    background-color:#1A2E0F;
 }

@@ -620,54 +620,84 @@ async function postData(url, data) {
 
 /**
  * Initialize Sidebar Collapse
+ * - On desktop: toggles a full hide ("hidden-desktop") so the main content expands to full width.
+ * - State is saved to localStorage under 'sidebarHiddenDesktop' and persists across reloads.
+ * - On small screens the button falls back to the mobile open behavior (toggle .active).
  */
 function initializeSidebarCollapse() {
   const collapseBtn = document.getElementById("sidebarCollapseBtn");
   const sidebar = document.querySelector(".sidebar");
   const mainContent = document.querySelector(".main-content");
+  const DESKTOP_MIN = 992; // Bootstrap lg breakpoint in px
+
+  function applyStateFromStorage() {
+    const hidden = localStorage.getItem("sidebarHiddenDesktop") === "true";
+    if (hidden && window.innerWidth >= DESKTOP_MIN) {
+      if (sidebar) {
+        sidebar.classList.add("hidden-desktop");
+        sidebar.setAttribute("aria-hidden", "true");
+      }
+      if (mainContent) mainContent.classList.add("expanded");
+      if (collapseBtn) {
+        collapseBtn.classList.add("open");
+        collapseBtn.setAttribute("aria-expanded", "true");
+      }
+    } else {
+      if (sidebar) {
+        sidebar.classList.remove("hidden-desktop");
+        sidebar.setAttribute("aria-hidden", "false");
+      }
+      if (mainContent) mainContent.classList.remove("expanded");
+      if (collapseBtn) {
+        collapseBtn.classList.remove("open");
+        collapseBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+  }
 
   if (collapseBtn && sidebar) {
     collapseBtn.addEventListener("click", function () {
-      // Toggle hidden (desktop) state - sidebar fully disappears
-      sidebar.classList.toggle("hidden");
-      collapseBtn.classList.toggle("open");
-      const expanded = String(collapseBtn.classList.contains("open"));
-      collapseBtn.setAttribute("aria-expanded", expanded);
-
-      // Update aria-hidden for sidebar
-      sidebar.setAttribute("aria-hidden", sidebar.classList.contains("hidden") ? "true" : "false");
-
-      // Adjust main content margin
-      if (sidebar.classList.contains("hidden")) {
-        mainContent.style.marginLeft = "0";
+      if (window.innerWidth >= DESKTOP_MIN) {
+        const hidden = sidebar.classList.toggle("hidden-desktop");
+        if (hidden) {
+          mainContent.classList.add("expanded");
+        } else {
+          mainContent.classList.remove("expanded");
+        }
+        // Update ARIA and class for button
+        sidebar.setAttribute("aria-hidden", hidden ? "true" : "false");
+        collapseBtn.classList.toggle("open", hidden);
+        collapseBtn.setAttribute("aria-expanded", hidden ? "true" : "false");
+        
+        // Persist state
+        localStorage.setItem("sidebarHiddenDesktop", hidden);
       } else {
-        mainContent.style.marginLeft = "20.00rem";
+        // Mobile fallback
+        sidebar.classList.toggle("active");
+        document.body.classList.toggle("sidebar-open");
       }
-
-      // Save state to localStorage (use new key 'sidebarHidden')
-      localStorage.setItem(
-        "sidebarHidden",
-        sidebar.classList.contains("hidden")
-      );
     });
   }
 
-  // Load saved state (migrate old 'sidebarCollapsed' if present)
-  const savedHidden = localStorage.getItem("sidebarHidden");
-  const savedCollapsed = localStorage.getItem("sidebarCollapsed");
-  const isHidden = savedHidden === "true" || (!savedHidden && savedCollapsed === "true");
-
-  if (isHidden && sidebar) {
-    sidebar.classList.add("hidden");
-    sidebar.setAttribute("aria-hidden", "true");
-    if (collapseBtn) {
-      collapseBtn.classList.add("open");
-      collapseBtn.setAttribute("aria-expanded", "true");
-    }
-    if (mainContent) {
-      mainContent.style.marginLeft = "0";
-    }
+  // Legacy collapsed support
+  const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+  if (isCollapsed && sidebar) {
+    sidebar.classList.add("collapsed");
+    if (mainContent) mainContent.style.marginLeft = "5.00rem";
   }
+
+  // Apply stored hidden state on load (desktop only)
+  applyStateFromStorage();
+
+  // Handle window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth < DESKTOP_MIN) {
+      if (sidebar) sidebar.classList.remove("hidden-desktop");
+      if (mainContent) mainContent.classList.remove("expanded");
+    } else {
+      applyStateFromStorage();
+    }
+  });
 }
 
 /**
