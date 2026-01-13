@@ -64,105 +64,102 @@
 }
 
 [data-theme="dark"] {
-  /* Premium Dark Mode Color System */
+  /* Premium Forest Dark Color System (Inspired by Proxima/Web3) */
+  --bg-primary: #040d08;     /* Deepest Forest Charcoal */
+  --bg-secondary: #0a110d;   /* Surface: Deep Forest Green */
+  --bg-card-table: #0f1712;  /* Elevated: Dark Charcoal Emerald */
+  --primary-brand: #22c55e;  /* Brand: Vibrant Emerald */
+  --primary-soft: #10b981;   /* Accent: Soft Emerald */
+  --primary-lighter: #34d39a;
   
-  /* Primary Green - Optimized for Dark */
-  --primary-color: #22c55e; /* Green 500 */
-  --primary-dark: #16a34a; /* Green 600 */
-  --primary-light: #4ade80; /* Green 400 */
-  --primary-lighter: #86efac;
-  
-  --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  
-  /* Layered Dark Backgrounds */
-  --bg-deepest: #020617;    /* Deepest background */
-  --bg-body: #0f172a;       /* Main body background */
-  --bg-card: #0f172a;       /* Card background */
-  --bg-surface: #111827;    /* Elevated surfaces */
-  --bg-elevated: #1e293b;   /* Modals, dropdowns */
-  --bg-hover: rgba(255, 255, 255, 0.05);  /* Hover state */
-  --bg-active: rgba(34, 197, 94, 0.15);   /* Active state */
-  --bg-sidebar: #0f172a;
+  --primary-gradient: linear-gradient(135deg, #0a110d 0%, #0f1712 100%);
   
   /* Text Hierarchy */
-  --text-primary: #e5e7eb;     /* Main content - Gray 200 */
-  --text-secondary: #9ca3af;   /* Secondary text - Gray 400 */
-  --text-tertiary: #6b7280;    /* Hints, placeholders - Gray 500 */
-  --text-muted: #6b7280;
+  --text-primary: #e2e8f0;     /* Slate High-Viz */
+  --text-secondary: #94a3b8;   /* Slate Muted */
+  --text-muted: #64748b;
   --text-on-primary: #ffffff;
   
   /* Borders & Dividers */
-  --border-color: rgba(255, 255, 255, 0.08);      /* Subtle borders */
-  --border-emphasis: rgba(255, 255, 255, 0.12);   /* Emphasized borders */
-  --border-focus: rgba(34, 197, 94, 0.5);         /* Focus ring */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-emphasis: rgba(255, 255, 255, 0.1);
   
-  /* Shadows - Depth System for Dark Mode */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-button: 0 4px 12px rgba(34, 197, 94, 0.25);
-  
-  /* Component Specific */
-  --ticker-bg: rgba(15, 23, 42, 0.8);
-  --ticker-item-bg: rgba(17, 24, 39, 0.9);
-  
-  /* Status Colors - Dark Mode Optimized */
-  --success-bg: rgba(34, 197, 94, 0.15);
-  --success-text: #4ade80;
-  --danger-bg: rgba(239, 68, 68, 0.15);
-  --danger-text: #f87171;
-  --warning-bg: rgba(245, 158, 11, 0.15);
-  --warning-text: #fbbf24;
-  --info-bg: rgba(59, 130, 246, 0.15);
-  --info-text: #60a5fa;
+  /* Interaction & Atmos */
+  --hover-overlay: rgba(34, 197, 94, 0.04);
+  --active-overlay: rgba(34, 197, 94, 0.08);
+  --accent-glow: 0 0 20px rgba(34, 197, 94, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.7);
+  --shadow-button: 0 0 15px rgba(34, 197, 94, 0.2);
+
+  /* Mapping to existing variables */
+  --primary-color: var(--primary-brand);
+  --primary-dark: #16a34a;
+  --primary-light: var(--primary-soft);
+  --bg-body: var(--bg-primary);
+  --bg-card: var(--bg-card-table);
+  --bg-surface: var(--bg-secondary);
+  --bg-elevated: #1a221e;
+  --bg-sidebar: var(--bg-secondary);
+  --border-color: var(--border-subtle);
+  --text-dark: var(--text-primary);
+  --ticker-bg: rgba(10, 17, 13, 0.8);
+  --ticker-item-bg: rgba(15, 23, 18, 0.9);
 }
 
 /* Bootstrap Dark Mode Overrides - Premium Edition */
 
 /* Cards */
 [data-theme="dark"] .card {
-    background-color: var(--bg-card);
-    border-color: var(--border-color);
+    background-color: var(--bg-card-table);
+    border: 1px solid var(--border-subtle);
     color: var(--text-primary);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .card:hover {
+    border-color: var(--primary-brand);
+    box-shadow: var(--accent-glow);
 }
 
 [data-theme="dark"] .card-header {
-    background-color: var(--bg-surface);
-    border-bottom-color: var(--border-color);
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-subtle);
     color: var(--text-primary);
 }
 
 [data-theme="dark"] .card-footer {
-    background-color: var(--bg-surface);
-    border-top-color: var(--border-color);
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-subtle);
 }
 
 /* Modals */
 [data-theme="dark"] .modal-content {
-    background-color: var(--bg-elevated);
-    border-color: var(--border-emphasis);
+    background-color: var(--bg-card-table);
+    border: 1px solid var(--border-emphasis);
     color: var(--text-primary);
     box-shadow: var(--shadow-xl);
 }
 
 [data-theme="dark"] .modal-header {
-    border-bottom-color: var(--border-color);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .modal-footer {
-    border-top-color: var(--border-color);
+    border-top: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(2, 6, 23, 0.85);
 }
 
 /* Dropdowns */
 [data-theme="dark"] .dropdown-menu {
-    background-color: var(--bg-elevated);
-    border-color: var(--border-emphasis);
+    background-color: var(--bg-card-table);
+    border: 1px solid var(--border-emphasis);
     box-shadow: var(--shadow-xl);
 }
 
@@ -172,32 +169,32 @@
 
 [data-theme="dark"] .dropdown-item:hover,
 [data-theme="dark"] .dropdown-item:focus {
-    background-color: var(--bg-active);
-    color: var(--primary-color);
+    background-color: var(--hover-overlay);
+    color: var(--primary-brand);
 }
 
 [data-theme="dark"] .dropdown-divider {
-    border-top-color: var(--border-color);
+    border-top: 1px solid var(--border-subtle);
 }
 
 /* Forms */
 [data-theme="dark"] .form-control,
 [data-theme="dark"] .form-select {
-    background-color: var(--bg-surface);
-    border-color: var(--border-emphasis);
+    background-color: var(--bg-secondary);
+    border-color: var(--border-subtle);
     color: var(--text-primary);
 }
 
 [data-theme="dark"] .form-control::placeholder {
-    color: var(--text-tertiary);
+    color: var(--text-muted);
 }
 
 [data-theme="dark"] .form-control:focus,
 [data-theme="dark"] .form-select:focus {
-    background-color: var(--bg-surface);
-    border-color: var(--primary-color);
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-brand);
     color: var(--text-primary);
-    box-shadow: 0 0 0 0.25rem var(--border-focus);
+    box-shadow: 0 0 0 0.2rem var(--border-focus);
 }
 
 [data-theme="dark"] .form-label {
@@ -207,62 +204,61 @@
 /* Tables */
 [data-theme="dark"] .table {
     color: var(--text-primary);
-    border-color: var(--border-color);
+    border-color: var(--border-subtle);
 }
 
 [data-theme="dark"] .table thead th {
-    background-color: var(--bg-surface);
+    background-color: var(--bg-secondary);
     color: var(--text-primary);
-    border-bottom-color: var(--border-emphasis);
+    border-bottom: 2px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .table tbody tr {
-    border-bottom-color: var(--border-color);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .table-hover tbody tr:hover {
     color: var(--text-primary);
-    background-color: var(--bg-hover);
+    background-color: var(--hover-overlay);
 }
 
 [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 /* Buttons */
 [data-theme="dark"] .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    background-color: var(--primary-brand);
+    border-color: var(--primary-brand);
     color: white;
-    box-shadow: var(--shadow-button);
 }
 
 [data-theme="dark"] .btn-primary:hover {
-    background-color: var(--primary-dark);
-    border-color: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
+    background-color: var(--primary-brand);
+    opacity: 0.9;
+    border-color: var(--primary-brand);
 }
 
 [data-theme="dark"] .btn-secondary {
-    background-color: var(--bg-surface);
-    border-color: var(--border-emphasis);
+    background-color: var(--bg-secondary);
+    border-color: var(--border-subtle);
     color: var(--text-primary);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background-color: var(--bg-elevated);
-    border-color: var(--border-emphasis);
+    background-color: var(--bg-secondary);
+    opacity: 0.85;
 }
 
 [data-theme="dark"] .btn-outline-primary {
-    color: var(--primary-color);
-    border-color: var(--primary-color);
+    color: var(--primary-brand);
+    border-color: var(--primary-brand);
 }
 
 [data-theme="dark"] .btn-outline-primary:hover {
-    background-color: var(--primary-color);
+    background-color: var(--primary-brand);
     color: white;
+    opacity: 0.9;
 }
 
 /* Utility Classes */
@@ -280,30 +276,29 @@
 }
 
 [data-theme="dark"] .bg-white {
-    background-color: var(--bg-card) !important;
+    background-color: var(--bg-card-table) !important;
 }
 
 [data-theme="dark"] .bg-light {
-    background-color: var(--bg-surface) !important;
+    background-color: var(--bg-secondary) !important;
 }
 
 /* Dark Mode Scrollbar */
 [data-theme="dark"] ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-track {
-    background: var(--bg-body); 
+    background: var(--bg-primary); 
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background-color: var(--border-color);
-    border-radius: 6px;
-    border: 3px solid var(--bg-body);
+    background-color: var(--border-subtle);
+    border-radius: 5px;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--text-secondary);
+    background-color: var(--text-muted);
 }
 
 /* Fix Autofill Background */
@@ -322,13 +317,13 @@
 
 /* Sidebar Dark Mode */
 [data-theme="dark"] .sidebar {
-    background: var(--bg-body);
-    border-right: 1px solid var(--border-color);
-    box-shadow: var(--shadow-xl);
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-emphasis);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] .sidebar-header {
-    border-bottom-color: var(--border-color);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .sidebar-nav .nav-link {
@@ -336,26 +331,26 @@
 }
 
 [data-theme="dark"] .sidebar-nav .nav-link:hover {
-    background-color: var(--bg-hover);
-    color: var(--text-primary);
-    border-left-color: var(--primary-color);
+    background: var(--hover-overlay);
+    color: var(--primary-brand);
+    border-left-color: var(--primary-brand);
 }
 
 [data-theme="dark"] .sidebar-nav .nav-link.active {
-    background-color: var(--bg-active);
-    color: var(--primary-color);
-    border-left-color: var(--primary-color);
+    background: var(--active-overlay);
+    color: var(--primary-brand);
+    border-left-color: var(--primary-brand);
 }
 
 [data-theme="dark"] .sidebar-footer {
-    border-top-color: var(--border-color);
+    border-top: 1px solid var(--border-subtle);
 }
 
 /* Top Navbar Dark Mode */
 [data-theme="dark"] .top-navbar {
-    background: rgba(15, 23, 42, 0.95);
-    border-bottom-color: var(--border-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    background: rgba(2, 6, 23, 0.95);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: none;
 }
 
 [data-theme="dark"] .page-title {
@@ -387,14 +382,15 @@
 
 /* Dashboard Stat Cards */
 [data-theme="dark"] .stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
+    background: var(--bg-card-table);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
 }
 
 [data-theme="dark"] .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: var(--hover-overlay);
+    border-color: var(--primary-soft);
+    box-shadow: var(--accent-glow);
 }
 
 [data-theme="dark"] .stat-label {
@@ -406,7 +402,7 @@
 }
 
 [data-theme="dark"] .stat-icon {
-    background: var(--bg-surface);
+    background: var(--bg-secondary);
 }
 
 [data-theme="dark"] .stat-icon.income {
@@ -431,18 +427,17 @@
 
 /* Balance Card (Hero) */
 [data-theme="dark"] .balance-card-main {
-    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%);
-    border: 1px solid var(--border-emphasis);
-    box-shadow: var(--shadow-xl);
+    background: var(--bg-card-table);
+    border: 1px solid var(--border-subtle);
+    box-shadow: none;
 }
 
 [data-theme="dark"] .balance-card-glow {
-    background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.15), transparent 70%);
+    display: none;
 }
 
 [data-theme="dark"] .balance-amount {
-    color: #ffffff;
-    text-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .balance-label {
@@ -456,7 +451,7 @@
 [data-theme="dark"] .balance-badge {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    border: 1px solid rgba(34, 197, 94, 0.1);
 }
 
 /* Chart Card */
@@ -506,9 +501,9 @@
 }
 
 [data-theme="dark"] .btn-primary-ghost:hover {
-    background: var(--bg-hover);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    background: var(--hover-overlay);
+    border-color: var(--primary-brand);
+    color: var(--primary-brand);
 }
 
 [data-theme="dark"] .btn-secondary-ghost {
@@ -529,20 +524,20 @@
 }
 
 [data-theme="dark"] .transaction-table thead {
-    background: var(--bg-surface);
+    background: var(--bg-secondary);
 }
 
 [data-theme="dark"] .transaction-table th {
     color: var(--text-primary);
-    border-bottom-color: var(--border-emphasis);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .transaction-row {
-    border-bottom-color: var(--border-color);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 [data-theme="dark"] .transaction-row:hover {
-    background: var(--bg-hover);
+    background: var(--hover-overlay);
 }
 
 [data-theme="dark"] .transaction-date {
@@ -561,13 +556,13 @@
 [data-theme="dark"] .badge-income {
     background: var(--success-bg);
     color: var(--success-text);
-    border-color: rgba(34, 197, 94, 0.3);
+    border-color: rgba(34, 197, 94, 0.1);
 }
 
 [data-theme="dark"] .badge-expense {
     background: var(--danger-bg);
     color: var(--danger-text);
-    border-color: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.1);
 }
 
 /* Top Ticker */

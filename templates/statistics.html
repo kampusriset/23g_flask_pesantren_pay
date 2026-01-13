@@ -129,14 +129,14 @@
     }).format(val);
   };
 
-  // Color Palette - Fintech Styles
-  const incomeColors = ['#166534', '#15803d', '#16a34a', '#22c55e', '#4ade80', '#86efac'];
-  const expenseColors = ['#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#f87171', '#fca5a5'];
+  // Color Palette - Standardized Premium Forest Tones
+  const incomeColors = ['#10b981', '#059669', '#047857', '#064e3b', '#065f46', '#34d399'];
+  const expenseColors = ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#f87171'];
 
   // Theme Detection
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-  const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-  const textColor = isDarkMode ? '#9ca3af' : '#64748b';
+  const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.05)';
+  const textColor = isDarkMode ? '#94a3b8' : '#64748b';
 
   // Chart.js Shared Config
   Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
@@ -199,10 +199,10 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
-            titleColor: isDarkMode ? '#fff' : '#1e293b',
-            bodyColor: isDarkMode ? '#cbd5e1' : '#64748b',
-            borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            backgroundColor: isDarkMode ? '#0f1712' : '#fff',
+            titleColor: isDarkMode ? '#e2e8f0' : '#1e293b',
+            bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+            borderColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.1)',
             borderWidth: 1,
             padding: 12,
             displayColors: true,
@@ -240,10 +240,10 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: isDarkMode ? '#1e293b' : '#fff',
-            titleColor: isDarkMode ? '#fff' : '#1e293b',
-            bodyColor: isDarkMode ? '#cbd5e1' : '#64748b',
-            borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            backgroundColor: isDarkMode ? '#0f1712' : '#fff',
+            titleColor: isDarkMode ? '#e2e8f0' : '#1e293b',
+            bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+            borderColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.1)',
             borderWidth: 1,
             padding: 12,
             displayColors: true,
@@ -284,8 +284,8 @@
           {
             label: "Pemasukan",
             data: [totalIncome],
-            backgroundColor: '#166534',
-            borderRadius: 12,
+            backgroundColor: '#059669',
+            borderRadius: 8,
             barThickness: 'flex',
             maxBarThickness: 50
           },
@@ -293,7 +293,7 @@
             label: "Pengeluaran",
             data: [totalExpense],
             backgroundColor: '#dc2626',
-            borderRadius: 12,
+            borderRadius: 8,
             barThickness: 'flex',
             maxBarThickness: 50
           }
@@ -337,8 +337,8 @@
             meta.data.forEach((bar, index) => {
               const val = data.datasets[i].data[index];
               if (val > 0) {
-                ctx.fillStyle = isDarkMode ? '#fff' : '#1e293b';
-                ctx.font = 'bold 13px "Plus Jakarta Sans"';
+                ctx.fillStyle = isDarkMode ? '#e5e7eb' : '#1e293b';
+                ctx.font = '500 12px "Plus Jakarta Sans"';
                 ctx.textAlign = 'left';
                 ctx.fillText(formatIDR(val), bar.x + 12, bar.y + 5);
               }
