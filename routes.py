@@ -1302,15 +1302,31 @@ def index_payments():
     # Visible to admin and staff
     if session.get('role') not in ('admin', 'staff'):
         return redirect(url_for('dashboard.index'))
-    # List bills
-    bills_data = get_all_bills()
+    
+    from db import get_summarized_student_bills
+    students_bills = get_summarized_student_bills()
+    
+    return render_template('payments_list.html', students_bills=students_bills)
+
+@payments_bp.route('/student/<int:student_id>')
+def student_detail(student_id):
+    if session.get('role') not in ('admin', 'staff'):
+        return redirect(url_for('dashboard.index'))
+    
+    from db import get_student, get_student_bills, get_bill_total_paid
+    student = get_student(student_id)
+    if not student:
+        flash('Santri tidak ditemukan', 'danger')
+        return redirect(url_for('payments.index_payments'))
+    
+    bills_data = get_student_bills(student_id)
     bills = []
-    from db import get_bill_total_paid
     for b in bills_data:
         b_dict = dict(b)
         b_dict['paid_amount'] = get_bill_total_paid(b['id'])
         bills.append(b_dict)
-    return render_template('payments_list.html', bills=bills)
+        
+    return render_template('student_payment_detail.html', student=student, bills=bills)
 
 
 
@@ -1474,14 +1490,12 @@ def bill_receipt(bill_id):
         return redirect(url_for('payments.index_payments'))
     
     # Try to find the latest transaction that matches this bill
-    # We use amount and description (title) and student_id
     query = '''
         SELECT id FROM transactions 
-        WHERE student_id = ? AND amount = ? AND (description = ? OR description LIKE ?)
-        AND type = 'income'
+        WHERE bill_id = ? AND type = 'income'
         ORDER BY created_at DESC LIMIT 1
     '''
-    trans = query_db(query, (bill['student_id'], bill['amount'], bill['title'], f"%{bill['title']}%"), one=True)
+    trans = query_db(query, (bill_id,), one=True)
     
     if trans:
         return redirect(url_for('transaction.receipt', id=trans['id']))

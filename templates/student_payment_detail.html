@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail Pembayaran - {{ student.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--card-shadow);
+        border-radius: 1.25rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+    }
+
+    .gradient-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+    .gradient-success { background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); }
+    .gradient-danger { background: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%); }
+
+    .summary-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.25rem;
+        color: white;
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .summary-card::before {
+        content: "";
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .profile-sidebar {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .profile-photo-wrapper {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+    }
+
+    .profile-photo-wrapper img, .profile-initial-wrapper {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 2.5rem;
+        border: 4px solid #f8fafc;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .profile-initial-wrapper {
+        background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 800;
+    }
+
+    .info-list-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.875rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+    }
+
+    .info-list-item:last-child { border-bottom: none; }
+
+    .animate-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+</style>
+{% endblock %}
+
+{% block page_title %}
+<div class="d-flex align-items-center animate-in">
+    <a href="{{ url_for('payments.index_payments') }}" class="btn btn-icon btn-light rounded-circle me-3 shadow-sm">
+        <i class="fas fa-arrow-left text-primary"></i>
+    </a>
+    <div>
+        <h1 class="h3 mb-1 fw-bold">Detail Pembayaran</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('payments.index_payments') }}">Pembayaran</a></li>
+                <li class="breadcrumb-item active">{{ student.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="row g-4">
+        <!-- Sidebar: Student Info -->
+        <div class="col-lg-4 animate-in stagger-1">
+            <div class="profile-sidebar text-center">
+                <div class="profile-photo-wrapper">
+                    {% if student.photo %}
+                        <img src="{{ url_for('static', filename=student.photo) }}" alt="{{ student.name }}">
+                    {% else %}
+                        <div class="profile-initial-wrapper">{{ student.name[0] }}</div>
+                    {% endif %}
+                </div>
+                <h4 class="fw-bold mb-1 text-gray-900">{{ student.name }}</h4>
+                <p class="text-primary fw-medium mb-4">{{ student.kelas }}</p>
+                
+                <div class="info-list text-start">
+                    <div class="info-list-item">
+                        <span class="text-muted"><i class="fas fa-shield-alt me-2"></i>Status</span>
+                        <span class="badge {% if student.status == 'aktif' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %} rounded-pill px-3">
+                            {{ student.status|upper }}
+                        </span>
+                    </div>
+                    <div class="info-list-item">
+                        <span class="text-muted"><i class="fas fa-id-card me-2"></i>NISN</span>
+                        <span class="fw-bold text-gray-700">{{ student.nisn }}</span>
+                    </div>
+                    <div class="info-list-item">
+                        <span class="text-muted"><i class="fas fa-user-friends me-2"></i>Wali</span>
+                        <span class="fw-bold text-gray-700">{{ student.parent_name }}</span>
+                    </div>
+                    <div class="info-list-item border-0">
+                        <span class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Alamat</span>
+                        <span class="text-end text-gray-600 truncate-2 d-inline-block" style="max-width: 150px;">{{ student.alamat }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content: Summary & List -->
+        <div class="col-lg-8 animate-in stagger-2">
+            <!-- Summary Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="summary-card gradient-primary shadow-lg">
+                        <div class="mb-3">
+                            <i class="fas fa-file-invoice text-white-50 fa-2x"></i>
+                        </div>
+                        <div class="text-white-50 small fw-bold text-uppercase mb-1">Total Tagihan</div>
+                        <h2 class="mb-0 fw-bold">{{ bills|sum(attribute='amount')|rupiah }}</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="summary-card gradient-success shadow-lg">
+                        <div class="mb-3">
+                            <i class="fas fa-check-circle text-white-50 fa-2x"></i>
+                        </div>
+                        <div class="text-white-50 small fw-bold text-uppercase mb-1">Sudah Dibayar</div>
+                        <h2 class="mb-0 fw-bold">{{ bills|sum(attribute='paid_amount')|rupiah }}</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="summary-card gradient-danger shadow-lg">
+                        <div class="mb-3">
+                            <i class="fas fa-hourglass-half text-white-50 fa-2x"></i>
+                        </div>
+                        <div class="text-white-50 small fw-bold text-uppercase mb-1">Sisa Tagihan</div>
+                        {% set total_remaining = (bills|sum(attribute='amount') - bills|sum(attribute='paid_amount')) %}
+                        <h2 class="mb-0 fw-bold text-white">{{ total_remaining|rupiah }}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bills Detail Table -->
+            <div class="card glass-card animate-in stagger-3">
+                <div class="card-header bg-transparent py-4 px-4 d-flex justify-content-between align-items-center border-0">
+                    <h5 class="fw-bold mb-0 text-gray-800">Rincian Tagihan Spesifik</h5>
+                    <span class="badge bg-primary rounded-pill px-3 py-2">{{ bills|length }} Item</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-gray-50 border-bottom border-top border-gray-100">
+                                <tr>
+                                    <th class="ps-4 text-gray-500 small text-uppercase fw-bold">No</th>
+                                    <th class="text-gray-500 small text-uppercase fw-bold">Keterangan Tagihan</th>
+                                    <th class="text-gray-500 small text-uppercase fw-bold text-end">Jumlah</th>
+                                    <th class="text-gray-500 small text-uppercase fw-bold text-end">Terbayar</th>
+                                    <th class="text-gray-500 small text-uppercase fw-bold text-end">Sisa</th>
+                                    <th class="text-gray-500 small text-uppercase fw-bold text-center">Status</th>
+                                    <th class="pe-4 text-center text-gray-500 small text-uppercase fw-bold">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in bills %}
+                                {% set rem = b.amount - b.paid_amount %}
+                                <tr>
+                                    <td class="ps-4">{{ loop.index }}</td>
+                                    <td>
+                                        <div class="fw-bold text-gray-800">{{ b.title }}</div>
+                                        <div class="text-muted smaller"><i class="far fa-clock me-1"></i>{{ b.created_at[:10] }}</div>
+                                    </td>
+                                    <td class="text-end fw-medium">{{ b.amount|rupiah }}</td>
+                                    <td class="text-end text-emerald-600 fw-medium">{{ b.paid_amount|rupiah }}</td>
+                                    <td class="text-end text-rose-600 fw-bold">{{ rem|rupiah }}</td>
+                                    <td class="text-center">
+                                        {% if b.status == 'paid' %}
+                                            <span class="badge bg-emerald-100 text-emerald-700 rounded-pill px-3">LUNAS</span>
+                                        {% elif b.paid_amount > 0 %}
+                                            <span class="badge bg-sky-100 text-sky-700 rounded-pill px-3">CICILAN</span>
+                                        {% else %}
+                                            <span class="badge bg-amber-100 text-amber-700 rounded-pill px-3">BELUM BAYAR</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-center">
+                                        <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                                            {% if b.status != 'paid' %}
+                                                <button type="button" class="btn btn-emerald btn-sm px-3 btn-pay" 
+                                                        data-bill-id="{{ b.id }}" 
+                                                        data-bill-title="{{ b.title }}" 
+                                                        data-bill-remaining="{{ rem }}"
+                                                        data-student-name="{{ student.name }}">
+                                                    <i class="fas fa-coins me-1"></i> Bayar
+                                                </button>
+                                            {% endif %}
+                                            
+                                            {% if b.paid_amount > 0 %}
+                                                <a href="{{ url_for('payments.bill_receipt', bill_id=b.id) }}" 
+                                                   class="btn btn-sky btn-sm px-3" 
+                                                   target="_blank" title="Cetak Kuitansi">
+                                                    <i class="fas fa-print"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" 
+                                               class="btn btn-light btn-sm px-3 border-start" title="Edit">
+                                                <i class="fas fa-pen text-gray-600"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="opacity-40 mb-3">
+                                            <i class="fas fa-file-invoice fa-3x"></i>
+                                        </div>
+                                        <h6 class="text-muted fw-bold">Belum ada rincian tagihan.</h6>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pembayaran (Modernized) -->
+<div class="modal fade" id="payModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header gradient-success border-0 py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fas fa-money-check-alt text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white mb-0" id="payModalLabel">Konfirmasi Pembayaran</h5>
+                        <small class="text-white text-opacity-75">Silakan masukkan jumlah pembayaran</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="payForm" method="post" action="">
+                <div class="modal-body p-4">
+                    <div class="card bg-light border-0 rounded-3 mb-4 p-3">
+                        <div class="row items-center">
+                            <div class="col-6">
+                                <label class="text-muted smaller d-block mb-1">SANTRI</label>
+                                <span id="modalStudentName" class="fw-bold d-block truncate">-</span>
+                            </div>
+                            <div class="col-6 border-start ps-3">
+                                <label class="text-muted smaller d-block mb-1">TAGIHAN</label>
+                                <span id="modalBillTitle" class="fw-bold d-block truncate">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-gray-700">Jumlah Pembayaran</label>
+                        <div class="input-group input-group-lg shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-primary fw-bold">Rp</span>
+                            <input type="number" name="amount" id="payAmountInput" class="form-control border-start-0 ps-0 fw-bold" placeholder="0" required>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div class="form-text text-gray-500" id="remainingText">Sisa tagihan: Rp 0</div>
+                            <a href="#" class="form-text text-primary text-decoration-none fw-bold" id="btnPayFull">Bayar Lunas</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-emerald rounded-pill px-5 fw-bold shadow-lg">
+                        <i class="fas fa-check-circle me-1"></i> Proses Bayar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payModal = new bootstrap.Modal(document.getElementById('payModal'));
+    const payForm = document.getElementById('payForm');
+    const payAmountInput = document.getElementById('payAmountInput');
+    const remainingText = document.getElementById('remainingText');
+    const modalStudentName = document.getElementById('modalStudentName');
+    const modalBillTitle = document.getElementById('modalBillTitle');
+    const btnPayFull = document.getElementById('btnPayFull');
+
+    let currentRemaining = 0;
+
+    document.querySelectorAll('.btn-pay').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const billId = this.dataset.billId;
+            const title = this.dataset.billTitle;
+            const remaining = this.dataset.billRemaining;
+            const studentName = this.dataset.studentName;
+
+            currentRemaining = parseInt(remaining);
+            payForm.action = "{{ url_for('payments.pay_bill_view', bill_id=0) }}".replace('/0', '/' + billId);
+            
+            modalStudentName.textContent = studentName;
+            modalBillTitle.textContent = title;
+            payAmountInput.value = remaining;
+            payAmountInput.max = remaining;
+            remainingText.textContent = `Sisa tagihan: Rp ${currentRemaining.toLocaleString('id-ID')}`;
+            
+            payModal.show();
+        });
+    });
+
+    btnPayFull.addEventListener('click', function(e) {
+        e.preventDefault();
+        payAmountInput.value = currentRemaining;
+    });
+});
+</script>
+{% endblock %}

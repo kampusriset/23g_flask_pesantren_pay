@@ -16,70 +16,43 @@
                     <tr>
                         <th>#</th>
                         <th>Santri</th>
-                        <th>Judul</th>
                         <th>Total Tagihan</th>
                         <th>Terbayar</th>
                         <th>Sisa</th>
-                        <th>Jatuh Tempo</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for b in bills %}
-                    {% set remaining = b.amount - b.paid_amount %}
+                    {% for sb in students_bills %}
+                    {% set remaining = sb.total_amount - sb.total_paid %}
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td>
-                            <strong>{{ b.student_name }}</strong><br>
-                            <small class="text-muted">{{ b.student_nisn }}</small>
+                            <strong>{{ sb.name }}</strong><br>
+                            <small class="text-muted">{{ sb.nisn }}</small>
                         </td>
-                        <td>{{ b.title }}</td>
-                        <td>{{ b.amount|rupiah }}</td>
-                        <td class="text-success">{{ b.paid_amount|rupiah }}</td>
+                        <td>{{ sb.total_amount|rupiah }}</td>
+                        <td class="text-success">{{ sb.total_paid|rupiah }}</td>
                         <td class="text-danger fw-bold">{{ remaining|rupiah }}</td>
-                        <td>{{ b.due_date or '-' }}</td>
                         <td>
-                            {% if b.status == 'paid' %}
+                            {% if remaining <= 0 %}
                                 <span class="badge bg-success">Lunas</span>
-                            {% elif b.paid_amount > 0 %}
+                            {% elif sb.total_paid > 0 %}
                                 <span class="badge bg-info text-white">Cicilan</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark">Belum Bayar</span>
                             {% endif %}
+                            <br><small class="text-muted">{{ sb.bill_count }} Tagihan</small>
                         </td>
                         <td>
-                            <div class="btn-group">
-                                {% if b.status != 'paid' %}
-                                    <button type="button" class="btn btn-sm btn-success btn-pay" 
-                                            data-bill-id="{{ b.id }}" 
-                                            data-bill-title="{{ b.title }}" 
-                                            data-bill-remaining="{{ remaining }}"
-                                            data-student-name="{{ b.student_name }}">
-                                        <i class="fas fa-money-bill-wave"></i> Bayar
-                                    </button>
-                                {% endif %}
-                                
-                                {% if b.paid_amount > 0 %}
-                                    <a href="{{ url_for('payments.bill_receipt', bill_id=b.id) }}" class="btn btn-sm btn-info text-white" target="_blank" title="Cetak Kuitansi Terakhir">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-                                {% endif %}
-
-                                <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Tagihan">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                
-                                <form action="{{ url_for('payments.delete_bill_view', bill_id=b.id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Hapus tagihan ini?');">
-                                    <button class="btn btn-sm btn-outline-danger" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <a href="{{ url_for('payments.student_detail', student_id=sb.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> Detail
+                            </a>
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="9" class="text-center">Belum ada tagihan.</td></tr>
+                    <tr><td colspan="7" class="text-center">Belum ada data tagihan.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

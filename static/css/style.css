@@ -4038,3 +4038,9 @@ canvas {
     max-width: 100%;
 }
 
+
+/* Fix for Tailwind CSS conflict where .collapse class receives visibility: collapse
+   from Tailwind's utility sets, causing Bootstrap sub-menus to disappear. */
+.collapse.show {
+    visibility: visible !important;
+}

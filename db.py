@@ -482,3 +482,22 @@ def get_bill_total_paid(bill_id):
     """Hitung total yang sudah dibayar untuk satu tagihan"""
     row = query_db('SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE bill_id = ? AND type = "income"', (bill_id,), one=True)
     return row['total'] if row else 0
+
+def get_summarized_student_bills():
+    """Mendapatkan daftar santri yang memiliki tagihan dengan ringkasan totalnya"""
+    return query_db('''
+        SELECT 
+            s.id, 
+            s.name, 
+            s.nisn, 
+            s.kelas,
+            COUNT(b.id) as bill_count,
+            SUM(b.amount) as total_amount,
+            (SELECT COALESCE(SUM(t.amount), 0) 
+             FROM transactions t 
+             WHERE t.student_id = s.id AND t.type = 'income' AND t.bill_id IS NOT NULL) as total_paid
+        FROM students s
+        JOIN bills b ON s.id = b.student_id
+        GROUP BY s.id
+        ORDER BY s.name ASC
+    ''')

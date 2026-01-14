@@ -535,8 +535,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                           <button
                             onclick="toggleDetails({{ student.id }})"
                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-eye mr-2"></i>Lihat Detail
+                            <i class="fas fa-eye mr-2"></i>Lihat Detail Profil
                           </button>
+                          <a
+                            href="{{ url_for('payments.student_detail', student_id=student.id) }}"
+                            class="flex items-center w-full px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50">
+                            <i class="fas fa-file-invoice-dollar mr-2"></i>Detail Pembayaran
+                          </a>
                           <a
                             href="{{ url_for('students.edit', student_id=student.id) }}"
                             class="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
