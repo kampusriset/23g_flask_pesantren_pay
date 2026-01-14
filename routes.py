@@ -273,76 +273,94 @@ def export_excel():
     filter_category = request.args.get('category', 'all')
     filter_month = request.args.get('month', '')
 
-    query = '''
-        SELECT t.*, COALESCE(s.name, '') as student_name, COALESCE(s.nisn, '') as student_nisn
-        FROM transactions t
-        LEFT JOIN students s ON t.student_id = s.id
-        WHERE t.user_id = ?
-    '''
-    params = [user_id]
-    if filter_type != 'all':
-        query += ' AND t.type = ? '
-        params.append(filter_type)
-    if filter_category != 'all':
-        query += ' AND t.category = ? '
-        params.append(filter_category)
-    if filter_month:
-        query += ' AND t.date LIKE ? '
-        params.append(f'{filter_month}%')
+    try:
+        query = '''
+            SELECT t.*, COALESCE(s.name, '') as student_name, COALESCE(s.nisn, '') as student_nisn
+            FROM transactions t
+            LEFT JOIN students s ON t.student_id = s.id
+            WHERE t.user_id = ?
+        '''
+        params = [user_id]
+        if filter_type != 'all':
+            query += ' AND t.type = ? '
+            params.append(filter_type)
+        if filter_category != 'all':
+            query += ' AND t.category = ? '
+            params.append(filter_category)
+        if filter_month:
+            query += ' AND t.date LIKE ? '
+            params.append(f'{filter_month}%')
 
-    query += ' ORDER BY t.date DESC, t.created_at DESC'
+        query += ' ORDER BY t.date DESC, t.created_at DESC'
 
-    rows = query_db(query, params)
+        rows = query_db(query, params)
 
-    # Create workbook
-    wb = Workbook()
-    ws = wb.active
-    ws.title = 'Transaksi'
+        # Create workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Transaksi'
 
-    # Styles
-    header_fill = PatternFill(start_color='6366F1', end_color='6366F1', fill_type='solid')
-    header_font = Font(bold=True, color='FFFFFF', size=11)
-    header_alignment = Alignment(horizontal='center')
-    border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        # Styles
+        header_fill = PatternFill(start_color='6366F1', end_color='6366F1', fill_type='solid')
+        header_font = Font(bold=True, color='FFFFFF', size=11)
+        header_alignment = Alignment(horizontal='center', vertical='center')
+        border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
 
-    headers = ['No.', 'Tanggal', 'Kategori', 'Keterangan', 'Santri', 'NISN', 'Nominal', 'Jenis', 'Created At']
-    ws.append(headers)
-    for cell in ws[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = header_alignment
-        cell.border = border
+        headers = ['No.', 'Tanggal', 'Kategori', 'Keterangan', 'Santri', 'NISN', 'Nominal', 'Jenis', 'Created At']
+        ws.append(headers)
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = header_alignment
+            cell.border = border
 
-    for idx, r in enumerate(rows, 1):
-        typ = r['type']
-        amount = r['amount']
-        ws.append([
-            idx,
-            r['date'],
-            r['category'],
-            r['description'],
-            r['student_name'],
-            r['student_nisn'],
-            amount,
-            typ,
-            r.get('created_at') if isinstance(r, dict) else r['created_at']
-        ])
+        for idx, r in enumerate(rows, 1):
+            typ = r['type']
+            amount = r['amount']
+            
+            # Format date if possible
+            date_val = r['date']
+            
+            # Helper to safely get value directly from dict or via key
+            # SQLite rows might behave like dicts or tuples depending on row factory
+            def get_val(row, key):
+                return row[key] if isinstance(row, dict) else row[key]
 
-    # Column widths
-    widths = [5, 15, 25, 40, 25, 15, 15, 12, 20]
-    for i, w in enumerate(widths, 1):
-        ws.column_dimensions[chr(64 + i)].width = w
+            created_at = get_val(r, 'created_at')
 
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
+            ws.append([
+                idx,
+                date_val,
+                r['category'],
+                r['description'],
+                r['student_name'],
+                r['student_nisn'],
+                amount,
+                typ,
+                created_at
+            ])
 
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name=f'transaksi_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
-    )
+        # Column widths
+        widths = [5, 15, 25, 40, 25, 15, 15, 12, 20]
+        for i, w in enumerate(widths, 1):
+            ws.column_dimensions[chr(64 + i)].width = w
+
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
+        filename = f'transaksi_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        current_app.logger.error(f"Export Excel Error: {str(e)}")
+        flash(f"Gagal mengexport data: {str(e)}", "danger")
+        return redirect(url_for('transaction.index'))
 
 @transaction_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
