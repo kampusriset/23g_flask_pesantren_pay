@@ -4,16 +4,17 @@
 {% block page_title %}Edit Transaksi{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
+<div class="container mx-auto px-4 py-6" id="transactionPage">
+    <div class="d-flex justify-content-center">
+        <div style="width:100%;max-width:760px;">
+            <div class="form-card card">
                 <div class="card-header">
                     <h6 class="card-title">Form Edit Transaksi</h6>
                 </div>
                 <div class="card-body">
                     <form method="POST">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
                         <div class="form-group mb-3">
                             <label class="form-label">Jenis Transaksi</label>
                             <select class="form-select" name="type" id="transType" required>
@@ -34,11 +35,11 @@
                             <select class="form-select" name="student_id" id="student_id">
                                 <option value="">-- Tidak ada santri --</option>
                                 {% if students %}
-                                    {% for student in students %}
-                                    <option value="{{ student['id'] }}" {% if transaction.get('student_id') == student['id'] %}selected{% endif %}>
-                                        {{ student['name'] }} ({{ student['nisn'] }})
-                                    </option>
-                                    {% endfor %}
+                                {% for student in students %}
+                                <option value="{{ student['id'] }}" {% if transaction.get('student_id') == student['id'] %}selected{% endif %}>
+                                    {{ student['name'] }} ({{ student['nisn'] }})
+                                </option>
+                                {% endfor %}
                                 {% endif %}
                             </select>
                         </div>
