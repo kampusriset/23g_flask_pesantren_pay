@@ -66,14 +66,14 @@
                                     <td>{{ trans['description'] }}</td>
                                     <td class="text-end">
                                         {% if trans['type'] == 'expense' %}
-                                        <span style="color: #D32F2F;">{{ trans['amount']|rupiah }}</span>
+                                        <span class="text-danger">{{ trans['amount']|rupiah }}</span>
                                         {% else %}
                                         -
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
                                         {% if trans['type'] == 'income' %}
-                                        <span style="color: #2E7D32;">{{ trans['amount']|rupiah }}</span>
+                                        <span class="text-success">{{ trans['amount']|rupiah }}</span>
                                         {% else %}
                                         -
                                         {% endif %}

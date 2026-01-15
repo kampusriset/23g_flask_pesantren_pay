@@ -7,18 +7,22 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
       extend: {
         colors: {
           primary: {
-            50: "#f0fdf4",
-            100: "#dcfce7",
-            200: "#bbf7d0",
-            300: "#86efac",
-            400: "#4ade80",
-            500: "#22c55e",
-            600: "#16a34a",
-            700: "#15803d",
-            800: "#166534",
-            900: "#14532d",
-            950: "#052e16",
+            50: 'var(--bg-secondary)',
+            100: 'var(--bg-card)',
+            200: 'var(--border-subtle)',
+            300: 'var(--border-emphasis)',
+            500: 'var(--color-primary)',
+            600: 'var(--color-primary-dark)',
+            700: 'var(--color-primary-dark)',
+            800: 'var(--color-primary-dark)',
+            900: 'var(--color-primary-dark)',
+            DEFAULT: 'var(--color-primary)',
           },
+          secondary: 'var(--text-secondary)',
+          glow: 'var(--color-glow)',
+          dark: 'var(--bg-main)',
+          surface: 'var(--bg-card)',
+          border: 'var(--border-subtle)',
         },
       },
     },
@@ -28,19 +32,23 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
   .fade-in {
     animation: fadeIn 0.5s ease-in-out;
   }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
   .hover-lift {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
+
   .hover-lift:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -53,7 +61,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
     font-size: 0.85rem;
   }
 
-  .table > :not(caption) > * > * {
+  .table> :not(caption)>*>* {
     padding: 1rem 0.75rem;
   }
 
@@ -232,8 +240,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 mb-1">Total Santri</p>
@@ -241,15 +248,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
               {{ students|length }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+          <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-users text-primary-600 text-xl"></i>
           </div>
         </div>
       </div>
 
-      <div
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
         style="animation-delay: 0.1s">
         <div class="flex items-center justify-between">
           <div>
@@ -259,15 +264,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
               'aktif')|list %}{{ aktif|length }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-check-circle text-green-600 text-xl"></i>
           </div>
         </div>
       </div>
 
-      <div
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
         style="animation-delay: 0.2s">
         <div class="flex items-center justify-between">
           <div>
@@ -281,15 +284,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
               belum_bayar_count }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+          <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-exclamation-triangle text-orange-600 text-xl"></i>
           </div>
         </div>
       </div>
 
-      <div
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-lift fade-in"
         style="animation-delay: 0.3s">
         <div class="flex items-center justify-between">
           <div>
@@ -298,8 +299,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
               {{ (students|map(attribute='total_payment')|sum)|int|rupiah }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
             <i class="fas fa-wallet text-purple-600 text-xl"></i>
           </div>
         </div>
@@ -312,15 +312,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
       <div class="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
         <button
           class="flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 active-tab bg-white text-primary-600 shadow-sm"
-          id="all-tab"
-          onclick="switchTab('all')">
+          id="all-tab" onclick="switchTab('all')">
           <i class="fas fa-list mr-2"></i>
           Semua Santri
         </button>
         <button
           class="flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 text-gray-600 hover:text-gray-900"
-          id="belum-bayar-tab"
-          onclick="switchTab('belum-bayar')">
+          id="belum-bayar-tab" onclick="switchTab('belum-bayar')">
           <i class="fas fa-exclamation-circle mr-2"></i>
           Belum Bayar
         </button>
@@ -329,19 +327,13 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
       <!-- Filters -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Cari Nama</label
-          >
-          <input
-            type="text"
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cari Nama</label>
+          <input type="text"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-            id="search"
-            placeholder="Nama santri..." />
+            id="search" placeholder="Nama santri..." />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Kelas</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
           <select
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
             id="filterKelas">
@@ -352,9 +344,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Status</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
           <select
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
             id="filterStatus">
@@ -364,8 +354,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
           </select>
         </div>
         <div class="flex items-end">
-          <button
-            type="reset"
+          <button type="reset"
             class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
             onclick="resetFilters()">
             Reset Filter
@@ -378,23 +367,19 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
       <h6 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h6>
       <div class="flex flex-wrap gap-3">
-        <a
-          href="{{ url_for('students.add') }}"
+        <a href="{{ url_for('students.add') }}"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
           <i class="fas fa-plus mr-2"></i>Tambah Santri
         </a>
-        <a
-          href="{{ url_for('students.import_excel') }}"
+        <a href="{{ url_for('students.import_excel') }}"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
           <i class="fas fa-upload mr-2"></i>Import Excel
         </a>
-        <a
-          href="{{ url_for('students.export_excel') }}"
+        <a href="{{ url_for('students.export_excel') }}"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
           <i class="fas fa-download mr-2"></i>Export Data
         </a>
-        <a
-          href="{{ url_for('students.download_report') }}"
+        <a href="{{ url_for('students.download_report') }}"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
           <i class="fas fa-file-excel mr-2"></i>Laporan
         </a>
@@ -405,49 +390,38 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
     <div class="space-y-6">
       <!-- All Students Tab -->
       <div id="all-pane" class="active-tab-content">
-        <div
-          class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     No.
                   </th>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Santri
                   </th>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Kelas
                   </th>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Pembayaran
                   </th>
-                  <th
-                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Aksi
                   </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200" id="studentTableBody">
                 {% if students %} {% for student in students %}
-                <tr
-                  class="student-row hover:bg-gray-50 transition-colors duration-200"
-                  data-name="{{ student.name }}"
-                  data-kelas="{{ student.kelas }}"
-                  data-status="{{ student.status }}"
+                <tr class="student-row hover:bg-gray-50 transition-colors duration-200" data-name="{{ student.name }}"
+                  data-kelas="{{ student.kelas }}" data-status="{{ student.status }}"
                   data-paid="{{ student.month_payment }}">
                   <!-- No. -->
-                  <td
-                    class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                     {{ loop.index }}
                   </td>
 
@@ -455,8 +429,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                   <td class="px-4 py-3">
                     <div class="flex items-center">
                       <div class="flex-shrink-0 w-8 h-8">
-                        <div
-                          class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                           <span class="text-xs font-medium text-primary-700">
                             {{ student.name[0].upper() }}
                           </span>
@@ -490,7 +463,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                     </span>
                     {% else %}
                     <span
-                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                      class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200">
                       <i class="fas fa-times-circle mr-1"></i>Non-Aktif
                     </span>
                     {% endif %}
@@ -510,9 +483,7 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                           Bayar
                         </span>
                         {% else %}
-                        <span class="text-green-600 font-medium"
-                          >{{ student.month_payment|rupiah }}</span
-                        >
+                        <span class="text-green-600 font-medium">{{ student.month_payment|rupiah }}</span>
                         <span class="text-gray-400">bulan ini</span>
                         {% endif %}
                       </div>
@@ -522,33 +493,27 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                   <!-- Aksi -->
                   <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
                     <div class="relative">
-                      <button
-                        onclick="toggleDropdown({{ student.id }})"
+                      <button onclick="toggleDropdown('{{ student.id }}')"
                         class="inline-flex items-center p-1.5 border border-gray-300 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         title="Menu Aksi">
                         <i class="fas fa-ellipsis-v"></i>
                       </button>
-                      <div
-                        id="dropdown-{{ student.id }}"
+                      <div id="dropdown-{{ student.id }}"
                         class="hidden absolute right-0 z-10 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200">
                         <div class="py-1">
-                          <button
-                            onclick="toggleDetails({{ student.id }})"
+                          <button onclick="toggleDetails('{{ student.id }}')"
                             class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-eye mr-2"></i>Lihat Detail Profil
                           </button>
-                          <a
-                            href="{{ url_for('payments.student_detail', student_id=student.id) }}"
+                          <a href="{{ url_for('payments.student_detail', student_id=student.id) }}"
                             class="flex items-center w-full px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50">
                             <i class="fas fa-file-invoice-dollar mr-2"></i>Detail Pembayaran
                           </a>
-                          <a
-                            href="{{ url_for('students.edit', student_id=student.id) }}"
+                          <a href="{{ url_for('students.edit', student_id=student.id) }}"
                             class="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
                             <i class="fas fa-edit mr-2"></i>Edit
                           </a>
-                          <a
-                            href="{{ url_for('students.delete', student_id=student.id) }}"
+                          <a href="{{ url_for('students.delete', student_id=student.id) }}"
                             class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                             onclick="return confirm('Yakin ingin menghapus santri ini?')">
                             <i class="fas fa-trash mr-2"></i>Hapus
@@ -564,28 +529,20 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
                   <td colspan="6" class="px-6 py-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span class="font-medium text-gray-600"
-                          >Jenis Kelamin:</span
-                        >
+                        <span class="font-medium text-gray-600">Jenis Kelamin:</span>
                         <span class="ml-2">
                           {% if student.jenis_kelamin == 'Perempuan' %}
-                          <i class="fas fa-venus text-pink-500 mr-1"></i
-                          >Perempuan {% else %}
-                          <i class="fas fa-mars text-blue-500 mr-1"></i
-                          >Laki-laki {% endif %}
+                          <i class="fas fa-venus text-gray-400 mr-1"></i>Perempuan {% else %}
+                          <i class="fas fa-mars text-blue-500 mr-1"></i>Laki-laki {% endif %}
                         </span>
                       </div>
                       <div>
-                        <span class="font-medium text-gray-600"
-                          >Orang Tua:</span
-                        >
+                        <span class="font-medium text-gray-600">Orang Tua:</span>
                         <span class="ml-2">{{ student.parent_name }}</span>
                       </div>
                       <div>
                         <span class="font-medium text-gray-600">Telepon:</span>
-                        <a
-                          href="tel:{{ student.parent_phone }}"
-                          class="ml-2 text-blue-600 hover:text-blue-800">
+                        <a href="tel:{{ student.parent_phone }}" class="ml-2 text-blue-600 hover:text-blue-800">
                           <i class="fas fa-phone mr-1"></i>{{
                           student.parent_phone }}
                         </a>
@@ -613,138 +570,138 @@ block page_title %}Data Santri{% endblock %} {% block extra_css %}
           </div>
         </div>
       </div>
-      </div>
     </div>
   </div>
-  {% endblock %} {% block extra_js %}
-  <script>
-    // Tab switching functionality
-    function switchTab(tabName) {
-      const allTab = document.getElementById("all-tab");
-      const belumBayarTab = document.getElementById("belum-bayar-tab");
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Tab switching functionality
+  function switchTab(tabName) {
+    const allTab = document.getElementById("all-tab");
+    const belumBayarTab = document.getElementById("belum-bayar-tab");
 
-      if (tabName === "all") {
-        allTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
-        allTab.classList.remove("text-gray-600", "hover:text-gray-900");
-        belumBayarTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
-        belumBayarTab.classList.add("text-gray-600", "hover:text-gray-900");
-        window.currentTab = 'all';
-      } else {
-        belumBayarTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
-        belumBayarTab.classList.remove("text-gray-600", "hover:text-gray-900");
-        allTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
-        allTab.classList.add("text-gray-600", "hover:text-gray-900");
-        window.currentTab = 'unpaid';
-      }
-      filterTable();
+    if (tabName === "all") {
+      allTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
+      allTab.classList.remove("text-gray-600", "hover:text-gray-900");
+      belumBayarTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
+      belumBayarTab.classList.add("text-gray-600", "hover:text-gray-900");
+      window.currentTab = 'all';
+    } else {
+      belumBayarTab.classList.add("active-tab", "bg-white", "text-primary-600", "shadow-sm");
+      belumBayarTab.classList.remove("text-gray-600", "hover:text-gray-900");
+      allTab.classList.remove("active-tab", "bg-white", "text-primary-600", "shadow-sm");
+      allTab.classList.add("text-gray-600", "hover:text-gray-900");
+      window.currentTab = 'unpaid';
     }
+    filterTable();
+  }
 
-    // Details toggle functionality
-    function toggleDetails(studentId) {
-      const detailsRow = document.getElementById(`details-${studentId}`);
-      const eyeIcon = event.target.closest("button").querySelector("i");
+  // Details toggle functionality
+  function toggleDetails(studentId) {
+    const detailsRow = document.getElementById(`details-${studentId}`);
+    const eyeIcon = event.target.closest("button").querySelector("i");
 
-      if (detailsRow.classList.contains("hidden")) {
-        detailsRow.classList.remove("hidden");
-        eyeIcon.classList.remove("fa-eye");
-        eyeIcon.classList.add("fa-eye-slash");
-      } else {
-        detailsRow.classList.add("hidden");
-        eyeIcon.classList.remove("fa-eye-slash");
-        eyeIcon.classList.add("fa-eye");
-      }
+    if (detailsRow.classList.contains("hidden")) {
+      detailsRow.classList.remove("hidden");
+      eyeIcon.classList.remove("fa-eye");
+      eyeIcon.classList.add("fa-eye-slash");
+    } else {
+      detailsRow.classList.add("hidden");
+      eyeIcon.classList.remove("fa-eye-slash");
+      eyeIcon.classList.add("fa-eye");
     }
+  }
 
-    // Dropdown toggle functionality
-    function toggleDropdown(studentId) {
-      const dropdown = document.getElementById(`dropdown-${studentId}`);
-      const isHidden = dropdown.classList.contains("hidden");
+  // Dropdown toggle functionality
+  function toggleDropdown(studentId) {
+    const dropdown = document.getElementById(`dropdown-${studentId}`);
+    const isHidden = dropdown.classList.contains("hidden");
 
-      // Close all other dropdowns
+    // Close all other dropdowns
+    document.querySelectorAll('[id^="dropdown-"]').forEach((d) => {
+      if (d !== dropdown) d.classList.add("hidden");
+    });
+
+    // Toggle current dropdown
+    if (isHidden) {
+      dropdown.classList.remove("hidden");
+    } else {
+      dropdown.classList.add("hidden");
+    }
+  }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".relative")) {
       document.querySelectorAll('[id^="dropdown-"]').forEach((d) => {
-        if (d !== dropdown) d.classList.add("hidden");
+        d.classList.add("hidden");
       });
+    }
+  });
 
-      // Toggle current dropdown
-      if (isHidden) {
-        dropdown.classList.remove("hidden");
+  // Reset filters functionality
+  function resetFilters() {
+    document.getElementById("search").value = "";
+    document.getElementById("filterKelas").value = "";
+    document.getElementById("filterStatus").value = "";
+    filterTable();
+  }
+
+  // Real-time search dan filter
+  document.getElementById("search").addEventListener("keyup", filterTable);
+  document
+    .getElementById("filterKelas")
+    .addEventListener("change", filterTable);
+  document
+    .getElementById("filterStatus")
+    .addEventListener("change", filterTable);
+
+  function filterTable() {
+    const searchValue = document.getElementById("search").value.toLowerCase();
+    const kelasValue = document.getElementById("filterKelas").value;
+    const statusValue = document.getElementById("filterStatus").value;
+    const currentTab = window.currentTab || 'all';
+
+    const rows = document.querySelectorAll(".student-row");
+    let visibleCount = 0;
+
+    rows.forEach((row) => {
+      const name = row.getAttribute("data-name").toLowerCase();
+      const kelas = row.getAttribute("data-kelas");
+      const status = row.getAttribute("data-status");
+      const paidAmount = parseInt(row.getAttribute("data-paid") || "0");
+
+      const matchName = name.includes(searchValue);
+      const matchKelas = !kelasValue || kelas === kelasValue;
+      const matchStatus = !statusValue || status === statusValue;
+      const matchTab = currentTab === 'all' || paidAmount === 0;
+
+      if (matchName && matchKelas && matchStatus && matchTab) {
+        row.style.display = "";
+        visibleCount++;
       } else {
-        dropdown.classList.add("hidden");
-      }
-    }
-
-    // Close dropdowns when clicking outside
-    document.addEventListener("click", function (event) {
-      if (!event.target.closest(".relative")) {
-        document.querySelectorAll('[id^="dropdown-"]').forEach((d) => {
-          d.classList.add("hidden");
-        });
+        row.style.display = "none";
       }
     });
 
-    // Reset filters functionality
-    function resetFilters() {
-      document.getElementById("search").value = "";
-      document.getElementById("filterKelas").value = "";
-      document.getElementById("filterStatus").value = "";
-      filterTable();
-    }
-
-    // Real-time search dan filter
-    document.getElementById("search").addEventListener("keyup", filterTable);
-    document
-      .getElementById("filterKelas")
-      .addEventListener("change", filterTable);
-    document
-      .getElementById("filterStatus")
-      .addEventListener("change", filterTable);
-
-    function filterTable() {
-      const searchValue = document.getElementById("search").value.toLowerCase();
-      const kelasValue = document.getElementById("filterKelas").value;
-      const statusValue = document.getElementById("filterStatus").value;
-      const currentTab = window.currentTab || 'all';
-
-      const rows = document.querySelectorAll(".student-row");
-      let visibleCount = 0;
-
-      rows.forEach((row) => {
-        const name = row.getAttribute("data-name").toLowerCase();
-        const kelas = row.getAttribute("data-kelas");
-        const status = row.getAttribute("data-status");
-        const paidAmount = parseInt(row.getAttribute("data-paid") || "0");
-
-        const matchName = name.includes(searchValue);
-        const matchKelas = !kelasValue || kelas === kelasValue;
-        const matchStatus = !statusValue || status === statusValue;
-        const matchTab = currentTab === 'all' || paidAmount === 0;
-
-        if (matchName && matchKelas && matchStatus && matchTab) {
-          row.style.display = "";
-          visibleCount++;
-        } else {
-          row.style.display = "none";
-        }
-      });
-
-      // Show empty message if no rows visible
-      const emptyRow = document.getElementById("emptyRow");
-      if (visibleCount === 0) {
-        if (!emptyRow) {
-          const tbody = document.getElementById("studentTableBody");
-          const tr = document.createElement("tr");
-          tr.id = "emptyRow";
-          tr.innerHTML = `<td colspan="6" class="px-6 py-12 text-center text-gray-500">Tidak ada data yang cocok dengan filter</td>`;
-          tbody.appendChild(tr);
-        }
-      } else if (emptyRow) {
-        emptyRow.remove();
+    // Show empty message if no rows visible
+    const emptyRow = document.getElementById("emptyRow");
+    if (visibleCount === 0) {
+      if (!emptyRow) {
+        const tbody = document.getElementById("studentTableBody");
+        const tr = document.createElement("tr");
+        tr.id = "emptyRow";
+        tr.innerHTML = `<td colspan="6" class="px-6 py-12 text-center text-gray-500">Tidak ada data yang cocok dengan filter</td>`;
+        tbody.appendChild(tr);
       }
+    } else if (emptyRow) {
+      emptyRow.remove();
     }
+  }
 
-    // Initialize default tab
-    document.addEventListener("DOMContentLoaded", function () {
-      switchTab("all");
-    });
-  </script>
-  {% endblock %}
+  // Initialize default tab
+  document.addEventListener("DOMContentLoaded", function () {
+    switchTab("all");
+  });
+</script>
+{% endblock %}

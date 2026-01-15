@@ -533,13 +533,14 @@
 
     // Initial Load
     document.addEventListener('DOMContentLoaded', () => {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      initChart(isDark);
-    });
+      // Initial load
+      const initialIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      initChart(initialIsDark);
 
-    // Listen for theme changes
-    document.addEventListener('themeChanged', (e) => {
-      initChart(e.detail.isDark);
+      // Listen for theme changes
+      document.addEventListener('themeChanged', function (e) {
+        initChart(e.detail.isDark);
+      });
     });
   })();
 </script>

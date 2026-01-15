@@ -14,22 +14,22 @@
       extend: {
         colors: {
           primary: {
-            50: 'var(--primary-lighter)',
-            100: '#d1fae5',
-            500: 'var(--primary-light)', // Green 500
-            600: 'var(--primary-color)', // Green 800 (Main)
-            700: 'var(--primary-dark)',
+            50: 'var(--bg-secondary)',
+            100: 'var(--bg-card)',
+            500: 'var(--color-primary)',
+            600: 'var(--color-primary-dark)',
+            700: 'var(--color-primary-dark)',
           },
           danger: {
-            50: '#fef2f2',
-            100: '#fee2e2',
-            500: 'var(--danger-color)', // Red 500
-            600: '#b91c1c',
+            50: 'rgba(239, 68, 68, 0.05)',
+            100: 'rgba(239, 68, 68, 0.1)',
+            500: 'var(--color-danger)',
+            600: 'var(--color-danger)',
           },
           dark: {
-            900: '#040d08', // Deep Forest Charcoal
-            800: '#0f1712', // Dark Charcoal Emerald
-            700: 'rgba(255, 255, 255, 0.05)', // Border
+            900: 'var(--bg-main)',
+            800: 'var(--bg-secondary)',
+            700: 'var(--border-subtle)',
           }
         },
         fontFamily: {
@@ -54,18 +54,33 @@
 
   /* Tom Select Overrides for Tailwind */
   .ts-control {
-    @apply w-full rounded-xl border-gray-200 px-4 py-3 shadow-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 !important;
+    width: 100% !important;
+    border-radius: 0.75rem !important;
+    border-color: var(--border-color) !important;
+    padding: 0.75rem 1rem !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all 0.3s ease !important;
     min-height: 56px;
     display: flex;
     align-items: center;
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
   }
 
   .ts-dropdown {
-    @apply rounded-xl shadow-xl border-none z-50 overflow-hidden mt-2 dark:bg-gray-800 dark:text-gray-200 !important;
+    border-radius: 0.75rem !important;
+    box-shadow: var(--shadow-xl) !important;
+    border: none !important;
+    z-index: 50 !important;
+    overflow: hidden !important;
+    margin-top: 0.5rem !important;
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
   }
 
   .ts-dropdown .active {
-    @apply bg-primary-500 text-white !important;
+    background-color: var(--primary-color) !important;
+    color: white !important;
   }
 
   /* Animations */
