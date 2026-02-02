@@ -13,53 +13,84 @@
   <div class="top-ticker mb-4" aria-hidden="false">
     <div class="ticker-viewport">
       <div class="ticker-track">
+        <!-- Set 1 -->
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-success">
-            <i class="fas fa-arrow-down"></i>
+          <div class="ticker-icon text-success">
+            <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}" alt="Pemasukan"
+              style="width: 32px; height: 26px;">
           </div>
           <div class="ticker-text">
-            <small>Pemasukan</small><strong>{{ stats.total_income|rupiah }}</strong>
+            <small>Pemasukan</small>
+            <strong class="text-success">{{ stats.total_income|rupiah }}</strong>
           </div>
         </div>
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-danger">
-            <i class="fas fa-arrow-up"></i>
+          <div class="ticker-icon text-danger">
+            <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}" alt="Pengeluaran"
+              style="width: 32px; height: 26px;">
           </div>
           <div class="ticker-text">
-            <small>Pengeluaran</small><strong>{{ stats.total_expense|rupiah }}</strong>
+            <small>Pengeluaran</small>
+            <strong class="text-danger">{{ stats.total_expense|rupiah }}</strong>
           </div>
         </div>
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-primary">
+          <div class="ticker-icon text-primary">
             <i class="fas fa-wallet"></i>
           </div>
           <div class="ticker-text">
-            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+            <small>Saldo Kas</small>
+            <strong class="text-primary">{{ stats.balance|rupiah }}</strong>
           </div>
         </div>
-        <!-- duplicate for continuous loop -->
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-success">
-            <i class="fas fa-arrow-down"></i>
+          <div class="ticker-icon"
+            style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">
+            <i class="fas fa-chart-line"></i>
           </div>
           <div class="ticker-text">
-            <small>Pemasukan</small><strong>{{ stats.total_income|rupiah }}</strong>
+            <small>Net Profit</small>
+            <strong style="color: #8b5cf6;">{{ (stats.total_income - stats.total_expense)|rupiah }}</strong>
           </div>
         </div>
+        <!-- Set 2 (duplicate for seamless loop) -->
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-danger">
-            <i class="fas fa-arrow-up"></i>
+          <div class="ticker-icon text-success">
+            <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}" alt="Pemasukan"
+              style="width: 32px; height: 26px;">
           </div>
           <div class="ticker-text">
-            <small>Pengeluaran</small><strong>{{ stats.total_expense|rupiah }}</strong>
+            <small>Pemasukan</small>
+            <strong class="text-success">{{ stats.total_income|rupiah }}</strong>
           </div>
         </div>
         <div class="ticker-item">
-          <div class="ticker-icon icon-animate text-primary">
+          <div class="ticker-icon text-danger">
+            <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}" alt="Pengeluaran"
+              style="width: 32px; height: 26px;">
+          </div>
+          <div class="ticker-text">
+            <small>Pengeluaran</small>
+            <strong class="text-danger">{{ stats.total_expense|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon text-primary">
             <i class="fas fa-wallet"></i>
           </div>
           <div class="ticker-text">
-            <small>Saldo</small><strong>{{ stats.balance|rupiah }}</strong>
+            <small>Saldo Kas</small>
+            <strong class="text-primary">{{ stats.balance|rupiah }}</strong>
+          </div>
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-icon"
+            style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="ticker-text">
+            <small>Net Profit</small>
+            <strong style="color: #8b5cf6;">{{ (stats.total_income - stats.total_expense)|rupiah }}</strong>
           </div>
         </div>
       </div>
@@ -123,8 +154,9 @@
   <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
       <div class="stat-card">
-        <div class="stat-icon income">
-          <i class="fas fa-arrow-down"></i>
+        <div class="stat-icon income" style="display: flex; align-items: center; justify-content: center;">
+          <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}" alt="Pemasukan"
+            style="width: 40px; height: 32px;">
         </div>
         <div class="stat-content">
           <p class="stat-label">Total Pemasukan</p>
@@ -134,8 +166,9 @@
     </div>
     <div class="col-lg-3 col-md-6 mb-3">
       <div class="stat-card">
-        <div class="stat-icon expense">
-          <i class="fas fa-arrow-up"></i>
+        <div class="stat-icon expense" style="display: flex; align-items: center; justify-content: center;">
+          <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}" alt="Pengeluaran"
+            style="width: 40px; height: 32px;">
         </div>
         <div class="stat-content">
           <p class="stat-label">Total Pengeluaran</p>
@@ -188,24 +221,48 @@
     <div class="col-lg-4">
       <div class="card card-actions">
         <div class="card-header">
-          <h6 class="card-title">Aksi Cepat</h6>
+          <h6 class="card-title"><i class="fas fa-bolt me-2 text-warning"></i>Aksi Cepat</h6>
         </div>
-        <div class="card-body">
-          <a href="{{ url_for('transaction.add') }}" class="btn btn-action">
-            <i class="fas fa-plus"></i>
-            <span>Tambah Transaksi</span>
+        <div class="card-body quick-actions-body">
+          <a href="{{ url_for('transaction.add') }}" class="btn btn-action btn-action-add">
+            <div class="action-icon">
+              <i class="fas fa-plus"></i>
+            </div>
+            <div class="action-text">
+              <span class="action-title">Tambah Transaksi</span>
+              <span class="action-desc">Catat pemasukan/pengeluaran</span>
+            </div>
+            <i class="fas fa-chevron-right action-arrow"></i>
           </a>
-          <a href="{{ url_for('wallet.index') }}" class="btn btn-action">
-            <i class="fas fa-wallet"></i>
-            <span>Lihat Dompet</span>
+          <a href="{{ url_for('wallet.index') }}" class="btn btn-action btn-action-wallet">
+            <div class="action-icon">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="action-text">
+              <span class="action-title">Lihat Dompet</span>
+              <span class="action-desc">Kelola saldo pondok</span>
+            </div>
+            <i class="fas fa-chevron-right action-arrow"></i>
           </a>
-          <a href="{{ url_for('statistics.index') }}" class="btn btn-action">
-            <i class="fas fa-chart-bar"></i>
-            <span>Lihat Statistik</span>
+          <a href="{{ url_for('statistics.index') }}" class="btn btn-action btn-action-stats">
+            <div class="action-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="action-text">
+              <span class="action-title">Lihat Statistik</span>
+              <span class="action-desc">Analisis keuangan</span>
+            </div>
+            <i class="fas fa-chevron-right action-arrow"></i>
           </a>
-          <a href="{{ url_for('transaction.index') }}" class="btn btn-action">
-            <i class="fas fa-list"></i>
-            <span>Semua Transaksi</span>
+          <a href="{{ url_for('transaction.index') }}" class="btn btn-action btn-action-list">
+            <div class="action-icon">
+              <i class="fas fa-list"></i>
+            </div>
+            <div class="action-text">
+              <span class="action-title">Semua Transaksi</span>
+              <span class="action-desc">Riwayat lengkap</span>
+            </div>
+            <i class="fas fa-chevron-right action-arrow"></i>
           </a>
         </div>
       </div>
@@ -273,9 +330,11 @@
                     <span
                       class="transaction-type {% if trans['type'] == 'income' %}type-income{% else %}type-expense{% endif %}">
                       {% if trans['type'] == 'income' %}
-                      <i class="fas fa-arrow-trend-up me-1"></i>Pemasukan {%
+                      <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}" alt="Pemasukan"
+                        style="width: 20px; height: 16px; margin-right: 4px;">Pemasukan {%
                       else %}
-                      <i class="fas fa-arrow-trend-down me-1"></i>Pengeluaran {%
+                      <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}" alt="Pengeluaran"
+                        style="width: 20px; height: 16px; margin-right: 4px;">Pengeluaran {%
                       endif %}
                     </span>
                   </td>

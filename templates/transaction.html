@@ -15,8 +15,10 @@
                             <label class="form-label">Jenis Transaksi</label>
                             <select class="form-select" id="filterType">
                                 <option value="all">Semua</option>
-                                <option value="income" {% if filter_type == 'income' %}selected{% endif %}>Pemasukan</option>
-                                <option value="expense" {% if filter_type == 'expense' %}selected{% endif %}>Pengeluaran</option>
+                                <option value="income" {% if filter_type=='income' %}selected{% endif %}>Pemasukan
+                                </option>
+                                <option value="expense" {% if filter_type=='expense' %}selected{% endif %}>Pengeluaran
+                                </option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3 mb-md-0">
@@ -24,10 +26,12 @@
                             <select class="form-select" id="filterCategory">
                                 <option value="all">Semua Kategori</option>
                                 {% for cat in categories_income %}
-                                    <option value="{{ cat }}" {% if filter_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                <option value="{{ cat }}" {% if filter_category==cat %}selected{% endif %}>{{ cat }}
+                                </option>
                                 {% endfor %}
                                 {% for cat in categories_expense %}
-                                    <option value="{{ cat }}" {% if filter_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                <option value="{{ cat }}" {% if filter_category==cat %}selected{% endif %}>{{ cat }}
+                                </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -94,41 +98,59 @@
                                         <small class="text-muted">{{ trans['date']|format_date }}</small>
                                     </td>
                                     <td>
-                                        <span class="badge {% if trans['type'] == 'income' %}bg-primary{% else %}bg-danger{% endif %} text-white">
+                                        <span
+                                            class="badge {% if trans['type'] == 'income' %}bg-primary{% else %}bg-danger{% endif %} text-white">
                                             {{ trans['category'] }}
                                         </span>
                                     </td>
                                     <td>{{ trans['description'] }}</td>
                                     <td>
                                         {% if trans['student_name'] %}
-                                            <small><strong>{{ trans['student_name'] }}</strong></small>
-                                            <br>
-                                            <small class="text-muted">NISN: {{ trans['student_nisn'] }}</small>
+                                        <small><strong>{{ trans['student_name'] }}</strong></small>
+                                        <br>
+                                        <small class="text-muted">NISN: {{ trans['student_nisn'] }}</small>
                                         {% else %}
-                                            <small class="text-muted">-</small>
+                                        <small class="text-muted">-</small>
                                         {% endif %}
                                     </td>
                                     <td class="text-end font-weight-bold">
-                                        <span class="{% if trans['type'] == 'income' %}text-primary{% else %}text-danger{% endif %}">
-                                            {% if trans['type'] == 'income' %}+{% else %}-{% endif %}{{ trans['amount']|rupiah }}
+                                        <span
+                                            class="{% if trans['type'] == 'income' %}text-primary{% else %}text-danger{% endif %}">
+                                            {% if trans['type'] == 'income' %}+{% else %}-{% endif %}{{
+                                            trans['amount']|rupiah }}
                                         </span>
                                     </td>
                                     <td>
                                         {% if trans['type'] == 'income' %}
-                                            <i class="fas fa-arrow-down text-primary"></i> Masuk
+                                        <span class="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill"
+                                            style="background-color: rgba(16, 185, 129, 0.1);">
+                                            <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}"
+                                                alt="Pemasukan" style="width: 24px; height: 20px;">
+                                            <span class="text-success fw-semibold small">Masuk</span>
+                                        </span>
                                         {% else %}
-                                            <i class="fas fa-arrow-up text-danger"></i> Keluar
+                                        <span class="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill"
+                                            style="background-color: rgba(239, 68, 68, 0.1);">
+                                            <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}"
+                                                alt="Pengeluaran" style="width: 24px; height: 20px;">
+                                            <span class="text-danger fw-semibold small">Keluar</span>
+                                        </span>
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ url_for('transaction.receipt', id=trans['id']) }}" class="btn btn-sm btn-outline-primary" title="Cetak Kwitansi" target="_blank">
+                                        <a href="{{ url_for('transaction.receipt', id=trans['id']) }}"
+                                            class="btn btn-sm btn-outline-primary" title="Cetak Kwitansi"
+                                            target="_blank">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
-                                        <a href="{{ url_for('transaction.edit', id=trans['id']) }}" class="btn btn-sm btn-info" title="Edit">
+                                        <a href="{{ url_for('transaction.edit', id=trans['id']) }}"
+                                            class="btn btn-sm btn-info" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         {% if session.get('role') == 'admin' %}
-                                        <a href="{{ url_for('transaction.delete', id=trans['id']) }}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')" title="Hapus">
+                                        <a href="{{ url_for('transaction.delete', id=trans['id']) }}"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Yakin ingin menghapus?')" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                         {% endif %}
@@ -154,23 +176,23 @@
 
 {% block extra_js %}
 <script>
-    document.getElementById('filterBtn').addEventListener('click', function() {
+    document.getElementById('filterBtn').addEventListener('click', function () {
         const type = document.getElementById('filterType').value;
         const category = document.getElementById('filterCategory').value;
         const month = document.getElementById('filterMonth').value;
-        
+
         let url = '{{ url_for("transaction.index") }}?';
         if (type !== 'all') url += 'type=' + type + '&';
         if (category !== 'all') url += 'category=' + category + '&';
         if (month) url += 'month=' + month + '&';
-        
+
         window.location.href = url;
     });
 
     // Build export URL with the same filters
     const downloadBtn = document.getElementById('downloadReportBtn');
     if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
+        downloadBtn.addEventListener('click', function () {
             const type = document.getElementById('filterType').value;
             const category = document.getElementById('filterCategory').value;
             const month = document.getElementById('filterMonth').value;

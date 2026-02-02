@@ -501,3 +501,111 @@ def get_summarized_student_bills():
         GROUP BY s.id
         ORDER BY s.name ASC
     ''')
+
+
+# ===== CATEGORY MANAGEMENT CRUD =====
+
+def ensure_categories_table():
+    """Memastikan tabel categories ada (dengan icon standar global)"""
+    db = get_db()
+    cur = db.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
+            icon TEXT DEFAULT 'fa-tag',
+            color TEXT DEFAULT '#6366f1',
+            description TEXT,
+            is_active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    db.commit()
+    
+    # Cek apakah sudah ada data
+    existing = cur.execute('SELECT COUNT(*) FROM categories').fetchone()[0]
+    if existing == 0:
+        # Insert kategori default dengan icon standar global
+        default_income = [
+            ('SPP Santri', 'income', 'fa-graduation-cap', '#10b981', 'Pembayaran SPP bulanan santri'),
+            ('Uang Makan', 'income', 'fa-utensils', '#22c55e', 'Pembayaran uang makan santri'),
+            ('Donasi', 'income', 'fa-hand-holding-heart', '#14b8a6', 'Donasi dari masyarakat'),
+            ('Subsidi Pemerintah', 'income', 'fa-university', '#06b6d4', 'Bantuan dari pemerintah'),
+            ('Infaq', 'income', 'fa-mosque', '#0ea5e9', 'Infaq dari jamaah'),
+            ('Lainnya', 'income', 'fa-plus-circle', '#6366f1', 'Pemasukan lainnya'),
+        ]
+        default_expense = [
+            ('Gaji Guru', 'expense', 'fa-chalkboard-teacher', '#ef4444', 'Gaji pengajar dan ustadz'),
+            ('Listrik & Air', 'expense', 'fa-bolt', '#f97316', 'Tagihan listrik dan air'),
+            ('Belanja Dapur', 'expense', 'fa-shopping-cart', '#f59e0b', 'Belanja kebutuhan dapur'),
+            ('Pembangunan', 'expense', 'fa-hammer', '#eab308', 'Biaya pembangunan'),
+            ('Operasional Kantor', 'expense', 'fa-briefcase', '#84cc16', 'Biaya operasional kantor'),
+            ('Perawatan', 'expense', 'fa-tools', '#f43f5e', 'Biaya perawatan fasilitas'),
+            ('Lainnya', 'expense', 'fa-minus-circle', '#dc2626', 'Pengeluaran lainnya'),
+        ]
+        
+        for cat in default_income:
+            cur.execute('INSERT INTO categories (name, type, icon, color, description) VALUES (?, ?, ?, ?, ?)', cat)
+        for cat in default_expense:
+            cur.execute('INSERT INTO categories (name, type, icon, color, description) VALUES (?, ?, ?, ?, ?)', cat)
+        
+        db.commit()
+    cur.close()
+
+
+def get_all_categories(cat_type=None):
+    """Mendapatkan semua kategori, bisa filter berdasarkan tipe"""
+    ensure_categories_table()
+    if cat_type:
+        return query_db('SELECT * FROM categories WHERE type = ? AND is_active = 1 ORDER BY name ASC', (cat_type,))
+    return query_db('SELECT * FROM categories WHERE is_active = 1 ORDER BY type, name ASC')
+
+
+def get_all_categories_admin():
+    """Mendapatkan semua kategori untuk admin (termasuk yang tidak aktif)"""
+    ensure_categories_table()
+    return query_db('SELECT * FROM categories ORDER BY type, name ASC')
+
+
+def get_category(category_id):
+    """Mendapatkan detail kategori berdasarkan ID"""
+    ensure_categories_table()
+    return query_db('SELECT * FROM categories WHERE id = ?', (category_id,), one=True)
+
+
+def get_category_by_name(name, cat_type):
+    """Mendapatkan kategori berdasarkan nama dan tipe"""
+    ensure_categories_table()
+    return query_db('SELECT * FROM categories WHERE name = ? AND type = ?', (name, cat_type), one=True)
+
+
+def create_category(name, cat_type, icon='fa-tag', color='#6366f1', description=''):
+    """Membuat kategori baru"""
+    ensure_categories_table()
+    return execute_db('''
+        INSERT INTO categories (name, type, icon, color, description)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (name, cat_type, icon, color, description))
+
+
+def update_category(category_id, name, cat_type, icon, color, description, is_active=1):
+    """Update kategori"""
+    ensure_categories_table()
+    return execute_db('''
+        UPDATE categories 
+        SET name = ?, type = ?, icon = ?, color = ?, description = ?, is_active = ?
+        WHERE id = ?
+    ''', (name, cat_type, icon, color, description, is_active, category_id))
+
+
+def delete_category(category_id):
+    """Menghapus kategori (soft delete - set is_active = 0)"""
+    ensure_categories_table()
+    return execute_db('UPDATE categories SET is_active = 0 WHERE id = ?', (category_id,))
+
+
+def hard_delete_category(category_id):
+    """Menghapus kategori secara permanen"""
+    ensure_categories_table()
+    return execute_db('DELETE FROM categories WHERE id = ?', (category_id,))

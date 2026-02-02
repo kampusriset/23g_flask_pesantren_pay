@@ -4,7 +4,7 @@ Main Flask Application
 """
 from flask import Flask, render_template, session, redirect, url_for, g, request
 from flask_wtf.csrf import CSRFProtect
-from db import init_db, get_db, close_db, ensure_history_table
+from db import init_db, get_db, close_db, ensure_history_table, ensure_categories_table
 import locale
 import logging
 from logging.handlers import RotatingFileHandler
@@ -65,6 +65,11 @@ def init_app():
             ensure_transactions_bill_id_column()
         except Exception:
             pass
+        # Ensure categories table exists
+        try:
+            ensure_categories_table()
+        except Exception:
+            pass
         
     app.teardown_appcontext(close_db)
 
@@ -103,7 +108,7 @@ def format_date(date_string):
         return str(date_string)
 
 # Import routes setelah membuat app
-from routes import auth_bp, dashboard_bp, transaction_bp, statistics_bp, wallet_bp, settings_bp, students_bp, history_bp, create_home_routes, users_bp, payments_bp
+from routes import auth_bp, dashboard_bp, transaction_bp, statistics_bp, wallet_bp, settings_bp, students_bp, history_bp, create_home_routes, users_bp, payments_bp, categories_bp
 
 # Register blueprints
 app.register_blueprint(auth_bp)
@@ -116,6 +121,7 @@ app.register_blueprint(students_bp)
 app.register_blueprint(history_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(payments_bp)
+app.register_blueprint(categories_bp)
 
 # Create home routes
 create_home_routes(app)

@@ -142,16 +142,18 @@
                 <div class="flex-1 relative">
                   <input type="radio" name="type" id="type-income" value="income" class="peer hidden" required>
                   <label for="type-income"
-                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-emerald-400 peer-checked:to-emerald-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <i class="fas fa-arrow-down mr-2"></i> Pemasukan
+                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-emerald-400 peer-checked:to-emerald-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center gap-2">
+                    <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}" alt="Pemasukan"
+                      style="width: 20px; height: 16px;"> Pemasukan
                   </label>
                 </div>
                 <!-- Expense Option -->
                 <div class="flex-1 relative">
                   <input type="radio" name="type" id="type-expense" value="expense" class="peer hidden" required>
                   <label for="type-expense"
-                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-red-400 peer-checked:to-red-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <i class="fas fa-arrow-up mr-2"></i> Pengeluaran
+                    class="block text-center py-3 rounded-lg cursor-pointer font-semibold text-gray-500 transition-all duration-200 peer-checked:bg-gradient-to-br peer-checked:from-red-400 peer-checked:to-red-600 peer-checked:text-white peer-checked:shadow-lg hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center gap-2">
+                    <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}" alt="Pengeluaran"
+                      style="width: 20px; height: 16px;"> Pengeluaran
                   </label>
                 </div>
               </div>
@@ -170,21 +172,27 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Category Input -->
+              <!-- Category Dropdown -->
               <div class="col-span-1">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
-                <input type="text" name="category" list="categoryList" placeholder="Contoh: SPP, Sumbangan" required
-                  class="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                <datalist id="categoryList">
-                  <option value="SPP Santri">
-                  <option value="Uang Makan">
-                  <option value="Donasi">
-                  <option value="Gaji Guru">
-                  <option value="Listrik & Air">
-                  <option value="Belanja Dapur">
-                  <option value="Pembangunan">
-                  <option value="Operasional Kantor">
-                </datalist>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori <span
+                    class="text-danger">*</span></label>
+                <select name="category" id="categorySelect" required
+                  class="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                  <option value="">-- Pilih Kategori --</option>
+                  {% for cat in categories_income %}
+                  <option value="{{ cat.name }}" data-type="income" data-icon="{{ cat.icon }}"
+                    data-color="{{ cat.color }}">
+                    {{ cat.name }}
+                  </option>
+                  {% endfor %}
+                  {% for cat in categories_expense %}
+                  <option value="{{ cat.name }}" data-type="expense" data-icon="{{ cat.icon }}"
+                    data-color="{{ cat.color }}">
+                    {{ cat.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <small class="text-gray-400 dark:text-gray-500 mt-1 block">Pilih sesuai jenis transaksi</small>
               </div>
 
               <!-- Date Input -->
@@ -299,6 +307,22 @@
 
     // 3. Dynamic Theme Handling
     const radioInputs = document.querySelectorAll('input[name="type"]');
+    const categorySelect = document.getElementById('categorySelect');
+
+    function filterCategories(type) {
+      // Show/hide category options based on transaction type
+      const options = categorySelect.querySelectorAll('option');
+      categorySelect.value = ''; // Reset selection
+
+      options.forEach(opt => {
+        if (opt.value === '') {
+          opt.style.display = ''; // Always show placeholder
+        } else {
+          const optType = opt.dataset.type;
+          opt.style.display = optType === type ? '' : 'none';
+        }
+      });
+    }
 
     function updateTheme(type) {
       // Reset base classes
@@ -307,7 +331,7 @@
       if (type === 'income') {
         // Green / Emerald Theme
         submitBtn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-600', 'hover:from-emerald-400', 'hover:to-emerald-500', 'shadow-emerald-500/30', 'hover:shadow-emerald-500/50');
-        submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> <span>Simpan Pemasukan</span>';
+        submitBtn.innerHTML = '<img src="/static/images/icon_pemasukan.svg" alt="Pemasukan" style="width: 20px; height: 16px;"> <span>Simpan Pemasukan</span>';
 
         cardBottomBar.className = "h-1.5 w-full bg-emerald-500 transition-colors duration-500";
 
@@ -318,7 +342,7 @@
       } else if (type === 'expense') {
         // Red Theme
         submitBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-red-600', 'hover:from-red-400', 'hover:to-red-500', 'shadow-red-500/30', 'hover:shadow-red-500/50');
-        submitBtn.innerHTML = '<i class="fas fa-minus-circle"></i> <span>Simpan Pengeluaran</span>';
+        submitBtn.innerHTML = '<img src="/static/images/icon_pengeluaran.svg" alt="Pengeluaran" style="width: 20px; height: 16px;"> <span>Simpan Pengeluaran</span>';
 
         cardBottomBar.className = "h-1.5 w-full bg-red-500 transition-colors duration-500";
 
@@ -326,6 +350,9 @@
         amountDisplay.classList.remove('focus:border-b-emerald-500');
         amountDisplay.classList.add('focus:border-b-red-500');
       }
+
+      // Filter categories based on type
+      filterCategories(type);
     }
 
     radioInputs.forEach(input => {

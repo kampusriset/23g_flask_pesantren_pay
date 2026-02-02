@@ -6,7 +6,8 @@ from db import (query_db, execute_db, get_dashboard_stats, get_monthly_stats, ge
                 get_all_students, get_student, get_student_payments, get_student_payment_stats,
                 add_student, update_student, delete_student, record_history, get_history,
                 get_all_users, get_user, create_user, update_user, delete_user, set_user_password, get_user_by_username,
-                get_all_bills, create_bill, get_bill, update_bill, delete_bill, mark_bill_paid, get_student_unpaid_amount, get_bill_stats_by_class)
+                get_all_bills, create_bill, get_bill, update_bill, delete_bill, mark_bill_paid, get_student_unpaid_amount, get_bill_stats_by_class,
+                get_all_categories, get_all_categories_admin, get_category, create_category, update_category, delete_category, ensure_categories_table)
 from werkzeug.security import check_password_hash
 from datetime import datetime, timedelta
 import json
@@ -261,7 +262,18 @@ def add():
     # Convert sqlite3.Row to plain dicts so templates render cleanly (avoid printing Row repr)
     students = [dict(s) for s in students] if students else []
 
-    return render_template('add_transaction.html', students=students)
+    # Get categories from database
+    today = datetime.now().strftime('%Y-%m-%d')
+    categories_income = get_all_categories('income')
+    categories_expense = get_all_categories('expense')
+    categories_income = [dict(c) for c in categories_income] if categories_income else []
+    categories_expense = [dict(c) for c in categories_expense] if categories_expense else []
+
+    return render_template('add_transaction.html', 
+                           students=students, 
+                           today=today,
+                           categories_income=categories_income,
+                           categories_expense=categories_expense)
 
 
 @transaction_bp.route('/export-excel')
@@ -428,7 +440,17 @@ def edit(id):
     students = get_all_students()
     students = [dict(s) for s in students] if students else []
 
-    return render_template('edit_transaction.html', transaction=trans, students=students)
+    # Get categories from database
+    categories_income = get_all_categories('income')
+    categories_expense = get_all_categories('expense')
+    categories_income = [dict(c) for c in categories_income] if categories_income else []
+    categories_expense = [dict(c) for c in categories_expense] if categories_expense else []
+
+    return render_template('edit_transaction.html', 
+                           transaction=trans, 
+                           students=students,
+                           categories_income=categories_income,
+                           categories_expense=categories_expense)
 
 @transaction_bp.route('/delete/<int:id>')
 def delete(id):
@@ -654,12 +676,17 @@ def update_profile():
     """Update profil user"""
     user_id = session.get('user_id', 1)
 
-    full_name = request.form.get('full_name')
-    email = request.form.get('email')
-    username = request.form.get('username')
-    current_password = request.form.get('current_password')
-    new_password = request.form.get('new_password')
-    confirm_password = request.form.get('confirm_password')
+    full_name = request.form.get('full_name', '').strip()
+    email = request.form.get('email', '').strip()
+    username = request.form.get('username', '').strip()
+    current_password = request.form.get('current_password', '')
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    # Validasi input dasar
+    if not username:
+        flash('Username tidak boleh kosong', 'danger')
+        return redirect(url_for('settings.index'))
 
     # Validasi username unik (kecuali untuk user sendiri)
     existing_user = get_user_by_username(username)
@@ -670,7 +697,7 @@ def update_profile():
     # Validasi password jika diisi
     if new_password:
         if not current_password:
-            
+            flash('Masukkan password lama untuk mengubah password', 'danger')
             return redirect(url_for('settings.index'))
         
         user = get_user(user_id)
@@ -683,47 +710,78 @@ def update_profile():
             return redirect(url_for('settings.index'))
         
         if len(new_password) < 6:
-            
+            flash('Password baru minimal 6 karakter', 'danger')
             return redirect(url_for('settings.index'))
 
     # Update basic fields
-    execute_db(
-        'UPDATE users SET username = ?, full_name = ?, email = ? WHERE id = ?',
-        (username, full_name, email, user_id)
-    )
+    try:
+        execute_db(
+            'UPDATE users SET username = ?, full_name = ?, email = ? WHERE id = ?',
+            (username, full_name, email, user_id)
+        )
+    except Exception as e:
+        flash(f'Gagal memperbarui profil: {str(e)}', 'danger')
+        return redirect(url_for('settings.index'))
     
     # Update password jika diisi
     if new_password:
-        set_user_password(user_id, new_password)
-        flash('Password berhasil diubah', 'success')
-        
+        try:
+            set_user_password(user_id, new_password)
+            flash('Password berhasil diubah', 'success')
+        except Exception as e:
+            flash(f'Gagal mengubah password: {str(e)}', 'danger')
+            
     # Handle profile picture upload (optional)
     if 'profile_picture' in request.files:
         file = request.files['profile_picture']
-        if file and file.filename:
+        if file and file.filename and file.filename.strip() != '':
             filename = secure_filename(file.filename)
             ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
-            allowed = {'png', 'jpg', 'jpeg', 'gif'}
-            if ext in allowed:
+            allowed = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            
+            if ext not in allowed:
+                flash('Format file tidak didukung. Gunakan PNG, JPG, JPEG, GIF, atau WebP.', 'danger')
+            else:
                 try:
                     # Use current_app.root_path for correct path
                     upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
                     if not os.path.exists(upload_dir):
                         os.makedirs(upload_dir, exist_ok=True)
-                    new_name = f"user_{user_id}_{int(datetime.now().timestamp())}.{ext}"
+                    
+                    # Generate unique filename with timestamp
+                    timestamp = int(datetime.now().timestamp())
+                    new_name = f"user_{user_id}_{timestamp}.{ext}"
                     save_path = os.path.join(upload_dir, new_name)
+                    
+                    # Delete old profile picture if exists
+                    user = get_user(user_id)
+                    if user and user['profile_picture']:
+                        old_path = os.path.join(current_app.root_path, 'static', user['profile_picture'])
+                        if os.path.exists(old_path):
+                            try:
+                                os.remove(old_path)
+                            except Exception:
+                                pass  # Ignore deletion errors
+                    
+                    # Save new file
                     file.save(save_path)
+                    
                     # Store relative path under static (e.g. uploads/filename)
                     picture_db_path = f"uploads/{new_name}"
                     update_user_profile_picture(user_id, picture_db_path)
+                    
+                    # Update session with new picture and timestamp for cache busting
                     session['profile_picture'] = picture_db_path
+                    session['profile_picture_timestamp'] = timestamp
+                    
                     flash('Foto profil berhasil diperbarui', 'success')
                 except Exception as e:
+                    current_app.logger.error(f"Profile picture upload error: {str(e)}")
                     flash(f'Gagal mengupload foto profil: {str(e)}', 'danger')
-            else:
-                flash('Format file tidak didukung. Gunakan PNG, JPG, JPEG, atau GIF.', 'danger')
                 
+    # Update session with new values
     session['full_name'] = full_name
+    session['username'] = username
 
     try:
         record_history(user_id, 'update', 'user', user_id, full_name)
@@ -1522,3 +1580,149 @@ def bill_receipt(bill_id):
         return redirect(url_for('payments.index_payments'))
 
 
+# ===== CATEGORY MANAGEMENT BLUEPRINT =====
+categories_bp = Blueprint('categories', __name__, url_prefix='/categories')
+
+
+@categories_bp.route('/')
+def index():
+    """Halaman daftar kategori"""
+    if session.get('role') not in ['admin', 'staff']:
+        flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    ensure_categories_table()
+    categories = get_all_categories_admin()
+    # Convert to list of dicts
+    categories = [dict(c) for c in categories] if categories else []
+    
+    return render_template('categories.html', categories=categories)
+
+
+@categories_bp.route('/add', methods=['GET', 'POST'])
+def add():
+    """Tambah kategori baru"""
+    if session.get('role') not in ['admin', 'staff']:
+        flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        cat_type = request.form.get('type', 'income')
+        icon = request.form.get('icon', 'fa-tag')
+        color = request.form.get('color', '#6366f1')
+        description = request.form.get('description', '')
+        
+        if not name:
+            flash('Nama kategori harus diisi', 'danger')
+            return redirect(url_for('categories.add'))
+        
+        try:
+            new_id = create_category(name, cat_type, icon, color, description)
+            record_history(session.get('user_id'), 'create', 'category', new_id, name)
+            flash(f'Kategori "{name}" berhasil ditambahkan', 'success')
+            return redirect(url_for('categories.index'))
+        except Exception as e:
+            flash(f'Gagal menambahkan kategori: {str(e)}', 'danger')
+            return redirect(url_for('categories.add'))
+    
+    return render_template('category_form.html', category=None, action='add')
+
+
+@categories_bp.route('/edit/<int:category_id>', methods=['GET', 'POST'])
+def edit(category_id):
+    """Edit kategori"""
+    if session.get('role') not in ['admin', 'staff']:
+        flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    category = get_category(category_id)
+    if not category:
+        flash('Kategori tidak ditemukan', 'danger')
+        return redirect(url_for('categories.index'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        cat_type = request.form.get('type', 'income')
+        icon = request.form.get('icon', 'fa-tag')
+        color = request.form.get('color', '#6366f1')
+        description = request.form.get('description', '')
+        is_active = 1 if request.form.get('is_active') else 0
+        
+        if not name:
+            flash('Nama kategori harus diisi', 'danger')
+            return redirect(url_for('categories.edit', category_id=category_id))
+        
+        try:
+            update_category(category_id, name, cat_type, icon, color, description, is_active)
+            record_history(session.get('user_id'), 'update', 'category', category_id, name)
+            flash(f'Kategori "{name}" berhasil diperbarui', 'success')
+            return redirect(url_for('categories.index'))
+        except Exception as e:
+            flash(f'Gagal memperbarui kategori: {str(e)}', 'danger')
+            return redirect(url_for('categories.edit', category_id=category_id))
+    
+    category = dict(category)
+    return render_template('category_form.html', category=category, action='edit')
+
+
+@categories_bp.route('/delete/<int:category_id>')
+def delete(category_id):
+    """Hapus kategori (soft delete)"""
+    if session.get('role') not in ['admin', 'staff']:
+        flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    category = get_category(category_id)
+    if not category:
+        flash('Kategori tidak ditemukan', 'danger')
+        return redirect(url_for('categories.index'))
+    
+    try:
+        delete_category(category_id)
+        record_history(session.get('user_id'), 'delete', 'category', category_id, category['name'])
+        flash(f'Kategori "{category["name"]}" berhasil dihapus', 'success')
+    except Exception as e:
+        flash(f'Gagal menghapus kategori: {str(e)}', 'danger')
+    
+    return redirect(url_for('categories.index'))
+
+
+@categories_bp.route('/api/list')
+def api_list():
+    """API endpoint untuk mengambil daftar kategori"""
+    cat_type = request.args.get('type', None)
+    categories = get_all_categories(cat_type)
+    categories = [dict(c) for c in categories] if categories else []
+    return jsonify(categories)
+
+
+@categories_bp.route('/toggle/<int:category_id>')
+def toggle_active(category_id):
+    """Toggle status aktif/nonaktif kategori"""
+    if session.get('role') not in ['admin', 'staff']:
+        flash('Anda tidak memiliki akses ke halaman ini', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    category = get_category(category_id)
+    if not category:
+        flash('Kategori tidak ditemukan', 'danger')
+        return redirect(url_for('categories.index'))
+    
+    new_status = 0 if category['is_active'] else 1
+    try:
+        update_category(
+            category_id, 
+            category['name'], 
+            category['type'], 
+            category['icon'], 
+            category['color'], 
+            category['description'], 
+            new_status
+        )
+        status_text = 'diaktifkan' if new_status else 'dinonaktifkan'
+        flash(f'Kategori "{category["name"]}" berhasil {status_text}', 'success')
+    except Exception as e:
+        flash(f'Gagal mengubah status kategori: {str(e)}', 'danger')
+    
+    return redirect(url_for('categories.index'))

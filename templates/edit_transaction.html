@@ -1,42 +1,146 @@
 {% extends 'base.html' %}
 
 {% block title %}Edit Transaksi - PonPay{% endblock %}
-{% block page_title %}Edit Transaksi{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center gap-3">
+    <a href="{{ url_for('transaction.index') }}" class="btn btn-light btn-sm rounded-circle shadow-sm">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <div>
+        <h5 class="mb-0 fw-bold">Edit Transaksi</h5>
+        <small class="text-muted">Perbarui data transaksi</small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .type-toggle {
+        display: flex;
+        gap: 1rem;
+        padding: 0.5rem;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+    }
+
+    .type-option {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .type-option:hover {
+        background: var(--bg-card);
+    }
+
+    .type-option.income-selected {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+        color: #10b981;
+    }
+
+    .type-option.expense-selected {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    .type-option input {
+        display: none;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6" id="transactionPage">
-    <div class="d-flex justify-content-center">
-        <div style="width:100%;max-width:760px;">
-            <div class="form-card card">
-                <div class="card-header">
-                    <h6 class="card-title">Form Edit Transaksi</h6>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="card-title mb-0 fw-bold">Form Edit Transaksi</h6>
                 </div>
-                <div class="card-body">
-                    <form method="POST">
+                <div class="card-body p-4">
+                    <form method="POST" id="editTransactionForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Jenis Transaksi</label>
-                            <select class="form-select" name="type" id="transType" required>
-                                <option value="income" {% if transaction['type'] == 'income' %}selected{% endif %}>Pemasukan</option>
-                                <option value="expense" {% if transaction['type'] == 'expense' %}selected{% endif %}>Pengeluaran</option>
+                        <!-- Jenis Transaksi -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Jenis Transaksi <span
+                                    class="text-danger">*</span></label>
+                            <div class="type-toggle">
+                                <label class="type-option {{ 'income-selected' if transaction['type'] == 'income' }}"
+                                    id="incomeLabel">
+                                    <input type="radio" name="type" value="income" {{ 'checked' if
+                                        transaction['type']=='income' }} required>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}"
+                                            alt="Pemasukan" style="width: 28px; height: 22px;">
+                                        <span class="fw-bold">Pemasukan</span>
+                                    </div>
+                                </label>
+                                <label class="type-option {{ 'expense-selected' if transaction['type'] == 'expense' }}"
+                                    id="expenseLabel">
+                                    <input type="radio" name="type" value="expense" {{ 'checked' if
+                                        transaction['type']=='expense' }} required>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}"
+                                            alt="Pengeluaran" style="width: 28px; height: 22px;">
+                                        <span class="fw-bold">Pengeluaran</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Kategori Dropdown -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-lg" name="category" id="categorySelect" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                {% for cat in categories_income %}
+                                <option value="{{ cat.name }}" data-type="income" data-icon="{{ cat.icon }}"
+                                    data-color="{{ cat.color }}" {{ 'selected' if transaction['category']==cat.name and
+                                    transaction['type']=='income' }}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                                {% for cat in categories_expense %}
+                                <option value="{{ cat.name }}" data-type="expense" data-icon="{{ cat.icon }}"
+                                    data-color="{{ cat.color }}" {{ 'selected' if transaction['category']==cat.name and
+                                    transaction['type']=='expense' }}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                                <!-- Add current category if not in list -->
+                                {% set cat_exists = false %}
+                                {% for cat in categories_income %}
+                                {% if cat.name == transaction['category'] %}{% set cat_exists = true %}{% endif %}
+                                {% endfor %}
+                                {% for cat in categories_expense %}
+                                {% if cat.name == transaction['category'] %}{% set cat_exists = true %}{% endif %}
+                                {% endfor %}
+                                {% if not cat_exists and transaction['category'] %}
+                                <option value="{{ transaction['category'] }}" selected
+                                    data-type="{{ transaction['type'] }}">
+                                    {{ transaction['category'] }} (Kategori lama)
+                                </option>
+                                {% endif %}
                             </select>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Kategori</label>
-                            <select class="form-select" name="category" id="category" required>
-                                <option value="{{ transaction['category'] }}" selected>{{ transaction['category'] }}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Santri <small class="text-muted">(Opsional, jika pembayaran santri)</small></label>
+                        <!-- Santri -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Santri <span
+                                    class="text-muted fw-normal">(Opsional)</span></label>
                             <select class="form-select" name="student_id" id="student_id">
                                 <option value="">-- Tidak ada santri --</option>
                                 {% if students %}
                                 {% for student in students %}
-                                <option value="{{ student['id'] }}" {% if transaction.get('student_id') == student['id'] %}selected{% endif %}>
+                                <option value="{{ student['id'] }}" {% if transaction.get('student_id')==student['id']
+                                    %}selected{% endif %}>
                                     {{ student['name'] }} ({{ student['nisn'] }})
                                 </option>
                                 {% endfor %}
@@ -44,28 +148,40 @@
                             </select>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Nominal (Rupiah)</label>
-                            <input type="number" class="form-control" name="amount" value="{{ transaction['amount'] }}" min="0" required>
+                        <!-- Nominal -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Nominal (Rupiah) <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light fw-bold text-primary">Rp</span>
+                                <input type="number" class="form-control" name="amount"
+                                    value="{{ transaction['amount'] }}" min="0" required>
+                            </div>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Keterangan</label>
-                            <textarea class="form-control" name="description" rows="3">{{ transaction['description'] }}</textarea>
+                        <!-- Keterangan -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Keterangan</label>
+                            <textarea class="form-control" name="description" rows="3"
+                                placeholder="Tambahkan catatan transaksi...">{{ transaction['description'] }}</textarea>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Tanggal</label>
-                            <input type="date" class="form-control" name="date" value="{{ transaction['date'] }}" required>
+                        <!-- Tanggal -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control form-control-lg" name="date"
+                                value="{{ transaction['date'] }}" required>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save"></i> Simpan Perubahan
-                            </button>
-                            <a href="{{ url_for('transaction.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Batal
+                        <!-- Action Buttons -->
+                        <hr class="my-4">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="{{ url_for('transaction.index') }}" class="btn btn-light px-4">
+                                <i class="fas fa-times me-2"></i>Batal
                             </a>
+                            <button type="submit" class="btn btn-success px-4" id="submitBtn">
+                                <i class="fas fa-save me-2"></i>Simpan Perubahan
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -77,25 +193,62 @@
 
 {% block extra_js %}
 <script>
-    const incomeCategories = ['Pembayaran Santri', 'Donasi', 'Subsidi Pemerintah', 'Lainnya'];
-    const expenseCategories = ['Pembelian Kebutuhan', 'Gaji Pengajar', 'Perbaikan Bangunan', 'Listrik & Air', 'Operasional'];
+    document.addEventListener('DOMContentLoaded', function () {
+        const incomeLabel = document.getElementById('incomeLabel');
+        const expenseLabel = document.getElementById('expenseLabel');
+        const typeInputs = document.querySelectorAll('input[name="type"]');
+        const categorySelect = document.getElementById('categorySelect');
+        const currentCategory = '{{ transaction["category"] }}';
+        const currentType = '{{ transaction["type"] }}';
 
-    function updateCategories() {
-        const categorySelect = document.getElementById('category');
-        const currentValue = categorySelect.value;
-        categorySelect.innerHTML = '';
-        
-        const categories = document.getElementById('transType').value === 'income' ? incomeCategories : expenseCategories;
-        categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            if (cat === currentValue) option.selected = true;
-            categorySelect.appendChild(option);
+        function filterCategories(type) {
+            const options = categorySelect.querySelectorAll('option');
+            let hasSelected = false;
+
+            options.forEach(opt => {
+                if (opt.value === '') {
+                    opt.style.display = '';
+                } else {
+                    const optType = opt.dataset.type;
+                    if (optType === type) {
+                        opt.style.display = '';
+                        // Select current category if it matches
+                        if (opt.value === currentCategory) {
+                            opt.selected = true;
+                            hasSelected = true;
+                        }
+                    } else {
+                        opt.style.display = 'none';
+                        if (opt.selected) opt.selected = false;
+                    }
+                }
+            });
+
+            // If no selection, reset to placeholder
+            if (!hasSelected && categorySelect.value !== currentCategory) {
+                categorySelect.value = '';
+            }
+        }
+
+        function updateTypeUI(type) {
+            if (type === 'income') {
+                incomeLabel.classList.add('income-selected');
+                expenseLabel.classList.remove('expense-selected');
+            } else {
+                expenseLabel.classList.add('expense-selected');
+                incomeLabel.classList.remove('income-selected');
+            }
+            filterCategories(type);
+        }
+
+        typeInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                updateTypeUI(this.value);
+            });
         });
-    }
 
-    document.getElementById('transType').addEventListener('change', updateCategories);
-    updateCategories();
+        // Initial filter
+        filterCategories(currentType);
+    });
 </script>
 {% endblock %}

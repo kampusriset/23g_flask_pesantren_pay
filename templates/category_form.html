@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Edit' if action == 'edit' else 'Tambah' }} Kategori - PonPay{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center gap-3">
+    <a href="{{ url_for('categories.index') }}" class="btn btn-light btn-sm rounded-circle shadow-sm">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <div>
+        <h5 class="mb-0 fw-bold">{{ 'Edit' if action == 'edit' else 'Tambah' }} Kategori</h5>
+        <small class="text-muted">{{ 'Perbarui data kategori' if action == 'edit' else 'Buat kategori baru' }}</small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .icon-picker {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+    }
+
+    .icon-option {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        background: var(--bg-card);
+    }
+
+    .icon-option:hover {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .icon-option.selected {
+        border-color: var(--color-primary);
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .color-picker-wrapper {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .color-option {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .color-option:hover {
+        transform: scale(1.15);
+    }
+
+    .color-option.selected {
+        border-color: var(--text-primary);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+    }
+
+    .preview-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .preview-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" id="categoryForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="row">
+                            <!-- Form Fields -->
+                            <div class="col-md-7">
+                                <!-- Nama Kategori -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Nama Kategori <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control form-control-lg"
+                                        placeholder="Contoh: SPP Santri, Gaji Guru"
+                                        value="{{ category.name if category else '' }}" required>
+                                </div>
+
+                                <!-- Tipe Kategori -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Tipe Kategori <span
+                                            class="text-danger">*</span></label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check form-check-inline flex-fill">
+                                            <input class="form-check-input" type="radio" name="type" id="typeIncome"
+                                                value="income" {{ 'checked' if not category or category.type=='income'
+                                                }}>
+                                            <label class="form-check-label d-flex align-items-center gap-2"
+                                                for="typeIncome">
+                                                <span
+                                                    class="badge bg-success rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                                                    <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}"
+                                                        alt="Pemasukan" style="width: 18px; height: 14px;"> Pemasukan
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline flex-fill">
+                                            <input class="form-check-input" type="radio" name="type" id="typeExpense"
+                                                value="expense" {{ 'checked' if category and category.type=='expense'
+                                                }}>
+                                            <label class="form-check-label d-flex align-items-center gap-2"
+                                                for="typeExpense">
+                                                <span
+                                                    class="badge bg-danger rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                                                    <img src="{{ url_for('static', filename='images/icon_pengeluaran.svg') }}"
+                                                        alt="Pengeluaran" style="width: 18px; height: 14px;">
+                                                    Pengeluaran
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pilih Icon -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Pilih Icon</label>
+                                    <input type="hidden" name="icon" id="selectedIcon"
+                                        value="{{ category.icon if category else 'fa-tag' }}">
+                                    <div class="icon-picker" id="iconPicker">
+                                        {% set icons = [
+                                        'fa-tag', 'fa-graduation-cap', 'fa-utensils', 'fa-hand-holding-heart',
+                                        'fa-university', 'fa-mosque', 'fa-plus-circle', 'fa-minus-circle',
+                                        'fa-chalkboard-teacher', 'fa-bolt', 'fa-shopping-cart', 'fa-hammer',
+                                        'fa-briefcase', 'fa-tools', 'fa-money-bill', 'fa-wallet',
+                                        'fa-book', 'fa-bus', 'fa-hospital', 'fa-home',
+                                        'fa-phone', 'fa-laptop', 'fa-print', 'fa-gift',
+                                        'fa-chart-line', 'fa-users', 'fa-building', 'fa-car',
+                                        'fa-plane', 'fa-bed', 'fa-coffee', 'fa-tshirt'
+                                        ] %}
+                                        {% for icon in icons %}
+                                        <div class="icon-option {{ 'selected' if (category and category.icon == icon) or (not category and icon == 'fa-tag') }}"
+                                            data-icon="{{ icon }}">
+                                            <i class="fas {{ icon }}"></i>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Pilih Warna -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Pilih Warna</label>
+                                    <input type="hidden" name="color" id="selectedColor"
+                                        value="{{ category.color if category else '#6366f1' }}">
+                                    <div class="color-picker-wrapper" id="colorPicker">
+                                        {% set colors = [
+                                        '#10b981', '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+                                        '#8b5cf6',
+                                        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#f43f5e', '#ec4899',
+                                        '#dc2626'
+                                        ] %}
+                                        {% for color in colors %}
+                                        <div class="color-option {{ 'selected' if (category and category.color == color) or (not category and color == '#6366f1') }}"
+                                            data-color="{{ color }}" style="background-color: {{ color }};"></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Deskripsi -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Deskripsi <span
+                                            class="text-muted">(Opsional)</span></label>
+                                    <textarea name="description" class="form-control" rows="2"
+                                        placeholder="Keterangan singkat tentang kategori ini">{{ category.description if category else '' }}</textarea>
+                                </div>
+
+                                {% if action == 'edit' %}
+                                <!-- Status Aktif -->
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_active" id="isActive"
+                                            {{ 'checked' if category and category.is_active }}>
+                                        <label class="form-check-label fw-semibold" for="isActive">Kategori
+                                            Aktif</label>
+                                    </div>
+                                    <small class="text-muted">Kategori nonaktif tidak muncul di form transaksi</small>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Preview -->
+                            <div class="col-md-5">
+                                <div class="preview-card sticky-top" style="top: 20px;">
+                                    <h6 class="text-muted mb-3 text-uppercase small fw-bold">Preview</h6>
+                                    <div class="preview-icon" id="previewIcon"
+                                        style="background-color: #6366f120; color: #6366f1;">
+                                        <i class="fas fa-tag"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2" id="previewName">Nama Kategori</h5>
+                                    <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1"
+                                        id="previewType" style="background-color: #10b981;">
+                                        <img src="{{ url_for('static', filename='images/icon_pemasukan.svg') }}"
+                                            alt="Pemasukan" style="width: 18px; height: 14px;"> Pemasukan
+                                    </span>
+                                    <p class="text-muted mt-3 small mb-0" id="previewDesc">Deskripsi kategori akan
+                                        muncul di sini</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('categories.index') }}" class="btn btn-light px-4">
+                                <i class="fas fa-times me-2"></i>Batal
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fas fa-save me-2"></i>{{ 'Simpan Perubahan' if action == 'edit' else 'Simpan
+                                Kategori' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const iconPicker = document.getElementById('iconPicker');
+        const colorPicker = document.getElementById('colorPicker');
+        const selectedIcon = document.getElementById('selectedIcon');
+        const selectedColor = document.getElementById('selectedColor');
+        const previewIcon = document.getElementById('previewIcon');
+        const previewName = document.getElementById('previewName');
+        const previewType = document.getElementById('previewType');
+        const previewDesc = document.getElementById('previewDesc');
+        const nameInput = document.querySelector('input[name="name"]');
+        const descInput = document.querySelector('textarea[name="description"]');
+        const typeInputs = document.querySelectorAll('input[name="type"]');
+
+        // Icon selection
+        iconPicker.querySelectorAll('.icon-option').forEach(opt => {
+            opt.addEventListener('click', function () {
+                iconPicker.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedIcon.value = this.dataset.icon;
+                updatePreview();
+            });
+        });
+
+        // Color selection
+        colorPicker.querySelectorAll('.color-option').forEach(opt => {
+            opt.addEventListener('click', function () {
+                colorPicker.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColor.value = this.dataset.color;
+                updatePreview();
+            });
+        });
+
+        // Name input
+        nameInput.addEventListener('input', updatePreview);
+        descInput.addEventListener('input', updatePreview);
+        typeInputs.forEach(input => input.addEventListener('change', updatePreview));
+
+        function updatePreview() {
+            const icon = selectedIcon.value;
+            const color = selectedColor.value;
+            const name = nameInput.value || 'Nama Kategori';
+            const desc = descInput.value || 'Deskripsi kategori akan muncul di sini';
+            const type = document.querySelector('input[name="type"]:checked').value;
+
+            previewIcon.style.backgroundColor = color + '20';
+            previewIcon.style.color = color;
+            previewIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+            previewName.textContent = name;
+            previewDesc.textContent = desc;
+
+            if (type === 'income') {
+                previewType.style.backgroundColor = '#10b981';
+                previewType.innerHTML = '<img src="/static/images/icon_pemasukan.svg" alt="Pemasukan" style="width: 18px; height: 14px;"> Pemasukan';
+            } else {
+                previewType.style.backgroundColor = '#ef4444';
+                previewType.innerHTML = '<img src="/static/images/icon_pengeluaran.svg" alt="Pengeluaran" style="width: 18px; height: 14px;"> Pengeluaran';
+            }
+        }
+
+        // Initial preview
+        updatePreview();
+    });
+</script>
+{% endblock %}

@@ -25,9 +25,17 @@
         box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
     }
 
-    .gradient-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
-    .gradient-success { background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); }
-    .gradient-danger { background: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%); }
+    .gradient-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    }
+
+    .gradient-success {
+        background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    }
+
+    .gradient-danger {
+        background: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%);
+    }
 
     .summary-card {
         position: relative;
@@ -64,13 +72,14 @@
         margin: 0 auto 1.5rem;
     }
 
-    .profile-photo-wrapper img, .profile-initial-wrapper {
+    .profile-photo-wrapper img,
+    .profile-initial-wrapper {
         width: 100%;
         height: 100%;
         object-fit: cover;
         border-radius: 2.5rem;
         border: 4px solid #f8fafc;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
 
     .profile-initial-wrapper {
@@ -91,7 +100,9 @@
         font-size: 0.95rem;
     }
 
-    .info-list-item:last-child { border-bottom: none; }
+    .info-list-item:last-child {
+        border-bottom: none;
+    }
 
     .animate-in {
         animation: fadeInUp 0.6s ease-out forwards;
@@ -99,13 +110,28 @@
     }
 
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .stagger-1 { animation-delay: 0.1s; }
-    .stagger-2 { animation-delay: 0.2s; }
-    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-1 {
+        animation-delay: 0.1s;
+    }
+
+    .stagger-2 {
+        animation-delay: 0.2s;
+    }
+
+    .stagger-3 {
+        animation-delay: 0.3s;
+    }
 </style>
 {% endblock %}
 
@@ -134,18 +160,19 @@
             <div class="profile-sidebar text-center">
                 <div class="profile-photo-wrapper">
                     {% if student.photo %}
-                        <img src="{{ url_for('static', filename=student.photo) }}" alt="{{ student.name }}">
+                    <img src="{{ url_for('static', filename=student.photo) }}" alt="{{ student.name }}">
                     {% else %}
-                        <div class="profile-initial-wrapper">{{ student.name[0] }}</div>
+                    <div class="profile-initial-wrapper">{{ student.name[0] }}</div>
                     {% endif %}
                 </div>
                 <h4 class="fw-bold mb-1 text-gray-900">{{ student.name }}</h4>
                 <p class="text-primary fw-medium mb-4">{{ student.kelas }}</p>
-                
+
                 <div class="info-list text-start">
                     <div class="info-list-item">
                         <span class="text-muted"><i class="fas fa-shield-alt me-2"></i>Status</span>
-                        <span class="badge {% if student.status == 'aktif' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %} rounded-pill px-3">
+                        <span
+                            class="badge {% if student.status == 'aktif' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %} rounded-pill px-3">
                             {{ student.status|upper }}
                         </span>
                     </div>
@@ -159,7 +186,8 @@
                     </div>
                     <div class="info-list-item border-0">
                         <span class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Alamat</span>
-                        <span class="text-end text-gray-600 truncate-2 d-inline-block" style="max-width: 150px;">{{ student.alamat }}</span>
+                        <span class="text-end text-gray-600 truncate-2 d-inline-block" style="max-width: 150px;">{{
+                            student.alamat }}</span>
                     </div>
                 </div>
             </div>
@@ -201,7 +229,8 @@
 
             <!-- Bills Detail Table -->
             <div class="card glass-card animate-in stagger-3">
-                <div class="card-header bg-transparent py-4 px-4 d-flex justify-content-between align-items-center border-0">
+                <div
+                    class="card-header bg-transparent py-4 px-4 d-flex justify-content-between align-items-center border-0">
                     <h5 class="fw-bold mb-0 text-gray-800">Rincian Tagihan Spesifik</h5>
                     <span class="badge bg-primary rounded-pill px-3 py-2">{{ bills|length }} Item</span>
                 </div>
@@ -226,42 +255,62 @@
                                     <td class="ps-4">{{ loop.index }}</td>
                                     <td>
                                         <div class="fw-bold text-gray-800">{{ b.title }}</div>
-                                        <div class="text-muted smaller"><i class="far fa-clock me-1"></i>{{ b.created_at[:10] }}</div>
+                                        <div class="text-muted smaller"><i class="far fa-clock me-1"></i>{{
+                                            b.created_at[:10] }}</div>
                                     </td>
                                     <td class="text-end fw-medium">{{ b.amount|rupiah }}</td>
-                                    <td class="text-end text-emerald-600 fw-medium">{{ b.paid_amount|rupiah }}</td>
-                                    <td class="text-end text-rose-600 fw-bold">{{ rem|rupiah }}</td>
+                                    <td class="text-end fw-medium">
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1 small"></i>{{ b.paid_amount|rupiah }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold">
+                                        {% if rem == 0 %}
+                                        <span class="badge bg-success text-white px-3 py-2">
+                                            <i class="fas fa-check me-1"></i>Lunas
+                                        </span>
+                                        {% elif rem > 0 and b.paid_amount > 0 %}
+                                        <span class="badge px-3 py-2"
+                                            style="background-color: #fef3c7; color: #d97706;">
+                                            <i class="fas fa-clock me-1"></i>{{ rem|rupiah }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge px-3 py-2"
+                                            style="background-color: #fee2e2; color: #dc2626;">
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ rem|rupiah }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
                                     <td class="text-center">
                                         {% if b.status == 'paid' %}
-                                            <span class="badge bg-emerald-100 text-emerald-700 rounded-pill px-3">LUNAS</span>
+                                        <span
+                                            class="badge bg-emerald-100 text-emerald-700 rounded-pill px-3">LUNAS</span>
                                         {% elif b.paid_amount > 0 %}
-                                            <span class="badge bg-sky-100 text-sky-700 rounded-pill px-3">CICILAN</span>
+                                        <span class="badge bg-sky-100 text-sky-700 rounded-pill px-3">CICILAN</span>
                                         {% else %}
-                                            <span class="badge bg-amber-100 text-amber-700 rounded-pill px-3">BELUM BAYAR</span>
+                                        <span class="badge bg-amber-100 text-amber-700 rounded-pill px-3">BELUM
+                                            BAYAR</span>
                                         {% endif %}
                                     </td>
                                     <td class="pe-4 text-center">
                                         <div class="btn-group shadow-sm rounded-pill overflow-hidden">
                                             {% if b.status != 'paid' %}
-                                                <button type="button" class="btn btn-emerald btn-sm px-3 btn-pay" 
-                                                        data-bill-id="{{ b.id }}" 
-                                                        data-bill-title="{{ b.title }}" 
-                                                        data-bill-remaining="{{ rem }}"
-                                                        data-student-name="{{ student.name }}">
-                                                    <i class="fas fa-coins me-1"></i> Bayar
-                                                </button>
-                                            {% endif %}
-                                            
-                                            {% if b.paid_amount > 0 %}
-                                                <a href="{{ url_for('payments.bill_receipt', bill_id=b.id) }}" 
-                                                   class="btn btn-sky btn-sm px-3" 
-                                                   target="_blank" title="Cetak Kuitansi">
-                                                    <i class="fas fa-print"></i>
-                                                </a>
+                                            <button type="button" class="btn btn-emerald btn-sm px-3 btn-pay"
+                                                data-bill-id="{{ b.id }}" data-bill-title="{{ b.title }}"
+                                                data-bill-remaining="{{ rem }}" data-student-name="{{ student.name }}">
+                                                <i class="fas fa-coins me-1"></i> Bayar
+                                            </button>
                                             {% endif %}
 
-                                            <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}" 
-                                               class="btn btn-light btn-sm px-3 border-start" title="Edit">
+                                            {% if b.paid_amount > 0 %}
+                                            <a href="{{ url_for('payments.bill_receipt', bill_id=b.id) }}"
+                                                class="btn btn-sky btn-sm px-3" target="_blank" title="Cetak Kuitansi">
+                                                <i class="fas fa-print"></i>
+                                            </a>
+                                            {% endif %}
+
+                                            <a href="{{ url_for('payments.edit_bill_view', bill_id=b.id) }}"
+                                                class="btn btn-light btn-sm px-3 border-start" title="Edit">
                                                 <i class="fas fa-pen text-gray-600"></i>
                                             </a>
                                         </div>
@@ -300,7 +349,8 @@
                         <small class="text-white text-opacity-75">Silakan masukkan jumlah pembayaran</small>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <form id="payForm" method="post" action="">
                 <div class="modal-body p-4">
@@ -316,16 +366,18 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label fw-bold text-gray-700">Jumlah Pembayaran</label>
                         <div class="input-group input-group-lg shadow-sm">
                             <span class="input-group-text bg-white border-end-0 text-primary fw-bold">Rp</span>
-                            <input type="number" name="amount" id="payAmountInput" class="form-control border-start-0 ps-0 fw-bold" placeholder="0" required>
+                            <input type="number" name="amount" id="payAmountInput"
+                                class="form-control border-start-0 ps-0 fw-bold" placeholder="0" required>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <div class="form-text text-gray-500" id="remainingText">Sisa tagihan: Rp 0</div>
-                            <a href="#" class="form-text text-primary text-decoration-none fw-bold" id="btnPayFull">Bayar Lunas</a>
+                            <a href="#" class="form-text text-primary text-decoration-none fw-bold"
+                                id="btnPayFull">Bayar Lunas</a>
                         </div>
                     </div>
                 </div>
@@ -343,41 +395,41 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const payModal = new bootstrap.Modal(document.getElementById('payModal'));
-    const payForm = document.getElementById('payForm');
-    const payAmountInput = document.getElementById('payAmountInput');
-    const remainingText = document.getElementById('remainingText');
-    const modalStudentName = document.getElementById('modalStudentName');
-    const modalBillTitle = document.getElementById('modalBillTitle');
-    const btnPayFull = document.getElementById('btnPayFull');
+    document.addEventListener('DOMContentLoaded', function () {
+        const payModal = new bootstrap.Modal(document.getElementById('payModal'));
+        const payForm = document.getElementById('payForm');
+        const payAmountInput = document.getElementById('payAmountInput');
+        const remainingText = document.getElementById('remainingText');
+        const modalStudentName = document.getElementById('modalStudentName');
+        const modalBillTitle = document.getElementById('modalBillTitle');
+        const btnPayFull = document.getElementById('btnPayFull');
 
-    let currentRemaining = 0;
+        let currentRemaining = 0;
 
-    document.querySelectorAll('.btn-pay').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const billId = this.dataset.billId;
-            const title = this.dataset.billTitle;
-            const remaining = this.dataset.billRemaining;
-            const studentName = this.dataset.studentName;
+        document.querySelectorAll('.btn-pay').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const billId = this.dataset.billId;
+                const title = this.dataset.billTitle;
+                const remaining = this.dataset.billRemaining;
+                const studentName = this.dataset.studentName;
 
-            currentRemaining = parseInt(remaining);
-            payForm.action = "{{ url_for('payments.pay_bill_view', bill_id=0) }}".replace('/0', '/' + billId);
-            
-            modalStudentName.textContent = studentName;
-            modalBillTitle.textContent = title;
-            payAmountInput.value = remaining;
-            payAmountInput.max = remaining;
-            remainingText.textContent = `Sisa tagihan: Rp ${currentRemaining.toLocaleString('id-ID')}`;
-            
-            payModal.show();
+                currentRemaining = parseInt(remaining);
+                payForm.action = "{{ url_for('payments.pay_bill_view', bill_id=0) }}".replace('/0', '/' + billId);
+
+                modalStudentName.textContent = studentName;
+                modalBillTitle.textContent = title;
+                payAmountInput.value = remaining;
+                payAmountInput.max = remaining;
+                remainingText.textContent = `Sisa tagihan: Rp ${currentRemaining.toLocaleString('id-ID')}`;
+
+                payModal.show();
+            });
+        });
+
+        btnPayFull.addEventListener('click', function (e) {
+            e.preventDefault();
+            payAmountInput.value = currentRemaining;
         });
     });
-
-    btnPayFull.addEventListener('click', function(e) {
-        e.preventDefault();
-        payAmountInput.value = currentRemaining;
-    });
-});
 </script>
 {% endblock %}

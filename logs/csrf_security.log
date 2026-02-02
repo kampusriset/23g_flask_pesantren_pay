@@ -6,3 +6,6 @@
 2025-12-25 21:41:18,786 - WARNING - CSRF token validation failed - Endpoint: auth.login, Method: POST - IP: 127.0.0.1 - User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0
 2025-12-25 21:42:55,340 - WARNING - CSRF token validation failed - Endpoint: auth.login, Method: POST - IP: 127.0.0.1 - User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0
 2026-01-14 13:07:39,486 - WARNING - CSRF token validation failed - Endpoint: auth.login, Method: POST - IP: 127.0.0.1 - User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+2026-01-27 10:05:01,842 ERROR: Profile picture upload error: name 'update_user_profile_picture' is not defined [in D:\tugas\ponpay\23g_flask_pesantren_pay\routes.py:779]
+2026-01-27 10:05:54,346 ERROR: Profile picture upload error: name 'update_user_profile_picture' is not defined [in D:\tugas\ponpay\23g_flask_pesantren_pay\routes.py:779]
+2026-01-27 10:08:41,516 ERROR: Profile picture upload error: name 'update_user_profile_picture' is not defined [in D:\tugas\ponpay\23g_flask_pesantren_pay\routes.py:779]
