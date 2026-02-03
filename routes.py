@@ -233,6 +233,39 @@ def add():
             except (ValueError, TypeError):
                 student_id = None
         
+        # Server-side Validation
+        error_msg = None
+        if not trans_type:
+            error_msg = 'Jenis transaksi (Pemasukan/Pengeluaran) harus dipilih'
+        elif not category:
+            error_msg = 'Kategori harus dipilih'
+        elif amount <= 0:
+            error_msg = 'Nominal harus lebih dari 0'
+        elif not date:
+            error_msg = 'Tanggal harus diisi'
+            
+        if error_msg:
+            flash(error_msg, 'danger')
+            # Return template with entered values so user doesn't lose data
+            students = get_all_students()
+            students = [dict(s) for s in students] if students else []
+            categories_income = get_all_categories('income')
+            categories_expense = get_all_categories('expense')
+            categories_income = [dict(c) for c in categories_income] if categories_income else []
+            categories_expense = [dict(c) for c in categories_expense] if categories_expense else []
+            
+            return render_template('add_transaction.html', 
+                                   students=students, 
+                                   today=date if date else datetime.now().strftime('%Y-%m-%d'),
+                                   categories_income=categories_income,
+                                   categories_expense=categories_expense,
+                                   # Pass back values
+                                   prev_type=trans_type,
+                                   prev_category=category,
+                                   prev_amount=amount,
+                                   prev_description=description,
+                                   prev_student_id=student_id)
+
         # Insert transaksi dengan student_id
         trans_id = execute_db(
             '''INSERT INTO transactions (user_id, student_id, type, category, amount, description, date)
