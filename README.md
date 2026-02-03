@@ -7,6 +7,18 @@
 **PonPay** adalah aplikasi web manajemen keuangan dan pembayaran yang dirancang khusus untuk Pondok Pesantren Al Huda. Aplikasi ini memudahkan pengelolaan data santri, pencatatan transaksi (pemasukan & pengeluaran), pemantauan tunggakan SPP/tagihan, serta pelaporan keuangan yang transparan dan akuntabel.
 
 ---
+## Flowchart
+![WhatsApp Image 2026-02-03 at 15 16 57](https://github.com/user-attachments/assets/073eaef9-17a6-40e2-851a-daf3d699aa36)
+
+## Nama Tim
+1. Luky Susanto : logika aplikasi, kemudahan pemakaian dan desain awal
+2. Azmi Adam M : Pengembangan UI/UX utama, integrasi frontend dengan backend, serta pengelolaan struktur halaman
+3. Dikry Aljanata : penambah fitur, perbaikan bug
+4. Irwan Wahyu W : Perbaikan toogle sidebar dan Tampilan profile
+5. Bintang Aulia : menambahkan tampilan halaman login
+
+## Link Video Dokumentasi
+Anda dapat menonton video dokumentasi aplikasi melalui tautan berikut:https://bit.ly/KLIKSINIDONG
 
 ## ✨ Fitur Utama
 
@@ -45,19 +57,6 @@
 - **Ekspor Data**: Unduh laporan transaksi dalam format Excel.
 
 ---
-
-## Flowchart
-![WhatsApp Image 2026-02-03 at 15 16 57](https://github.com/user-attachments/assets/073eaef9-17a6-40e2-851a-daf3d699aa36)
-
-## Nama Tim
-1. Luky Susanto : logika aplikasi, kemudahan pemakaian dan desain awal
-2. Azmi Adam M : Pengembangan UI/UX utama, integrasi frontend dengan backend, serta pengelolaan struktur halaman
-3. Dikry Aljanata : penambah fitur, perbaikan bug
-4. Irwan Wahyu W : Perbaikan toogle sidebar dan Tampilan profile
-5. Bintang Aulia : menambahkan tampilan halaman login
-
-## Link Video Dokumentasi
-Anda dapat menonton video dokumentasi aplikasi melalui tautan berikut:https://bit.ly/KLIKSINIDONG
 
 ## 🛠️ Teknologi yang Digunakan
 
